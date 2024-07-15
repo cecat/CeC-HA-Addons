@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.7
+- Another attempt to fix the pesky mqtt version warning
+
 ## 1.0.6
 - (fixed typo in) attempt to address Deprecation Warning related to mqtt Callback API 
 
