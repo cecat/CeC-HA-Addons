@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.4
+- change the log messages to send the volume values rounded to 2 decimal places
+
 ## 1.0.3
 - change the mqtt publish to send the volume values rounded to 2 decimal places
 
