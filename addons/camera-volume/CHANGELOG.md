@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.5
+- attempt to address Deprecation Warning related to mqtt Callback API 
+
 ## 1.0.4
 - change the log messages to send the volume values rounded to 2 decimal places
 

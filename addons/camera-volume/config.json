@@ -1,7 +1,7 @@
 {
   "name": "Camera Volume",
   "description": "Extract audio volume levels from camera mics via RTSP streams using FFmpeg",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "slug": "camera-volume",
   "init": false,
   "arch": [
