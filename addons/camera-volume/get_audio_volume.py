@@ -115,15 +115,23 @@ while True:
 
             if mqtt_client.is_connected():
                 try:
-                    result = mqtt_client.publish("{}/{}_audio_volume_mean".format(mqtt_topic_prefix, camera_name), average_mean_volume)
+                    result = mqtt_client.publish(
+                        "{}/{}_audio_volume_mean".format(mqtt_topic_prefix, camera_name),
+                        "{:.2f}".format(average_mean_volume)
+                    )
                     result.wait_for_publish()
+
                     if result.rc == mqtt.MQTT_ERR_SUCCESS:
                         logger.info(f"Published mean volume for {camera_name}: {average_mean_volume}")
                     else:
                         logger.error(f"Failed to publish MQTT message for mean volume, return code: {result.rc}")
 
-                    result = mqtt_client.publish("{}/{}_audio_volume_max".format(mqtt_topic_prefix, camera_name), average_max_volume)
+                    result = mqtt_client.publish(
+                        "{}/{}_audio_volume_max".format(mqtt_topic_prefix, camera_name),
+                        "{:.2f}".format(average_max_volume)
+                    )
                     result.wait_for_publish()
+
                     if result.rc == mqtt.MQTT_ERR_SUCCESS:
                         logger.info(f"Published max volume for {camera_name}: {average_max_volume}")
                     else:
