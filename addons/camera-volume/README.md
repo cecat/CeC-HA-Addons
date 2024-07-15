@@ -9,7 +9,7 @@ cameras so it's far from proven.
 The addon uses ffmpeg to sample 5s of sound from the mic(s) every 10s,
 then to report max and mean volume via MQTT every 60s.
 
-# To install as a local addon:
+# To Configure this Addon
 
 1. Customize *cameravolume.yaml* with specifics regarding your MQTT broker address,
 MQTT username and password, and RTSP feeds. These will be the same feeds you use
