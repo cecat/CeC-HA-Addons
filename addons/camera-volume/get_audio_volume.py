@@ -122,7 +122,7 @@ while True:
                     result.wait_for_publish()
 
                     if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                        logger.info(f"Published mean volume for {camera_name}: {average_mean_volume}")
+                        logger.info(f"Published mean volume for {camera_name}: {average_mean_volume:.2f}")
                     else:
                         logger.error(f"Failed to publish MQTT message for mean volume, return code: {result.rc}")
 
@@ -133,7 +133,7 @@ while True:
                     result.wait_for_publish()
 
                     if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                        logger.info(f"Published max volume for {camera_name}: {average_max_volume}")
+                        logger.info(f"Published max volume for {camera_name}: {average_max_volume:.2f}")
                     else:
                         logger.error(f"Failed to publish MQTT message for max volume, return code: {result.rc}")
                 except Exception as e:
