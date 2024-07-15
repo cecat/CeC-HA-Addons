@@ -19,23 +19,6 @@ every 60s you can change the *stats_interval* value in this file.
 
 2. Move *cameravolume.yaml* to the */config* directory in Home Assistant
 
-3. If you don't already have */addons/local* in Home Assistant, create it. Then
-create a directory for this particular local addon, named *cameravolume*.
-Thus you now have */addons/local/cameravolume* in Home Assistant.
-
-4. Move all of the files in the *src* directory here into the */addons/local/caameravolume*
-directory in Home Assistant..
-
-5. Make sure the permissions are correct - in your */addons/local/cameravolume*
-directory in Home Assistant set them:
-```
-chmod 755 ./*
-```
-
-You should now be able to go to the Add-on store and see this add-on in the local
-section.  If not, select "Check for Updates" from the 3-dot icon at upper right, 
-then reload the page.  If it still does not show up, review the instructions above.
-
 # To use the addon measurements
 
 For each camera, the addon creates two MQTT topics of the form
