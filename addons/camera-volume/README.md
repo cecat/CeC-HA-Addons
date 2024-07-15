@@ -13,7 +13,7 @@ then to report max and mean volume via MQTT every 60s.
 
 1. Customize *cameravolume.yaml* with specifics regarding your MQTT broker address,
 MQTT username and password, and RTSP feeds. These will be the same feeds you use
-in Frigate (if you use Frigate), which may have embedded credentils
+in Frigate (if you use Frigate), which may have embedded credentials
 (so treat this as a secrets file). If you want to report less frequently than
 every 60s you can change the *stats_interval* value in this file.
 
