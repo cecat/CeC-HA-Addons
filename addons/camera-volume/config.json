@@ -19,6 +19,6 @@
   "map": [
     "config:rw"
   ],
-  "url": "https://github.com/cecat/camera-volume"
+  "url": "https://github.com/cecat/HASS/tree/main/addons/camera-volume"
 }
 
