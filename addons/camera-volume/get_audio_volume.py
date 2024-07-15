@@ -39,13 +39,13 @@ def get_audio_volume(rtsp_url, duration=5):
 
 # MQTT connection setup
 
-def on_connect(client, userdata, flags, reason_code, properties):
-    if reason_code == 0:
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
         logger.info("Connected to MQTT broker")
     else:
-        logger.error(f"Failed to connect to MQTT broker, reason code: {reason_code}")
+        logger.error(f"Failed to connect to MQTT broker, return code: {rc}")
 
-mqtt_client = mqtt.Client(client_id=mqtt_client_id, protocol=mqtt.MQTTv5, callback_api_version=mqtt.CallbackAPIVersion.VERSION2)
+mqtt_client = mqtt.Client(client_id=mqtt_client_id, protocol=mqtt.MQTTv5)
 mqtt_client.username_pw_set(mqtt_username, mqtt_password)
 mqtt_client.on_connect = on_connect
 
