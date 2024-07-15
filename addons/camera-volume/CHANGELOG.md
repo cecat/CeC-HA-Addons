@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.8
+- Revert to version 1.0.4 of the code, live to fight the warning another day.
+
 ## 1.0.7
 - Another attempt to fix the pesky mqtt version warning
 
