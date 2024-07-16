@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.a
+- Fixed formatting issue in README
+
 ## 1.0.9
 - Add some helpful comments to the python script and README
 
