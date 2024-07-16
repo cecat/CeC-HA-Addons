@@ -9,7 +9,11 @@ cameras so it's far from proven.
 The addon uses ffmpeg to sample 5s of sound from the mic(s) every 10s,
 then to report max and mean volume via MQTT every 60s.
 
-# To Configure this Addon
+## Add the add-on's repo (https://github.com/cecat/CeC-HA-Addons.git) to your Home Assistant
+
+[![Open your Home Assistant instance and show the add-on store.](https://my.home-assistant.io/badges/supervisor_store.svg)](https://my.home-assistant.io/redirect/supervisor_store/)
+
+## To Configure this Addon
 
 0. This addon assumes you are running a MQTT broker already. This code
 has (only) been tested with the open source
@@ -63,7 +67,7 @@ mqtt:
       unit_of_measurement: 'dB'
 ```
 
-# A Note about FFmpeg volume measurements
+## A Note about FFmpeg volume measurements
 
 FFmpeg measurements are in dBFS (decibels relative to Full Scale), where the maximum
 possible volume level (digitally, from the point of view of the microphone) is 0 dBFS.

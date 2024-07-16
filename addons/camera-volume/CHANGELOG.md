@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.9
+- Add some helpful comments to the python script and README
+
 ## 1.0.8
 - Revert to version 1.0.4 of the code, live to fight the warning another day.
 
