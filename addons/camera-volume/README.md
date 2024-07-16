@@ -9,9 +9,14 @@ cameras so it's far from proven.
 The addon uses ffmpeg to sample 5s of sound from the mic(s) every 10s,
 then to report max and mean volume via MQTT every 60s.
 
-## Add the add-on's repo (https://github.com/cecat/CeC-HA-Addons.git) to your Home Assistant
+## Add the add-on's repo  to your Home Assistant
 
 [![Open your Home Assistant instance and show the add-on store.](https://my.home-assistant.io/badges/supervisor_store.svg)](https://my.home-assistant.io/redirect/supervisor_store/)
+
+Add this repo:
+```
+https://github.com/cecat/CeC-HA-Addons.git
+```
 
 ## To Configure this Addon
 
