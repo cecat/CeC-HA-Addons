@@ -36,6 +36,8 @@ mqtt_stats_interval = mqtt_settings.get('stats_interval', 60)
 camera_settings = config.get('cameras', {})
 
 
+# Build the ffmpeg command(s) and parse its output
+
 def get_audio_volume(rtsp_url, duration=5):
     command = [
         'ffmpeg',
@@ -108,6 +110,9 @@ while True:
             if max_volume is not None:
                 max_samples.append(max_volume)
             time.sleep(sample_interval)
+
+	# we average the mean and max volume samples over the sample_interval reporting period,
+        # then we report to HASS via mqtt
 
         if mean_samples and max_samples:
             average_mean_volume = sum(mean_samples) / len(mean_samples)

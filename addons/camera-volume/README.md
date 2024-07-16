@@ -11,6 +11,11 @@ then to report max and mean volume via MQTT every 60s.
 
 # To Configure this Addon
 
+0. This addon assumes you are running a MQTT broker already. This code
+has (only) been tested with the open source
+[Mosquitto broker](https://github.com/home-assistant/addons/tree/master/mosquitto) 
+from the *Official add-ons* repository.
+
 1. Customize *cameravolume.yaml* with specifics regarding your MQTT broker address,
 MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), which may have embedded credentials
