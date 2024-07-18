@@ -25,11 +25,31 @@ has (only) been tested with the open source
 [Mosquitto broker](https://github.com/home-assistant/addons/tree/master/mosquitto) 
 from the *Official add-ons* repository.
 
-1. Customize *cameravolume.yaml* with specifics regarding your MQTT broker address,
+1. Create a file, *cameravolume.yaml* with specifics regarding your MQTT broker address,
 MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), which may have embedded credentials
 (so treat this as a secrets file). If you want to report less frequently than
-every 60s you can change the *stats_interval* value in this file.
+every 60s you can change the *stats_interval* value in this file.  This configuration
+file will look something like this:
+
+```
+mqtt:
+  host: "x.x.x.x"
+  port: 1883
+  topic_prefix: "HA/sensor"
+  client_id: "camvolume"
+  user: "mymqttusernameforcamvol"
+  password: "mymqttpasswordforcamvol"
+  stats_interval: 30
+cameras:
+  doorfrontcam:
+    ffmpeg:
+      path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
+  frontyardcam:
+    ffmpeg:
+      path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
+```
+
 
 2. Move *cameravolume.yaml* to the */config* directory in Home Assistant
 

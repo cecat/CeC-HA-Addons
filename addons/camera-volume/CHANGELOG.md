@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.b
+- Added detail about camervolume.yaml in README
+- Fixed a warning issue re formatting in config.yaml
+
 ## 1.0.a
 - Fixed formatting issue in README
 

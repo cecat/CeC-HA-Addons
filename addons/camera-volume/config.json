@@ -1,7 +1,7 @@
 {
   "name": "Camera Volume",
   "description": "Extract audio volume levels from camera mics via RTSP streams using FFmpeg",
-  "version": "1.0.a",
+  "version": "1.0.b",
   "slug": "camera-volume",
   "init": false,
   "arch": [
@@ -12,9 +12,7 @@
     "i386"
   ],
   "startup": "services",
-  "options": {
-    "configuration_note": "Configuration settings are in /config/cameravolume.yaml - please see instructions on the Info page."
-  },
+  "options": {},
   "schema": {},
   "logo": "logo.png",
   "icon": "icon.png",
