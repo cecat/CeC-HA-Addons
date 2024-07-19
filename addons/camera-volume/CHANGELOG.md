@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.d
+- Fix python coding error
+
 ## 1.0.c
 - Changed yaml structure of /config/cameravolume.yaml to be more yaml-compliant w.r.t. key nesting
 - Modified get_audio_volume.py to read new (more compliant) YAML structure
