@@ -103,6 +103,7 @@ while True:
     for camera_name, camera_config in camera_settings.items():
         mean_samples = []
         max_samples = []
+        rtsp_url = camera_config['ffmpeg']['inputs'][0]['path'] 
         for _ in range(mqtt_stats_interval // sample_interval):
             mean_volume, max_volume = get_audio_volume(camera_config['ffmpeg']['path'], duration=sample_interval)
             if mean_volume is not None:

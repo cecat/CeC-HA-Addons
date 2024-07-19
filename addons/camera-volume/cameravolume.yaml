@@ -38,4 +38,5 @@ mqtt:
 cameras:
   cam1:
     ffmpeg:
-      path: "rtsp://USER:PASSWORD@IP:554/cam/realmonitor?channel=1&subtype=1"
+      inputs:
+      - path: "rtsp://USER:PASSWORD@IP:554/cam/realmonitor?channel=1&subtype=1"

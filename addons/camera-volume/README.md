@@ -30,7 +30,7 @@ MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), which may have embedded credentials
 (so treat this as a secrets file). If you want to report less frequently than
 every 60s you can change the *stats_interval* value in this file.  This configuration
-file will look something like this:
+file will look something like below. Put this file into */config*.
 
 ```
 mqtt:
@@ -44,14 +44,15 @@ mqtt:
 cameras:
   doorfrontcam:
     ffmpeg:
-      path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
+      inputs:
+      - path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
   frontyardcam:
     ffmpeg:
-      path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
+      inputs:
+      - path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
 ```
 
 
-2. Move *cameravolume.yaml* to the */config* directory in Home Assistant
 
 # To use the addon measurements
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.c
+- Changed yaml structure of /config/cameravolume.yaml to be more yaml-compliant w.r.t. key nesting
+- Modified get_audio_volume.py to read new (more compliant) YAML structure
+- Updated README.md example for /config/cemaravolume.yaml (and updated the example)
+
 ## 1.0.b
 - Added detail about camervolume.yaml in README
 - Fixed a warning issue re formatting in config.yaml
