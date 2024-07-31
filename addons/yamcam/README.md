@@ -19,6 +19,8 @@ cameras and moreover on an Intel Celeron (that does not support Advanced Vector
 Extensions (AVX) instructions), so it's far from proven.  It's not yet clear
 to me that this will be useful in the end but it is worth a try.
 
+## Configuring this Add-on
+
 The code right now has very extensive logging as I am experimenting with things like
 sample frequency and thresholds.  For each sound source, at each reporting interval,
 we send a MQTT  message to HA of the form "Class (score), Class (score)..."
