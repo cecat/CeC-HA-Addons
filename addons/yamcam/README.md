@@ -36,6 +36,10 @@ every 60s you can change the *stats_interval* value in this file.  This configur
 file will look something like below. Put this file into */config*.
 
 ```
+general:
+  sample_interval: 15       # Sampling frequency (seconds)
+  reporting_threshold: 0.4  # Reporting threshold for sound type scores
+
 mqtt:
   host: "x.x.x.x"
   port: 1883
