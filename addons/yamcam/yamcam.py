@@ -12,9 +12,9 @@ import tflite_runtime.interpreter as tflite
 logging.basicConfig(level=logging.INFO)  # Change to INFO to reduce verbosity
 logger = logging.getLogger(__name__)
 
-logger.info("----------------Add-on Started.----------------")
+logger.info("----------------Add-on Started----------------")
 
-# Load user configuration from /config/microphones.yaml
+# Load configuration from /config/microphones.yaml
 config_path = '/config/microphones.yaml'
 if not os.path.exists(config_path):
     logger.error(f"Configuration file {config_path} does not exist.")
@@ -23,12 +23,12 @@ if not os.path.exists(config_path):
 with open(config_path) as f:
     config = yaml.safe_load(f)
 
-# Extract general parameters from user config
+# Extract general parameters 
 general_settings = config.get('general', {})
 sample_interval = general_settings.get('sample_interval', 15)
 reporting_threshold = general_settings.get('reporting_threshold', 0.4)
 
-# Extract MQTT settings from user config
+# Extract MQTT settings 
 mqtt_settings = config.get('mqtt', {})
 mqtt_host = mqtt_settings.get('host')
 mqtt_port = mqtt_settings.get('port')
@@ -38,10 +38,10 @@ mqtt_username = mqtt_settings.get('user')
 mqtt_password = mqtt_settings.get('password')
 mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
 
-# Log the MQTT settings being used
+# Log the MQTT settings we'll use
 logger.info(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
 
-# Extract camera settings from user config
+# Extract RTSP feeds (our sound sources)
 camera_settings = config.get('cameras', {})
 
 # MQTT connection setup
@@ -71,7 +71,7 @@ output_details = interpreter.get_output_details()
 logger.info(f"Input details: {input_details}")
 class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_map.csv', delimiter=',', dtype=str, skiprows=1, usecols=2)]
 
-# Function to analyze audio using YAMNet
+# Analyze audio samples using YAMNet
 def analyze_audio(rtsp_url, duration=10, retries=3):
     for attempt in range(retries):
         command = [
@@ -96,7 +96,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             # Normalize the volume
             waveform = waveform / np.max(np.abs(waveform))
 
-            # Ensure the waveform is reshaped to match the expected input shape
+            # Reshape the waveform to match what YAMNet expects
             expected_length = input_details[0]['shape'][0]
             if waveform.shape[0] > expected_length:
                 waveform = waveform[:expected_length]
@@ -119,7 +119,10 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
 
     return None  # Return None if all attempts fail
 
-# Main Loop
+#
+# Main Loop - loop through our sound sources
+#
+
 while True:                             
     for camera_name, camera_config in camera_settings.items():
         rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
