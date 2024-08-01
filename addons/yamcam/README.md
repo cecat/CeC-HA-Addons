@@ -15,11 +15,11 @@ view.  Detecting a tornado
 warning siren migth not be a bad thing either.
 
 This add-on has only been tested using RTSP feeds from Amcrest
-cameras and moreover on an Intel Celeron (that does not support Advanced Vector
+cameras and moreover on a Raspberry Pi 4 and an Intel Celeron
+(neither of which support Advanced Vector
 Extensions (AVX) instructions), so it's far from proven.  It's not yet clear
 to me that this will be useful in the end but it is worth a try.
 
-<<<<<<< HEAD
 ## Installing
 Be patient the first time you install...  It builds a pretty complicated
 image so the first time
@@ -30,8 +30,6 @@ right now just going for functionality))
 
 ## Configuring this Add-on
 
-=======
->>>>>>> parent of a957443 (clarify config)
 The code right now has very extensive logging as I am experimenting with things like
 sample frequency and thresholds.  For each sound source, at each reporting interval,
 we send a MQTT  message to HA of the form "Class (score), Class (score)..."
