@@ -39,9 +39,33 @@ try:
     general_settings = config['general']
     sample_interval = general_settings.get('sample_interval', 15)
     reporting_threshold = general_settings.get('reporting_threshold', 0.4)
+    log_level = general_settings.get('log_level', 'INFO').upper()
 except KeyError as e:
     logger.error(f"Missing general settings in the configuration file: {e}")
     raise
+
+## Set logging level 
+
+# Map log level from string to logging constant
+log_levels = {
+    'DEBUG': logging.DEBUG,
+    'INFO': logging.INFO,
+    'WARNING': logging.WARNING,
+    'ERROR': logging.ERROR,
+    'CRITICAL': logging.CRITICAL
+}
+
+# Use the logging level specified in the config file (default to INFO)
+if log_level in log_levels:
+    logger.setLevel(log_levels[log_level])
+    for handler in logger.handlers:
+        handler.setLevel(log_levels[log_level])
+    logger.info(f"Logging level set to {log_level}")
+else:
+    logger.warning(f"Invalid log level {log_level} in config file. Using INFO level.")
+    logger.setLevel(logging.INFO)
+    for handler in logger.handlers:
+        handler.setLevel(logging.INFO)
 
 ## Extract MQTT particulars
 
@@ -161,7 +185,7 @@ while True:
             # Log the scores for the top class names
             top_class_indices = np.argsort(scores[0])[::-1]
             for i in top_class_indices[:10]:  # Log top 10 scores for better insight
-                logger.info(f"Camera: {camera_name}, Class: {class_names[i]}, Score: {scores[0][i]}")
+                logger.debug(f"Camera: {camera_name}, Class: {class_names[i]}, Score: {scores[0][i]}")
 
             # Filter and format the top class names with their scores
             results = []

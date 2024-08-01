@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 0.0.c
+- set logging level (verbosity) in /config/microphones.yaml (defualt INFO)
+- log the individual classes found only in debug mode; in info just 
+  log what is reported (i.e., score above reporting_threshold)
+
 ## 0.0.b
 - make log messages more useful
 
