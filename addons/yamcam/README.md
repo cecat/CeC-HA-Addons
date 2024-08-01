@@ -14,10 +14,18 @@ or the lawn was being mowed, even if the action is outside of the camera's field
 view.  Detecting a tornado 
 warning siren migth not be a bad thing either.
 
-This add-on has only been tested on Amcrest
+This add-on has only been tested using RTSP feeds from Amcrest
 cameras and moreover on an Intel Celeron (that does not support Advanced Vector
 Extensions (AVX) instructions), so it's far from proven.  It's not yet clear
 to me that this will be useful in the end but it is worth a try.
+
+## Installing
+Be patient the first time you install...  It builds a pretty complicated
+image so the first time
+installation will take 5-10 minutes depending on the speed of your Internet
+connection and of your CPU (it took 13 minutes to build on an RPi-4).
+Subsequent updates will not take nearly so long. (I will try to improve this...
+right now just going for functionality))
 
 ## Configuring this Add-on
 
