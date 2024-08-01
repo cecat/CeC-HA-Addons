@@ -81,5 +81,7 @@ You will also see *yamnet_class_map.csv* in this subdirectory. This maps the
 return codes from Yamnet to the human-readable names for those classes. There are
 a whopping 521 sound classes.
 
+There is a Deprecation warning regarding the paho mqtt client and I've given up
+trying to address that for now, as even with GPT4o's help I could not fix it.
 
 
