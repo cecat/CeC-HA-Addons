@@ -7,7 +7,7 @@ import numpy as np
 import io
 import logging
 import tflite_runtime.interpreter as tflite
-import pandas as pd
+import csv
 
 # Set up logging
 logging.basicConfig(
@@ -21,7 +21,7 @@ logger.info("----------------> ")
 logger.info("----------------> Add-on Started.")
 logger.info("----------------> ")
 
-# Load user config- bail there are YAML problems
+# Load user config - bail if there are YAML problems
 config_path = '/config/microphones.yaml'
 if not os.path.exists(config_path):
     logger.error(f"Configuration file {config_path} does not exist.")
@@ -70,10 +70,14 @@ if not os.path.exists(class_map_path):
     raise FileNotFoundError(f"Class map file {class_map_path} does not exist.")
 
 try:
-    class_map_df = pd.read_csv(class_map_path)
-    class_map_df = class_map_df[['index', 'display_name', 'Group']]
-    class_map = dict(zip(class_map_df['index'], class_map_df['Group']))
-    display_names = dict(zip(class_map_df['index'], class_map_df['display_name']))
+    class_map = {}
+    with open(class_map_path, newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader)  # skip header
+        for row in reader:
+            index = int(row[0])
+            group = row[3]
+            class_map[index] = group
 except Exception as e:
     logger.error(f"Error reading class map file {class_map_path}: {e}")
     raise
