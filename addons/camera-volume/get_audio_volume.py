@@ -31,10 +31,9 @@ mqtt_password = mqtt_settings.get('password')
 mqtt_stats_interval = mqtt_settings.get('stats_interval', 60)
 
 
-# Extract camera settings from user config
+# Extract camera (audio sources) settings from user config
 
 camera_settings = config.get('cameras', {})
-
 
 # Build the ffmpeg command(s) and parse its output
 
