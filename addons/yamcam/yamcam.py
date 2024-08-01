@@ -84,7 +84,7 @@ except KeyError as e:
 
 ## Log the MQTT settings being used
 
-logger.info(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
+logger.debug(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
 
 ## Extract camera settings (sound sources) 
 
@@ -101,7 +101,7 @@ mqtt_client.username_pw_set(mqtt_username, mqtt_password)
 
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
-        logger.info("Connected to MQTT broker")
+        logger.debug("Connected to MQTT broker")
     else:
         logger.error("Failed to connect to MQTT broker")
 
@@ -115,12 +115,12 @@ except Exception as e:
 
 ### Load YAMNet model using TensorFlow Lite
 
-logger.info("Load YAMNet")
+logger.debug("Load YAMNet")
 interpreter = tflite.Interpreter(model_path="yamnet.tflite")
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-logger.info(f"Input details: {input_details}")
+logger.debug(f"Input details: {input_details}")
 class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_map.csv', delimiter=',', dtype=str, skiprows=1, usecols=2)]
 
 ### Function to analyze audio using YAMNet
@@ -197,6 +197,8 @@ while True:
                     break
 
             sound_types_str = ','.join(results)
+            if not sound_types_str: # if nothing scored high enough, log as "(none)"
+                sound_types_str = "(none)"
 
             if mqtt_client.is_connected():
                 try:
