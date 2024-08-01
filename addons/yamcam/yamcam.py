@@ -14,36 +14,51 @@ logger = logging.getLogger(__name__)
 
 logger.info("----------------Add-on Started.----------------")
 
-# Load user configuration from /config/microphones.yaml
+# Load user config
 config_path = '/config/microphones.yaml'
 if not os.path.exists(config_path):
     logger.error(f"Configuration file {config_path} does not exist.")
     raise FileNotFoundError(f"Configuration file {config_path} does not exist.")
 
-with open(config_path) as f:
-    config = yaml.safe_load(f)
+try:
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
+except yaml.YAMLError as e:
+    logger.error(f"Error reading YAML file {config_path}: {e}")
+    raise
 
-# Extract general parameters from user config
-general_settings = config.get('general', {})
-sample_interval = general_settings.get('sample_interval', 15)
-reporting_threshold = general_settings.get('reporting_threshold', 0.4)
+# Extract general parameters 
+try:
+    general_settings = config['general']
+    sample_interval = general_settings.get('sample_interval', 15)
+    reporting_threshold = general_settings.get('reporting_threshold', 0.4)
+except KeyError as e:
+    logger.error(f"Missing general settings in the configuration file: {e}")
+    raise
 
 # Extract MQTT settings from user config
-mqtt_settings = config.get('mqtt', {})
-mqtt_host = mqtt_settings.get('host')
-mqtt_port = mqtt_settings.get('port')
-mqtt_topic_prefix = mqtt_settings.get('topic_prefix')
-# mqtt_client_id = mqtt_settings.get('client_id')
-mqtt_client_id = "yamcamLocal"  # avoid colliding with official version
-mqtt_username = mqtt_settings.get('user')
-mqtt_password = mqtt_settings.get('password')
-mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
+try:
+    mqtt_settings = config['mqtt']
+    mqtt_host = mqtt_settings['host']
+    mqtt_port = mqtt_settings['port']
+    mqtt_topic_prefix = mqtt_settings['topic_prefix']
+    mqtt_client_id = "yamcamLocal"  # avoid colliding with official version
+    mqtt_username = mqtt_settings['user']
+    mqtt_password = mqtt_settings['password']
+    mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
+except KeyError as e:
+    logger.error(f"Missing MQTT settings in the configuration file: {e}")
+    raise
 
 # Log the MQTT settings being used
 logger.info(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
 
 # Extract camera settings from user config
-camera_settings = config.get('cameras', {})
+try:
+    camera_settings = config['cameras']
+except KeyError as e:
+    logger.error(f"Missing camera settings in the configuration file: {e}")
+    raise
 
 # MQTT connection setup
 mqtt_client = mqtt.Client(client_id=mqtt_client_id, protocol=mqtt.MQTTv5)

@@ -1,6 +1,13 @@
 
 # Changelog
 
+## 0.0.a
+- went back to working code, re-implemented the error handling
+  previous attempt introduced too much complexity.
+- check for yaml errors and, rather than fail...
+- provide log messages for cases where there are errors in the user's
+  config (/config/microphones.yaml), or if it's missing.
+
 ## 0.0.9
 - check for yaml errors and, rather than fail...
 - provide log messages for cases where there are errors in the user's
