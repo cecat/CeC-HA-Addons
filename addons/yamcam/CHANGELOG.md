@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 0.0.b
+- make log messages more useful
+
 ## 0.0.a
 - went back to working code, re-implemented the error handling
   previous attempt introduced too much complexity.
