@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 logger.info("----------------Add-on Started.----------------")
 
 # Load user config
+
 config_path = '/config/microphones.yaml'
 if not os.path.exists(config_path):
     logger.error(f"Configuration file {config_path} does not exist.")
@@ -27,7 +28,8 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
-# Extract general parameters 
+# Extract general parameters - bail there are YAML problems
+
 try:
     general_settings = config['general']
     sample_interval = general_settings.get('sample_interval', 15)
@@ -36,7 +38,8 @@ except KeyError as e:
     logger.error(f"Missing general settings in the configuration file: {e}")
     raise
 
-# Extract MQTT settings from user config
+# Extract MQTT particulars
+
 try:
     mqtt_settings = config['mqtt']
     mqtt_host = mqtt_settings['host']
@@ -51,9 +54,11 @@ except KeyError as e:
     raise
 
 # Log the MQTT settings being used
+
 logger.info(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
 
-# Extract camera settings from user config
+# Extract camera settings (sound sources) 
+
 try:
     camera_settings = config['cameras']
 except KeyError as e:
@@ -61,6 +66,7 @@ except KeyError as e:
     raise
 
 # MQTT connection setup
+
 mqtt_client = mqtt.Client(client_id=mqtt_client_id, protocol=mqtt.MQTTv5)
 mqtt_client.username_pw_set(mqtt_username, mqtt_password)
 
@@ -79,6 +85,7 @@ except Exception as e:
     logger.error(f"Failed to connect to MQTT broker: {e}")
 
 # Load YAMNet model using TensorFlow Lite
+
 logger.info("Load YAMNet")
 interpreter = tflite.Interpreter(model_path="yamnet.tflite")
 interpreter.allocate_tensors()
@@ -88,6 +95,7 @@ logger.info(f"Input details: {input_details}")
 class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_map.csv', delimiter=',', dtype=str, skiprows=1, usecols=2)]
 
 # Function to analyze audio using YAMNet
+
 def analyze_audio(rtsp_url, duration=10, retries=3):
     for attempt in range(retries):
         command = [
@@ -112,7 +120,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             # Normalize the volume
             waveform = waveform / np.max(np.abs(waveform))
 
-            # Ensure the waveform is reshaped to match the expected input shape
+            # Reshape the waveform to match yamnet's expected input shape
             expected_length = input_details[0]['shape'][0]
             if waveform.shape[0] > expected_length:
                 waveform = waveform[:expected_length]
@@ -135,7 +143,10 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
 
     return None  # Return None if all attempts fail
 
+#
 # Main Loop
+#
+
 while True:                             
     for camera_name, camera_config in camera_settings.items():
         rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
