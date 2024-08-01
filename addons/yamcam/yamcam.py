@@ -76,7 +76,7 @@ try:
     mqtt_host = mqtt_settings['host']
     mqtt_port = mqtt_settings['port']
     mqtt_topic_prefix = mqtt_settings['topic_prefix']
-    mqtt_client_id = mqtt_settings['client_id']
+    mqtt_client_id = "yamcamLocal"  # avoid colliding with official version
     mqtt_username = mqtt_settings['user']
     mqtt_password = mqtt_settings['password']
     mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
@@ -123,7 +123,7 @@ interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 logger.debug(f"Input details: {input_details}")
-class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_groups.csv', delimiter=',', dtype=str, skiprows=1, usecols=3)]
+class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_map.csv', delimiter=',', dtype=str, skiprows=1, usecols=2)]
 
 ### Function to analyze audio using YAMNet
 
