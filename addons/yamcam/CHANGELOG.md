@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 0.0.d
+- added 4th column to yamnet_class_map.csv to group classes into a smaller
+  number of 'super-classes' such as "people," "bird," "weather," or "vehicle."
+
 ## 0.0.c
 - set logging level (verbosity) in /config/microphones.yaml (defualt INFO)
 - log the individual classes found only in debug mode; in info just 
