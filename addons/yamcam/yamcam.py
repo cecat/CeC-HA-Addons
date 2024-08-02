@@ -211,7 +211,7 @@ while True:
                     result.wait_for_publish()
                                                                                        
                     if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                        logger.info(f"Published sound types for {camera_name}: {sound_types_str}")
+                        logger.info(f"{camera_name}: {sound_types_str}")
                     else:      
                         logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
                 except Exception as e:
