@@ -26,7 +26,7 @@ image so the first time
 installation will take 5-10 minutes depending on the speed of your Internet
 connection and of your CPU (it took 13 minutes to build on an RPi-4).
 Subsequent updates will not take nearly so long. (I will try to improve this...
-right now just going for functionality))
+right now just going for functionality)
 
 ## Configuring this Add-on
 
@@ -39,26 +39,29 @@ has (only) been tested with the open source
 [Mosquitto broker](https://github.com/home-assistant/addons/tree/master/mosquitto) 
 from the *Official add-ons* repository.
 
-1. Create a file, *microphones.yaml* with specifics regarding your MQTT broker address,
+1. Create a file -  *microphones.yaml* - with specifics regarding your MQTT broker address,
 MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), which may have embedded credentials
-(so treat this as a secrets file). If you want to report less frequently than
-every 60s you can change the *stats_interval* value in this file.  This configuration
-file will look something like below. Put this file into */config*.
+(so treat this as a secrets file). If you want to adjust the sampling and/or
+reporting frequency, or the minimum score, you can do this in *microphones.yaml*.
+This configuration file will look something like below. Put this file into */config*.
 
 ```
 general:
   sample_interval: 15       # Sampling frequency (seconds)
   reporting_threshold: 0.4  # Reporting threshold for sound type scores
+  log_level: INFO           # Change to WARNING, ERROR, CRITICAL for increasing verbosity
 
 mqtt:
   host: "x.x.x.x"
   port: 1883
-  topic_prefix: "HA/sensor"
-  client_id: "yamcam"
-  user: "mymqttusernameforcamvol"
-  password: "mymqttpasswordforcamvol"
-  stats_interval: 30
+  topic_prefix: "HA/sensor" # adjust to your taste
+  client_id: "yamcam"       # adjust to your taste
+  user: "mymqttusername"    # your mqtt username 
+  password: "mymqttpassword"#         & password
+  stats_interval: 30        # how often to report (via mqtt) to HA
+
+# coupla examples of Amcrest cam rtsp feeds
 cameras:
   doorfrontcam:
     ffmpeg:
