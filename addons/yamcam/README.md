@@ -4,6 +4,8 @@ July 2024
 
 ---
 
+### This is still a work in progress
+It's basically working but I am still finding issues to fix...
 
 Use TensorFlow Lite and the YAMNet sound model to characterize 
 sounds deteced by  microphones on remote cameras.
