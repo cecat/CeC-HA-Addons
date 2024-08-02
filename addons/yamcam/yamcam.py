@@ -7,7 +7,7 @@ import numpy as np
 import io
 import logging
 import tflite_runtime.interpreter as tflite
-import pandas as pd
+import csv
 
 ### Set up logging
 logging.basicConfig(
@@ -126,11 +126,15 @@ output_details = interpreter.get_output_details()
 logger.debug(f"Input details: {input_details}")
 
 #class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_map.csv', delimiter=',', dtype=str, skiprows=1, usecols=3)]
-# use pandas to deal with col2 instances of quoted strings w/ commas
-namef = pd.read_csv('yamnet_class_map.csv')
+# use csv to deal with col2 instances of quoted strings w/ commas
 
-# Extract the required column
-class_names = namef.iloc[:, 3].str.strip('"').tolist()
+class_names = []
+with open('yamnet_class_map.csv', 'r') as file:
+    reader = csv.reader(file)
+    next(reader)  # Skip the header
+    for row in reader:
+        class_names.append(row[3].strip('"'))
+
 
 ### Function to analyze audio using YAMNet
 
