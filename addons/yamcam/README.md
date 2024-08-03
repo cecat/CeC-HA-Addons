@@ -50,15 +50,17 @@ This configuration file will look something like below. Put this file into */con
 
 ```
 general:
-  sample_interval: 15       # Sampling frequency (seconds)
+  sample_interval: 15       # Sampling interval (seconds)
   reporting_threshold: 0.4  # Reporting threshold for sound type scores
   log_level: INFO           # Change to WARNING, ERROR, CRITICAL for increasing verbosity
+  top_k: 3                  # Number of top scoring classes to report
+
 
 mqtt:
   host: "x.x.x.x"
   port: 1883
   topic_prefix: "HA/sensor" # adjust to your taste
-  client_id: "yamcam"       # adjust to your taste
+  client_id: "yamcam"       # unique, adjust to your taste
   user: "mymqttusername"    # your mqtt username 
   password: "mymqttpassword"#         & password
   stats_interval: 30        # how often to report (via mqtt) to HA

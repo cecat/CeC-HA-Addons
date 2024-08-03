@@ -9,6 +9,22 @@ import logging
 import tflite_runtime.interpreter as tflite
 import csv
 
+### setup
+
+config_path = '/config/microphones.yaml'
+class_map_path = 'yamnet_class_map.csv'
+model_path = 'yamnet.tflite'
+
+
+# Map log level from string to logging constant
+log_levels = {
+    'DEBUG': logging.DEBUG,
+    'INFO': logging.INFO,
+    'WARNING': logging.WARNING,
+    'ERROR': logging.ERROR,
+    'CRITICAL': logging.CRITICAL
+}
+
 ### Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -24,7 +40,6 @@ logger.info("----------------> ")
 
 ### Load user config- bail there are YAML problems
 
-config_path = '/config/microphones.yaml'
 if not os.path.exists(config_path):
     logger.error(f"Configuration file {config_path} does not exist.")
     raise FileNotFoundError(f"Configuration file {config_path} does not exist.")
@@ -36,7 +51,7 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
-## Extract general parameters 
+## Extract general parameters (defaults if not present)
 
 try:
     general_settings = config['general']
@@ -49,14 +64,6 @@ except KeyError as e:
 
 ## Set logging level 
 
-# Map log level from string to logging constant
-log_levels = {
-    'DEBUG': logging.DEBUG,
-    'INFO': logging.INFO,
-    'WARNING': logging.WARNING,
-    'ERROR': logging.ERROR,
-    'CRITICAL': logging.CRITICAL
-}
 
 # Use the logging level specified in the config file (default to INFO)
 if log_level in log_levels:
@@ -119,7 +126,8 @@ except Exception as e:
 ### Load YAMNet model using TensorFlow Lite
 
 logger.debug("Load YAMNet")
-interpreter = tflite.Interpreter(model_path="yamnet.tflite")
+#interpreter = tflite.Interpreter(model_path="yamnet.tflite")
+interpreter = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
@@ -129,7 +137,8 @@ logger.debug(f"Input details: {input_details}")
 # use csv to deal with col2 instances of quoted strings w/ commas
 
 class_names = []
-with open('yamnet_class_map.csv', 'r') as file:
+#with open('yamnet_class_map.csv', 'r') as file:
+with open(class_map_path, 'r') as file:
     reader = csv.reader(file)
     next(reader)  # Skip the header
     for row in reader:
