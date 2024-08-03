@@ -1,0 +1,24 @@
+{
+  "name": "YAMNet Camera Sounds (TPU)",
+  "description": "Analyze audio from camera mics via RTSP streams to detect sound types using YAMNet (TPU support)",
+  "version": "0.0.d",
+  "slug": "yamcamTPU",
+  "init": false,
+  "arch": [
+    "aarch64",
+    "amd64",
+    "armhf",
+    "armv7",
+    "i386"
+  ],
+  "startup": "services",
+  "options": {},
+  "schema": {},
+  "logo": "logo.png",
+  "icon": "icon.png",
+  "map": [
+    "config:rw"
+  ],
+  "url": "https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam-tpu"
+}
+
