@@ -58,6 +58,7 @@ try:
     sample_interval = general_settings.get('sample_interval', 15)
     reporting_threshold = general_settings.get('reporting_threshold', 0.4)
     log_level = general_settings.get('log_level', 'INFO').upper()
+    top_k = general_settings.get('top_k', 3)
 except KeyError as e:
     logger.error(f"Missing general settings in the configuration file: {e}")
     raise
