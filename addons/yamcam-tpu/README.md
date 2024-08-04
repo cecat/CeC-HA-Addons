@@ -1,11 +1,14 @@
-# Camera-sounds add-on for Home Assistant
+# Camera-sounds add-on for Home Assistant (w/ TPU support)
 CeC
 July 2024
 
 ---
 
-### This is still a work in progress
-It's basically working but I am still finding issues to fix...
+### This is not yet working
+
+this version is intended to support the Coral TPU for inference.
+
+
 
 Use TensorFlow Lite and the YAMNet sound model to characterize 
 sounds deteced by  microphones on remote cameras.
