@@ -11,7 +11,6 @@
     "armv7",
     "i386"
   ],
-  "image": "your_dockerhub_username/addon_name",
   "startup": "services",
   "options": {},
   "schema": {},
@@ -22,4 +21,3 @@
   ],
   "url": "https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam-tpu"
 }
-
