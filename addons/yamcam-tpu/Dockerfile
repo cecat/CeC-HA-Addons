@@ -1,24 +1,37 @@
+# Dockerfile for Home Assistant Addon with YAMNet TPU support
+
+# Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
-WORKDIR /app
+# Set the working directory in the container
+WORKDIR /usr/src/app
 
-# Install system dependencies
+# Copy the current directory contents into the container at /usr/src/app
+COPY . .
+
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    libsndfile1 \
-    wget \
+    gnupg \
+    curl \
+    && echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+    && apt-get update \
+    && apt-get install -y libedgetpu1-std \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install TensorFlow Lite runtime and compatible NumPy version
-RUN pip install --no-cache-dir tflite-runtime 'numpy<2.0' paho-mqtt pyyaml
+# Install any needed packages specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the local model and class map files from the subdirectory
-COPY files/yamnet.tflite .
-COPY files/yamnet_class_map.csv .
+# Install TensorFlow Lite runtime with TPU support
+RUN pip install tflite-runtime
 
-# Copy the yamcam.py script
-COPY yamcam.py .
+# Make port 80 available to the world outside this container
+EXPOSE 80
 
-# Set entrypoint
-CMD ["python", "yamcam-tpu.py"]
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
+CMD ["python", "./yamcam-tpu.py"]
 

@@ -1,12 +1,12 @@
 # Camera-sounds add-on for Home Assistant (w/ TPU support)
 CeC
-July 2024
+Aug 2024
 
 ---
 
-### This is not yet working
+### This is not yet working - don't install it. 
 
-this version is intended to support the Coral TPU for inference.
+this version is being modified to support the Coral TPU for inference.
 
 
 
