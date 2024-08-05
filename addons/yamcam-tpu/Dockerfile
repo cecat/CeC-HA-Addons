@@ -1,32 +1,29 @@
-# Dockerfile for Home Assistant Addon with YAMNet TPU support
+FROM python:3.9-slim
 
-# Use an official Python runtime as a parent image
-FROM python:3.9-alpine
-
-# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the current directory contents into the container at /usr/src/app
 COPY . .
 
-# Install dependencies using apk
-RUN apk update && apk add --no-cache \
+# Install dependencies using apt
+RUN apt-get update && apt-get install -y \
     gnupg \
     curl \
     bash \
-    && echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && apk add --no-cache libedgetpu@edge \
-    && apk add --no-cache --virtual .build-deps build-base \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip install tflite-runtime \
-    && apk del .build-deps
+    && echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+    && apt-get update \
+    && apt-get install -y libedgetpu1-std \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Make port 80 available to the world outside this container
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install TensorFlow Lite runtime with TPU support
+RUN pip install tflite-runtime
+
 EXPOSE 80
 
-# Define environment variable
 ENV NAME World
 
-# Run yamcam-tpu.py when the container launches
 CMD ["python", "./yamcam-tpu.py"]
 
