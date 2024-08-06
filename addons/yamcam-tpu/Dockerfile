@@ -1,24 +1,23 @@
-# Dockerfile for Home Assistant Addon with YAMNet TPU support
+FROM python:3.9-slim
 
-# Use an official Python runtime as a parent image
-FROM python:3.9-alpine
+WORKDIR /app
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy the current directory contents into the container at /usr/src/app
-COPY . .
+# Install TensorFlow Lite runtime and compatible NumPy version
+RUN pip install --no-cache-dir tflite-runtime 'numpy<2.0' paho-mqtt pyyaml
 
-# Install bash and necessary Python packages
-RUN apk update && apk add --no-cache bash \
-    && pip install --no-cache-dir paho-mqtt pyyaml tensorflow tflite-runtime
+# Copy the local model and class map files from the subdirectory
+COPY files/yamnet.tflite .
+COPY files/yamnet_class_map.csv .
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
+# Copy the yamcam.py script
+COPY yamcam-tpu.py .
 
-# Define environment variable
-ENV NAME World
-
-# Run yamcam-tpu.py when the container launches
-CMD ["python", "./yamcam-tpu.py"]
-
+# Set entrypoint
+CMD ["python", "yamcam-tpu.py"]
