@@ -1,32 +1,41 @@
-FROM python:3.9-alpine
+# Base image
+FROM python:3.9-slim
 
-WORKDIR /app
-
-# Install system dependencies using apk
-RUN apk update && apk add --no-cache \
-    ffmpeg \
-    libsndfile \
-    wget \
-    gnupg \
+# Add existing dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libffi-dev \
+    libssl-dev \
+    libyaml-dev \
+    libpython3-dev \
+    python3-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
+    git \
     curl \
-    bash
+    wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Add the Edge TPU repository
-RUN echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+# Add Coral TPU dependencies
+RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+    && apt-get update && apt-get install -y \
+    libedgetpu1-std \
+    libusb-1.0-0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Update apk and install libedgetpu1-std package
-RUN apk update && apk add --no-cache libedgetpu1-std@edge
+# Install Python dependencies
+COPY requirements.txt /
+RUN pip install --no-cache-dir -r /requirements.txt
 
-# Install TensorFlow Lite runtime and compatible NumPy version
-RUN pip install --no-cache-dir tflite-runtime 'numpy<2.0' paho-mqtt pyyaml
+# Copy the application code
+COPY run.sh /
+COPY yamcam-tpu.py /
+COPY yamnet_class_groups.csv /files/
 
-# Copy the local model and class map files from the subdirectory
-COPY files/yamnet.tflite .
-COPY files/yamnet_class_map.csv .
-
-# Copy the yamcam-tpu.py script
-COPY yamcam-tpu.py .
-
-# Set entrypoint
-CMD ["python", "yamcam-tpu.py"]
+# Set the entrypoint
+ENTRYPOINT ["/run.sh"]
 
