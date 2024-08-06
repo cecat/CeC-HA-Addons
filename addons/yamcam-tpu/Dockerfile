@@ -11,7 +11,7 @@ COPY . .
 
 # Install bash and necessary Python packages
 RUN apk update && apk add --no-cache bash \
-    && pip install --no-cache-dir paho-mqtt
+    && pip install --no-cache-dir paho-mqtt pyyaml tensorflow tflite-runtime
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
