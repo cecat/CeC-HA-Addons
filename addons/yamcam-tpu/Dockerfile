@@ -9,12 +9,11 @@ WORKDIR /usr/src/app
 # Copy the current directory contents into the container at /usr/src/app
 COPY . .
 
-# Log the current environment and install Python dependencies specified in requirements.txt
-RUN echo "Current Environment:" && env \
-    && echo "Installing bash" \
-    && apk add --no-cache bash \
-    && echo "Installing Python dependencies" \
-    && pip install --no-cache-dir -r requirements.txt
+# Install bash
+RUN apk update && apk add --no-cache bash
+
+# Install Python dependencies specified in requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
