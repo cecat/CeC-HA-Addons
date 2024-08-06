@@ -11,10 +11,11 @@ RUN apk update && apk add --no-cache \
     curl \
     bash
 
-# Add the Edge TPU repository and install the libedgetpu1-std package
-RUN echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && apk update \
-    && apk add --no-cache libedgetpu1-std@edge
+# Add the Edge TPU repository
+RUN echo "@edge http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
+
+# Update apk and install libedgetpu1-std package
+RUN apk update && apk add --no-cache libedgetpu1-std@edge
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 RUN pip install --no-cache-dir tflite-runtime 'numpy<2.0' paho-mqtt pyyaml
