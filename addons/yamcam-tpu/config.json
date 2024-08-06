@@ -2,7 +2,7 @@
   "name": "YAMNet Camera Sounds (TPU)",
   "description": "Analyze audio from camera mics via RTSP streams to detect sound types using YAMNet (TPU support)",
   "version": "0.0.0",
-  "slug": "yamcamTPU",
+  "slug": "yamcamtpu",
   "init": false,
   "arch": [
     "aarch64",
