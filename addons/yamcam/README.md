@@ -87,8 +87,12 @@ which I downloaded from the
 [TensorFlow hub](https://www.kaggle.com/models/google/yamnet/tfLite/classification-tflite/1?lite-format=tflite&tfhub-redirect=true).
 
 You will also see *yamnet_class_map.csv* in this subdirectory. This maps the
-return codes from Yamnet to the human-readable names for those classes. There are
-a whopping 521 sound classes.
+return codes from Yamnet to the human-readable names for those classes. Yamnet has
+a whopping 521 sound classes.  I've added a column to the original yamnet_class_map.csv
+that groups related sounds, creating a composite of the group and the original class of the
+form group.class but (a) making everything lower case and (b) keeping only the first word
+of the original class name.  So the Yamnet class *Middle Eastern music* is grouped into
+my *music* group and will be reported by the addon as *music.middle*.
 
 There is a Deprecation warning regarding the paho mqtt client and I've 
 put debugging that on hold. Even with Gemini's and GPT4o's help I've been stumped

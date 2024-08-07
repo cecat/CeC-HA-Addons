@@ -1,522 +1,522 @@
 index,mid,display_name,Group
-329,/m/0k5j,Aircraft,Aircraft.Aircraft
-330,/m/014yck,Aircraft engine,Aircraft.Aircraft
-331,/m/04229,Jet engine,Aircraft.Jet
-332,/m/02l6bg,"Propeller, airscrew",Aircraft.Propeller
-333,/m/09ct_,Helicopter,Aircraft.Helicopter
-334,/m/0cmf2,"Fixed-wing aircraft, airplane",Aircraft.Fixed-wing
-11,/m/03qc9zr,Screaming,Alert.Screaming
-19,/m/0463cq4,"Crying, sobbing",Alert.Crying
-22,/m/07qw_06,"Wail, moan",Alert.Wail
-292,/m/02_41,Fire,Alert.Fire
-293,/m/07pzfmf,Crackle,Alert.Crackle
-304,/m/02mfyn,Car alarm,Alert.Car
-316,/m/03j1ly,Emergency vehicle,Alert.Emergency
-317,/m/04qvtq,Police car (siren),Alert.Police
-318,/m/012n7d,Ambulance (siren),Alert.Ambulance
-319,/m/012ndj,"Fire engine, fire truck (siren)",Alert.Fire
-382,/m/07pp_mv,Alarm,Alert.Alarm
-383,/m/07cx4,Telephone,Alert.Telephone
-384,/m/07pp8cl,Telephone bell ringing,Alert.Telephone
-385,/m/01hnzm,Ringtone,Alert.Ringtone
-389,/m/046dlr,Alarm clock,Alert.Alarm
-390,/m/03kmc9,Siren,Alert.Siren
-391,/m/0dgbq,Civil defense siren,Alert.Civil
-392,/m/030rvx,Buzzer,Alert.Buzzer
-393,/m/01y3hg,"Smoke detector, smoke alarm",Alert.Smoke
-394,/m/0c3f7m,Fire alarm,Alert.Fire
-395,/m/04fq5q,Foghorn,Alert.Foghorn
-396,/m/0l156k,Whistle,Alert.Whistle
-397,/m/06hck5,Steam whistle,Alert.Steam
-420,/m/014zdl,Explosion,Alert.Explosion
-421,/m/032s66,"Gunshot, gunfire",Alert.Gunshot
-422,/m/04zjc,Machine gun,Alert.Machine
-423,/m/02z32qm,Fusillade,Alert.Fusillade
-424,/m/0_1c,Artillery fire,Alert.Artillery
-425,/m/073cg4,Cap gun,Alert.Cap
-426,/m/0g6b5,Fireworks,Alert.Fireworks
-427,/g/122z_qxw,Firecracker,Alert.Firecracker
-428,/m/07qsvvw,"Burst, pop",Alert.Burst
-429,/m/07pxg6y,Eruption,Alert.Eruption
-430,/m/07qqyl4,Boom,Alert.Boom
-437,/m/07rn7sz,Shatter,Alert.Shatter
-451,/m/0790c,Sonar,Alert.Sonar
-460,/m/07pws3f,Bang,Alert.Bang
-463,/m/07pjjrj,"Smash, crash",Alert.Smash
-464,/m/07pc8lb,Breaking,Alert.Breaking
-67,/m/0jbk,Animal,Animals.Animal
-68,/m/068hy,"Domestic animals, pets",Animals.Domestic
-69,/m/0bt9lr,Dog,Animals.Dog
-70,/m/05tny_,Bark,Animals.Bark
-71,/m/07r_k2n,Yip,Animals.Yip
-72,/m/07qf0zm,Howl,Animals.Howl
-73,/m/07rc7d9,Bow-wow,Animals.Bow-wow
-74,/m/0ghcn6,Growling,Animals.Growling
-75,/t/dd00136,Whimper (dog),Animals.Whimper
-76,/m/01yrx,Cat,Animals.Cat
-77,/m/02yds9,Purr,Animals.Purr
-78,/m/07qrkrw,Meow,Animals.Meow
-79,/m/07rjwbb,Hiss,Animals.Hiss
-80,/m/07r81j2,Caterwaul,Animals.Caterwaul
-81,/m/0ch8v,"Livestock, farm animals, working animals",Animals.Livestock
-82,/m/03k3r,Horse,Animals.Horse
-83,/m/07rv9rh,Clip-clop,Animals.Clip-clop
-84,/m/07q5rw0,"Neigh, whinny",Animals.Neigh
-85,/m/01xq0k1,"Cattle, bovinae",Animals.Cattle
-86,/m/07rpkh9,Moo,Animals.Moo
-87,/m/0239kh,Cowbell,Animals.Cowbell
-88,/m/068zj,Pig,Animals.Pig
-89,/t/dd00018,Oink,Animals.Oink
-90,/m/03fwl,Goat,Animals.Goat
-91,/m/07q0h5t,Bleat,Animals.Bleat
-92,/m/07bgp,Sheep,Animals.Sheep
-93,/m/025rv6n,Fowl,Animals.Fowl
-94,/m/09b5t,"Chicken, rooster",Animals.Chicken
-95,/m/07st89h,Cluck,Animals.Cluck
-96,/m/07qn5dc,"Crowing, cock-a-doodle-doo",Animals.Crowing
-97,/m/01rd7k,Turkey,Animals.Turkey
-98,/m/07svc2k,Gobble,Animals.Gobble
-103,/m/01280g,Wild animals,Animals.Wild
-104,/m/0cdnk,"Roaring cats (lions, tigers)",Animals.Roaring
-105,/m/04cvmfc,Roar,Animals.Roar
-117,/m/01z5f,"Canidae, dogs, wolves",Animals.Canidae
-118,/m/06hps,"Rodents, rats, mice",Animals.Rodents
-119,/m/04rmv,Mouse,Animals.Mouse
-120,/m/07r4gkf,Patter,Animals.Patter
-127,/m/09ld4,Frog,Animals.Frog
-128,/m/07st88b,Croak,Animals.Croak
-129,/m/078jl,Snake,Animals.Snake
-130,/m/07qn4z3,Rattle,Animals.Rattle
-131,/m/032n05,Whale vocalization,Animals.Whale
-99,/m/09ddx,Duck,Birds.Duck
-100,/m/07qdb04,Quack,Birds.Quack
-101,/m/0dbvp,Goose,Birds.Goose
-102,/m/07qwf61,Honk,Birds.Honk
-106,/m/015p6,Bird,Birds.Bird
-107,/m/020bb7,"Bird vocalization, bird call, bird song",Birds.Bird
-108,/m/07pggtn,"Chirp, tweet",Birds.Chirp
-109,/m/07sx8x_,Squawk,Birds.Squawk
-110,/m/0h0rv,"Pigeon, dove",Birds.Pigeon
-111,/m/07r_25d,Coo,Birds.Coo
-112,/m/04s8yn,Crow,Birds.Crow
-113,/m/07r5c2p,Caw,Birds.Caw
-114,/m/09d5_,Owl,Birds.Owl
-115,/m/07r_80w,Hoot,Birds.Hoot
-116,/m/05_wcq,"Bird flight, flapping wings",Birds.Bird
-296,/m/0hsrw,"Sailboat, sailing ship",Boats.Sailboat
-297,/m/056ks2,"Rowboat, canoe, kayak",Boats.Rowboat
-298,/m/02rlv9,"Motorboat, speedboat",Vehicles.Motorboat
-299,/m/06q74,Ship,Boats.Ship
-121,/m/03vt0,Insect,Bugs.Insect
-122,/m/09xqv,Cricket,Bugs.Cricket
-123,/m/09f96,Mosquito,Bugs.Mosquito
-124,/m/0h2mp,"Fly, housefly",Bugs.Fly
-125,/m/07pjwq1,Buzz,Bugs.Buzz
-126,/m/01h3n,"Bee, wasp, etc.",Bugs.Bee
-359,/m/023pjk,"Cutlery, silverware",Cooking.Cutlery
-360,/m/07pn_8q,Chopping (food),Cooking.Chopping
-361,/m/0dxrf,Frying (food),Cooking.Frying
-362,/m/0fx9l,Microwave oven,Cooking.Microwave
-363,/m/02pjr4,Blender,Cooking.Blender
-364,/m/02jz0l,"Water tap, faucet",Cooking.Water
-365,/m/0130jx,Sink (filling or washing),Cooking.Sink
-366,/m/03dnzn,Bathtub (filling or washing),Domestic.Bathtub
-367,/m/03wvsk,Hair dryer,Domestic.Hair
-368,/m/01jt3m,Toilet flush,Domestic.Toilet
-369,/m/012xff,Toothbrush,Domestic.Toothbrush
-370,/m/04fgwm,Electric toothbrush,Domestic.Electric
-371,/m/0d31p,Vacuum cleaner,Domestic.Vacuum
-375,/m/01lsmm,Scissors,Domestic.Scissors
-376,/m/02g901,"Electric shaver, electric razor",Domestic.Electric
-377,/m/05rj2,Shuffling cards,Domestic.Shuffling
-378,/m/0316dw,Typing,Domestic.Typing
-379,/m/0c2wf,Typewriter,Domestic.Typewriter
-380,/m/01m2v,Computer keyboard,Domestic.Computer
-381,/m/081rb,Writing,Domestic.Writing
-386,/m/02c8p,"Telephone dialing, DTMF",Domestic.Telephone
-387,/m/015jpf,Dial tone,Domestic.Dial
-388,/m/01z47d,Busy signal,Domestic.Busy
-400,/m/01x3z,Clock,Domestic.Clock
-401,/m/07qjznt,Tick,Domestic.Tick
-402,/m/07qjznl,Tick-tock,Domestic.Tick-tock
-403,/m/0l7xg,Gears,Domestic.Gears
-404,/m/05zc1,Pulleys,Domestic.Pulleys
-405,/m/0llzx,Sewing machine,Domestic.Sewing
-406,/m/02x984l,Mechanical fan,Domestic.Mechanical
-407,/m/025wky1,Air conditioning,Domestic.Air
-408,/m/024dl,Cash register,Domestic.Cash
-409,/m/01m4t,Printer,Domestic.Printer
-410,/m/0dv5r,Camera,Domestic.Camera
-411,/m/07bjf,Single-lens reflex camera,Domestic.Single-lens
-431,/m/083vt,Wood,Domestic.Wood
-432,/m/07pczhz,Chop,Domestic.Chop
-433,/m/07pl1bw,Splinter,Domestic.Splinter
-434,/m/07qs1cx,Crack,Domestic.Crack
-435,/m/039jq,Glass,Domestic.Glass
-436,/m/07q7njn,"Chink, clink",Domestic.Chink
-438,/m/04k94,Liquid,Domestic.Liquid
-439,/m/07rrlb6,"Splash, splatter",Domestic.Splash
-440,/m/07p6mqd,Slosh,Domestic.Slosh
-441,/m/07qlwh6,Squish,Domestic.Squish
-442,/m/07r5v4s,Drip,Domestic.Drip
-443,/m/07prgkl,Pour,Domestic.Pour
-444,/m/07pqc89,"Trickle, dribble",Domestic.Trickle
-445,/t/dd00088,Gush,Domestic.Gush
-446,/m/07p7b8y,Fill (with liquid),Domestic.Fill
-447,/m/07qlf79,Spray,Domestic.Spray
-448,/m/07ptzwd,Pump (liquid),Domestic.Pump
-449,/m/07ptfmf,Stir,Domestic.Stir
-450,/m/0dv3j,Boiling,Domestic.Boiling
-452,/m/0dl83,Arrow,Domestic.Arrow
-453,/m/07rqsjt,"Whoosh, swoosh, swish",Domestic.Whoosh
-454,/m/07qnq_y,"Thump, thud",Domestic.Thump
-455,/m/07rrh0c,Thunk,Domestic.Thunk
-459,/m/018w8,Basketball bounce,Domestic.Basketball
-465,/m/07pqn27,Bouncing,Domestic.Bouncing
-466,/m/07rbp7_,Whip,Domestic.Whip
-467,/m/07pyf11,Flap,Domestic.Flap
-468,/m/07qb_dv,Scratch,Domestic.Scratch
-469,/m/07qv4k0,Scrape,Domestic.Scrape
-470,/m/07pdjhy,Rub,Domestic.Rub
-471,/m/07s8j8t,Roll,Domestic.Roll
-472,/m/07plct2,Crushing,Domestic.Crushing
-473,/t/dd00112,"Crumpling, crinkling",Domestic.Crumpling
-474,/m/07qcx4z,Tearing,Domestic.Tearing
-475,/m/02fs_r,"Beep, bleep",Domestic.Beep
-476,/m/07qwdck,Ping,Domestic.Ping
-477,/m/07phxs1,Ding,Domestic.Ding
-478,/m/07rv4dm,Clang,Domestic.Clang
-479,/m/07s02z0,Squeal,Domestic.Squeal
-480,/m/07qh7jl,Creak,Domestic.Creak
-481,/m/07qwyj0,Rustle,Domestic.Rustle
-482,/m/07s34ls,Whir,Domestic.Whir
-483,/m/07qmpdm,Clatter,Domestic.Clatter
-484,/m/07p9k1k,Sizzle,Domestic.Sizzle
-485,/m/07qc9xj,Clicking,Domestic.Clicking
-486,/m/07rwm0c,Clickety-clack,Domestic.Clickety-clack
-488,/m/07qyrcz,Plop,Domestic.Plop
-489,/m/07qfgpx,"Jingle, tinkle",Domestic.Jingle
-490,/m/07rcgpl,Hum,Domestic.Hum
-491,/m/07p78v5,Zing,Domestic.Zing
-492,/t/dd00121,Boing,Domestic.Boing
-493,/m/07s12q4,Crunch,Domestic.Crunch
-500,/t/dd00125,"Inside, small room",Domestic.Inside
-501,/t/dd00126,"Inside, large room or hall",Domestic.Inside
-502,/t/dd00127,"Inside, public space",Domestic.Inside
-504,/t/dd00129,"Outside, rural or natural",Domestic.Outside
-505,/m/01b9nn,Reverberation,Domestic.Reverberation
-507,/m/096m7z,Noise,Domestic.Noise
-514,/m/0chx_,White noise,Domestic.White
-515,/m/0cj0r,Pink noise,Domestic.Pink
-516,/m/07p_0gm,Throbbing,Domestic.Throbbing
-517,/m/01jwx6,Vibration,Domestic.Vibration
-348,/m/02dgv,Door,Doors.Door
-349,/m/03wwcy,Doorbell,Doors.Doorbell
-350,/m/07r67yg,Ding-dong,Doors.Ding-dong
-351,/m/02y_763,Sliding door,Doors.Sliding
-352,/m/07rjzl8,Slam,Doors.Slam
-353,/m/07r4wb8,Knock,Doors.Knock
-354,/m/07qcpgn,Tap,Doors.Tap
-355,/m/07q6cd_,Squeak,Doors.Squeak
-356,/m/0642b4,Cupboard open or close,Doors.Cupboard
-357,/m/0fqfqc,Drawer open or close,Doors.Drawer
-358,/m/04brg2,"Dishes, pots, and pans",Doors.Dishes
-24,/m/015lz1,Singing,Music.Singing
-25,/m/0l14jd,Choir,Music.Choir
-26,/m/01swy6,Yodeling,Music.Yodeling
-27,/m/02bk07,Chant,Music.Chant
-28,/m/01c194,Mantra,Music.Mantra
-29,/t/dd00005,Child singing,Music.Child
-30,/t/dd00006,Synthetic singing,Music.Synthetic
-31,/m/06bxc,Rapping,Music.Rapping
-32,/m/02fxyj,Humming,Music.Humming
-58,/m/0l15bq,Clapping,Music.Clapping
-132,/m/04rlf,Music,Music.Music
-133,/m/04szw,Musical instrument,Music.Musical
-134,/m/0fx80y,Plucked string instrument,Music.Plucked
-135,/m/0342h,Guitar,Music.Guitar
-136,/m/02sgy,Electric guitar,Music.Electric
-137,/m/018vs,Bass guitar,Music.Bass
-138,/m/042v_gx,Acoustic guitar,Music.Acoustic
-139,/m/06w87,"Steel guitar, slide guitar",Music.Steel
-140,/m/01glhc,Tapping (guitar technique),Music.Tapping
-141,/m/07s0s5r,Strum,Music.Strum
-142,/m/018j2,Banjo,Music.Banjo
-143,/m/0jtg0,Sitar,Music.Sitar
-144,/m/04rzd,Mandolin,Music.Mandolin
-145,/m/01bns_,Zither,Music.Zither
-146,/m/07xzm,Ukulele,Music.Ukulele
-147,/m/05148p4,Keyboard (musical),Music.Keyboard
-148,/m/05r5c,Piano,Music.Piano
-149,/m/01s0ps,Electric piano,Music.Electric
-150,/m/013y1f,Organ,Music.Organ
-151,/m/03xq_f,Electronic organ,Music.Electronic
-152,/m/03gvt,Hammond organ,Music.Hammond
-153,/m/0l14qv,Synthesizer,Music.Synthesizer
-154,/m/01v1d8,Sampler,Music.Sampler
-155,/m/03q5t,Harpsichord,Music.Harpsichord
-156,/m/0l14md,Percussion,Music.Percussion
-157,/m/02hnl,Drum kit,Music.Drum
-158,/m/0cfdd,Drum machine,Music.Drum
-159,/m/026t6,Drum,Music.Drum
-160,/m/06rvn,Snare drum,Music.Snare
-161,/m/03t3fj,Rimshot,Music.Rimshot
-162,/m/02k_mr,Drum roll,Music.Drum
-163,/m/0bm02,Bass drum,Music.Bass
-164,/m/011k_j,Timpani,Music.Timpani
-165,/m/01p970,Tabla,Music.Tabla
-166,/m/01qbl,Cymbal,Music.Cymbal
-167,/m/03qtq,Hi-hat,Music.Hi-hat
-168,/m/01sm1g,Wood block,Music.Wood
-169,/m/07brj,Tambourine,Music.Tambourine
-170,/m/05r5wn,Rattle (instrument),Music.Rattle
-171,/m/0xzly,Maraca,Music.Maraca
-172,/m/0mbct,Gong,Music.Gong
-173,/m/016622,Tubular bells,Music.Tubular
-174,/m/0j45pbj,Mallet percussion,Music.Mallet
-175,/m/0dwsp,"Marimba, xylophone",Music.Marimba
-176,/m/0dwtp,Glockenspiel,Music.Glockenspiel
-177,/m/0dwt5,Vibraphone,Music.Vibraphone
-178,/m/0l156b,Steelpan,Music.Steelpan
-179,/m/05pd6,Orchestra,Music.Orchestra
-180,/m/01kcd,Brass instrument,Music.Brass
-181,/m/0319l,French horn,Music.French
-182,/m/07gql,Trumpet,Music.Trumpet
-183,/m/07c6l,Trombone,Music.Trombone
-184,/m/0l14_3,Bowed string instrument,Music.Bowed
-185,/m/02qmj0d,String section,Music.String
-186,/m/07y_7,"Violin, fiddle",Music.Violin
-187,/m/0d8_n,Pizzicato,Music.Pizzicato
-188,/m/01xqw,Cello,Music.Cello
-189,/m/02fsn,Double bass,Music.Double
-190,/m/085jw,"Wind instrument, woodwind instrument",Music.Wind
-191,/m/0l14j_,Flute,Music.Flute
-192,/m/06ncr,Saxophone,Music.Saxophone
-193,/m/01wy6,Clarinet,Music.Clarinet
-194,/m/03m5k,Harp,Music.Harp
-195,/m/0395lw,Bell,Music.Bell
-196,/m/03w41f,Church bell,Music.Church
-197,/m/027m70_,Jingle bell,Music.Jingle
-198,/m/0gy1t2s,Bicycle bell,Music.Bicycle
-199,/m/07n_g,Tuning fork,Music.Tuning
-200,/m/0f8s22,Chime,Music.Chime
-201,/m/026fgl,Wind chime,Music.Wind
-202,/m/0150b9,Change ringing (campanology),Music.Change
-203,/m/03qjg,Harmonica,Music.Harmonica
-204,/m/0mkg,Accordion,Music.Accordion
-205,/m/0192l,Bagpipes,Music.Bagpipes
-206,/m/02bxd,Didgeridoo,Music.Didgeridoo
-207,/m/0l14l2,Shofar,Music.Shofar
-208,/m/07kc_,Theremin,Music.Theremin
-209,/m/0l14t7,Singing bowl,Music.Singing
-210,/m/01hgjl,Scratching (performance technique),Music.Scratching
-211,/m/064t9,Pop music,Music.Pop
-212,/m/0glt670,Hip hop music,Music.Hip
-213,/m/02cz_7,Beatboxing,Music.Beatboxing
-214,/m/06by7,Rock music,Music.Rock
-215,/m/03lty,Heavy metal,Music.Heavy
-216,/m/05r6t,Punk rock,Music.Punk
-217,/m/0dls3,Grunge,Music.Grunge
-218,/m/0dl5d,Progressive rock,Music.Progressive
-219,/m/07sbbz2,Rock and roll,Music.Rock
-220,/m/05w3f,Psychedelic rock,Music.Psychedelic
-221,/m/06j6l,Rhythm and blues,Music.Rhythm
-222,/m/0gywn,Soul music,Music.Soul
-223,/m/06cqb,Reggae,Music.Reggae
-224,/m/01lyv,Country,Music.Country
-225,/m/015y_n,Swing music,Music.Swing
-226,/m/0gg8l,Bluegrass,Music.Bluegrass
-227,/m/02x8m,Funk,Music.Funk
-228,/m/02w4v,Folk music,Music.Folk
-229,/m/06j64v,Middle Eastern music,Music.Middle
-230,/m/03_d0,Jazz,Music.Jazz
-231,/m/026z9,Disco,Music.Disco
-232,/m/0ggq0m,Classical music,Music.Classical
-233,/m/05lls,Opera,Music.Opera
-234,/m/02lkt,Electronic music,Music.Electronic
-235,/m/03mb9,House music,Music.House
-236,/m/07gxw,Techno,Music.Techno
-237,/m/07s72n,Dubstep,Music.Dubstep
-238,/m/0283d,Drum and bass,Music.Drum
-239,/m/0m0jc,Electronica,Music.Electronica
-240,/m/08cyft,Electronic dance music,Music.Electronic
-241,/m/0fd3y,Ambient music,Music.Ambient
-242,/m/07lnk,Trance music,Music.Trance
-243,/m/0g293,Music of Latin America,Music.Music
-244,/m/0ln16,Salsa music,Music.Salsa
-245,/m/0326g,Flamenco,Music.Flamenco
-246,/m/0155w,Blues,Music.Blues
-247,/m/05fw6t,Music for children,Music.Music
-248,/m/02v2lh,New-age music,Music.New-age
-249,/m/0y4f8,Vocal music,Music.Vocal
-250,/m/0z9c,A capella,Music.A
-251,/m/0164x2,Music of Africa,Music.Music
-252,/m/0145m,Afrobeat,Music.Afrobeat
-253,/m/02mscn,Christian music,Music.Christian
-254,/m/016cjb,Gospel music,Music.Gospel
-255,/m/028sqc,Music of Asia,Music.Music
-256,/m/015vgc,Carnatic music,Music.Carnatic
-257,/m/0dq0md,Music of Bollywood,Music.Music
-258,/m/06rqw,Ska,Music.Ska
-259,/m/02p0sh1,Traditional music,Music.Traditional
-260,/m/05rwpb,Independent music,Music.Independent
-261,/m/074ft,Song,Music.Song
-262,/m/025td0t,Background music,Music.Background
-263,/m/02cjck,Theme music,Music.Theme
-264,/m/03r5q_,Jingle (music),Music.Jingle
-265,/m/0l14gg,Soundtrack music,Music.Soundtrack
-266,/m/07pkxdp,Lullaby,Music.Lullaby
-267,/m/01z7dr,Video game music,Music.Video
-268,/m/0140xf,Christmas music,Music.Christmas
-269,/m/0ggx5q,Dance music,Music.Dance
-270,/m/04wptg,Wedding music,Music.Wedding
-271,/t/dd00031,Happy music,Music.Happy
-272,/t/dd00033,Sad music,Music.Sad
-273,/t/dd00034,Tender music,Music.Tender
-274,/t/dd00035,Exciting music,Music.Exciting
-275,/t/dd00036,Angry music,Music.Angry
-276,/t/dd00037,Scary music,Music.Scary
-456,/m/0b_fwt,Electronic tuner,Music.Electronic
-457,/m/02rr_,Effects unit,Music.Effects
-458,/m/07m2kt,Chorus effect,Music.Chorus
-495,/m/01v_m0,Sine wave,Music.Sine
-496,/m/0b9m1,Harmonic,Music.Harmonic
-497,/m/0hdsk,Chirp tone,Music.Chirp
-498,/m/0c1dj,Sound effect,Music.Sound
-499,/m/07pt_g0,Pulse,Music.Pulse
-509,/m/07rgkc5,Static,Music.Static
-510,/m/06xkwv,Mains hum,Music.Mains
-511,/m/0g12c5,Distortion,Music.Distortion
-512,/m/08p9q4,Sidetone,Music.Sidetone
-0,/m/09x0r,Speech,People.Speech
-1,/m/0ytgt,"Child speech, kid speaking",People.Child
-2,/m/01h8n0,Conversation,People.Conversation
-3,/m/02qldy,"Narration, monologue",People.Narration
-4,/m/0261r1,Babbling,People.Babbling
-5,/m/0brhx,Speech synthesizer,People.Speech
-6,/m/07p6fty,Shout,People.Shout
-7,/m/07q4ntr,Bellow,People.Bellow
-8,/m/07rwj3x,Whoop,People.Whoop
-9,/m/07sr1lc,Yell,People.Yell
-10,/t/dd00135,Children shouting,People.Children
-12,/m/02rtxlg,Whispering,People.Whispering
-13,/m/01j3sz,Laughter,People.Laughter
-14,/t/dd00001,Baby laughter,People.Baby
-15,/m/07r660_,Giggle,People.Giggle
-16,/m/07s04w4,Snicker,People.Snicker
-17,/m/07sq110,Belly laugh,People.Belly
-18,/m/07rgt08,"Chuckle, chortle",People.Chuckle
-20,/t/dd00002,"Baby cry, infant cry",People.Baby
-21,/m/07qz6j3,Whimper,People.Whimper
-23,/m/07plz5l,Sigh,People.Sigh
-33,/m/07s2xch,Groan,People.Groan
-34,/m/07r4k75,Grunt,People.Grunt
-35,/m/01w250,Whistling,People.Whistling
-36,/m/0lyf6,Breathing,People.Breathing
-37,/m/07mzm6,Wheeze,People.Wheeze
-38,/m/01d3sd,Snoring,People.Snoring
-39,/m/07s0dtb,Gasp,People.Gasp
-40,/m/07pyy8b,Pant,People.Pant
-41,/m/07q0yl5,Snort,People.Snort
-42,/m/01b_21,Cough,People.Cough
-43,/m/0dl9sf8,Throat clearing,People.Throat
-44,/m/01hsr_,Sneeze,People.Sneeze
-45,/m/07ppn3j,Sniff,People.Sniff
-46,/m/06h7j,Run,People.Run
-47,/m/07qv_x_,Shuffle,People.Shuffle
-48,/m/07pbtc8,"Walk, footsteps",People.Walk
-49,/m/03cczk,"Chewing, mastication",People.Chewing
-50,/m/07pdhp0,Biting,People.Biting
-51,/m/0939n_,Gargling,People.Gargling
-52,/m/01g90h,Stomach rumble,People.Stomach
-53,/m/03q5_w,"Burping, eructation",People.Burping
-54,/m/02p3nc,Hiccup,People.Hiccup
-55,/m/02_nn,Fart,People.Fart
-56,/m/0k65p,Hands,People.Hands
-57,/m/025_jnm,Finger snapping,People.Finger
-59,/m/01jg02,"Heart sounds, heartbeat",People.Heart
-60,/m/01jg1z,Heart murmur,People.Heart
-61,/m/053hz1,Cheering,People.Cheering
-62,/m/028ght,Applause,People.Applause
-63,/m/07rkbfh,Chatter,People.Chatter
-64,/m/03qtwd,Crowd,People.Crowd
-65,/m/07qfr4h,"Hubbub, speech noise, speech babble",People.Hubbub
-66,/t/dd00013,Children playing,People.Children
-335,/m/0199g,Bicycle,People.Bicycle
-336,/m/06_fw,Skateboard,People.Skateboard
-372,/m/01s0vc,Zipper (clothing),People.Zipper
-373,/m/03v3yw,Keys jangling,People.Keys
-374,/m/0242l,Coin (dropping),People.Coin
-461,/m/07ryjzk,"Slap, smack",People.Slap
-503,/t/dd00128,"Outside, urban or manmade",People.Outside
-506,/m/01jnbd,Echo,People.Echo
-513,/m/07szfh9,Cacophony,People.Cacophony
-518,/m/07c52,Television,People.Television
-519,/m/06bz3,Radio,People.Radio
-520,/m/07hvw1,Field recording,People.Field
-494,/m/028v0c,Silence,Silence.Silence
-281,/m/0ngt1,Thunder,Storm.Thunder
-283,/m/06mb1,Rain,Storm.Rain
-284,/m/07r10fb,Raindrop,Storm.Raindrop
-285,/t/dd00038,Rain on surface,Storm.Rain
-322,/m/06d_3,Rail transport,Trains.Rail
-323,/m/07jdr,Train,Trains.Train
-324,/m/04zmvq,Train whistle,Trains.Train
-325,/m/0284vy3,Train horn,Trains.Train
-326,/m/01g50p,"Railroad car, train wagon",Trains.Railroad
-327,/t/dd00048,Train wheels squealing,Trains.Train
-328,/m/0195fx,"Subway, metro, underground",Trains.Subway
-294,/m/07yv9,Vehicle,Vehicles.Vehicle
-295,/m/019jd,"Boat, Water vehicle",Vehicles.Boat
-300,/m/012f08,Motor vehicle (road),Vehicles.Motor
-301,/m/0k4j,Car,Vehicles.Car
-302,/m/0912c9,"Vehicle horn, car horn, honking",Vehicles.Vehicle
-303,/m/07qv_d5,Toot,Vehicles.Toot
-305,/m/04gxbd,"Power windows, electric windows",Vehicles.Power
-306,/m/07rknqz,Skidding,Vehicles.Skidding
-307,/m/0h9mv,Tire squeal,Vehicles.Tire
-308,/t/dd00134,Car passing by,Vehicles.Car
-309,/m/0ltv,"Race car, auto racing",Vehicles.Race
-310,/m/07r04,Truck,Vehicles.Truck
-311,/m/0gvgw0,Air brake,Vehicles.Air
-312,/m/05x_td,"Air horn, truck horn",Vehicles.Air
-313,/m/02rhddq,Reversing beeps,Vehicles.Reversing
-314,/m/03cl9h,"Ice cream truck, ice cream van",Vehicles.Ice
-315,/m/01bjv,Bus,Vehicles.Bus
-320,/m/04_sv,Motorcycle,Vehicles.Motorcycle
-321,/m/0btp2,"Traffic noise, roadway noise",Vehicles.Traffic
-337,/m/02mk9,Engine,Vehicles.Engine
-338,/t/dd00065,Light engine (high frequency),Vehicles.Light
-339,/m/08j51y,"Dental drill, dentist's drill",Vehicles.Dental
-342,/t/dd00066,Medium engine (mid frequency),Vehicles.Medium
-343,/t/dd00067,Heavy engine (low frequency),Vehicles.Heavy
-344,/m/01h82_,Engine knocking,Vehicles.Engine
-345,/t/dd00130,Engine starting,Vehicles.Engine
-346,/m/07pb8fc,Idling,Vehicles.Idling
-347,/m/07q2z82,"Accelerating, revving, vroom",Vehicles.Accelerating
-287,/m/0j2kx,Waterfall,Water.Waterfall
-288,/m/05kq4,Ocean,Water.Ocean
-289,/m/034srq,"Waves, surf",Water.Waves
-290,/m/06wzb,Steam,Water.Steam
-291,/m/07swgks,Gurgling,Water.Gurgling
-277,/m/03m9d0z,Wind,Weather.Wind
-278,/m/09t49,Rustling leaves,Weather.Rustling
-279,/t/dd00092,Wind noise (microphone),Weather.Wind
-280,/m/0jb2l,Thunderstorm,Weather.Thunderstorm
-282,/m/0838f,Water,Weather.Water
-286,/m/0j6m2,Stream,Weather.Stream
-487,/m/07phhsh,Rumble,Weather.Rumble
-508,/m/06_y0by,Environmental noise,Weather.Environmental
-340,/m/01yg9g,Lawn mower,Yardcare.Lawn
-341,/m/01j4z9,Chainsaw,Yardcare.Chainsaw
-398,/t/dd00077,Mechanisms,Yardcare.Mechanisms
-399,/m/02bm9n,"Ratchet, pawl",Construction.Ratchet
-412,/m/07k1x,Tools,Construction.Tools
-413,/m/03l9g,Hammer,Construction.Hammer
-414,/m/03p19w,Jackhammer,Construction.Jackhammer
-415,/m/01b82r,Sawing,Construction.Sawing
-416,/m/02p01q,Filing (rasp),Construction.Filing
-417,/m/023vsd,Sanding,Construction.Sanding
-418,/m/0_ksk,Power tool,Construction.Power
-419,/m/01d380,Drill,Construction.Drill
-462,/m/07rdhzs,"Whack, thwack",Construction.Whack
+329,/m/0k5j,Aircraft,aircraft.aircraft
+330,/m/014yck,Aircraft engine,aircraft.aircraft
+331,/m/04229,Jet engine,aircraft.jet
+332,/m/02l6bg,"Propeller, airscrew",aircraft.propeller
+333,/m/09ct_,Helicopter,aircraft.helicopter
+334,/m/0cmf2,"Fixed-wing aircraft, airplane",aircraft.fixed-wing
+11,/m/03qc9zr,Screaming,alert.screaming
+19,/m/0463cq4,"Crying, sobbing",alert.crying
+22,/m/07qw_06,"Wail, moan",alert.wail
+292,/m/02_41,Fire,alert.fire
+293,/m/07pzfmf,Crackle,alert.crackle
+304,/m/02mfyn,Car alarm,alert.car
+316,/m/03j1ly,Emergency vehicle,alert.emergency
+317,/m/04qvtq,Police car (siren),alert.police
+318,/m/012n7d,Ambulance (siren),alert.ambulance
+319,/m/012ndj,"Fire engine, fire truck (siren)",alert.fire
+382,/m/07pp_mv,Alarm,alert.alarm
+383,/m/07cx4,Telephone,alert.telephone
+384,/m/07pp8cl,Telephone bell ringing,alert.telephone
+385,/m/01hnzm,Ringtone,alert.ringtone
+389,/m/046dlr,Alarm clock,alert.alarm
+390,/m/03kmc9,Siren,alert.siren
+391,/m/0dgbq,Civil defense siren,alert.civil
+392,/m/030rvx,Buzzer,alert.buzzer
+393,/m/01y3hg,"Smoke detector, smoke alarm",alert.smoke
+394,/m/0c3f7m,Fire alarm,alert.fire
+395,/m/04fq5q,Foghorn,alert.foghorn
+396,/m/0l156k,Whistle,alert.whistle
+397,/m/06hck5,Steam whistle,alert.steam
+420,/m/014zdl,Explosion,alert.explosion
+421,/m/032s66,"Gunshot, gunfire",alert.gunshot
+422,/m/04zjc,Machine gun,alert.machine
+423,/m/02z32qm,Fusillade,alert.fusillade
+424,/m/0_1c,Artillery fire,alert.artillery
+425,/m/073cg4,Cap gun,alert.cap
+426,/m/0g6b5,Fireworks,alert.fireworks
+427,/g/122z_qxw,Firecracker,alert.firecracker
+428,/m/07qsvvw,"Burst, pop",alert.burst
+429,/m/07pxg6y,Eruption,alert.eruption
+430,/m/07qqyl4,Boom,alert.boom
+437,/m/07rn7sz,Shatter,alert.shatter
+451,/m/0790c,Sonar,alert.sonar
+460,/m/07pws3f,Bang,alert.bang
+463,/m/07pjjrj,"Smash, crash",alert.smash
+464,/m/07pc8lb,Breaking,alert.breaking
+67,/m/0jbk,Animal,animals.animal
+68,/m/068hy,"Domestic animals, pets",animals.domestic
+69,/m/0bt9lr,Dog,animals.dog
+70,/m/05tny_,Bark,animals.bark
+71,/m/07r_k2n,Yip,animals.yip
+72,/m/07qf0zm,Howl,animals.howl
+73,/m/07rc7d9,Bow-wow,animals.bow-wow
+74,/m/0ghcn6,Growling,animals.growling
+75,/t/dd00136,Whimper (dog),animals.whimper
+76,/m/01yrx,Cat,animals.cat
+77,/m/02yds9,Purr,animals.purr
+78,/m/07qrkrw,Meow,animals.meow
+79,/m/07rjwbb,Hiss,animals.hiss
+80,/m/07r81j2,Caterwaul,animals.caterwaul
+81,/m/0ch8v,"Livestock, farm animals, working animals",animals.livestock
+82,/m/03k3r,Horse,animals.horse
+83,/m/07rv9rh,Clip-clop,animals.clip-clop
+84,/m/07q5rw0,"Neigh, whinny",animals.neigh
+85,/m/01xq0k1,"Cattle, bovinae",animals.cattle
+86,/m/07rpkh9,Moo,animals.moo
+87,/m/0239kh,Cowbell,animals.cowbell
+88,/m/068zj,Pig,animals.pig
+89,/t/dd00018,Oink,animals.oink
+90,/m/03fwl,Goat,animals.goat
+91,/m/07q0h5t,Bleat,animals.bleat
+92,/m/07bgp,Sheep,animals.sheep
+93,/m/025rv6n,Fowl,animals.fowl
+94,/m/09b5t,"Chicken, rooster",animals.chicken
+95,/m/07st89h,Cluck,animals.cluck
+96,/m/07qn5dc,"Crowing, cock-a-doodle-doo",animals.crowing
+97,/m/01rd7k,Turkey,animals.turkey
+98,/m/07svc2k,Gobble,animals.gobble
+103,/m/01280g,Wild animals,animals.wild
+104,/m/0cdnk,"Roaring cats (lions, tigers)",animals.roaring
+105,/m/04cvmfc,Roar,animals.roar
+117,/m/01z5f,"Canidae, dogs, wolves",animals.canidae
+118,/m/06hps,"Rodents, rats, mice",animals.rodents
+119,/m/04rmv,Mouse,animals.mouse
+120,/m/07r4gkf,Patter,animals.patter
+127,/m/09ld4,Frog,animals.frog
+128,/m/07st88b,Croak,animals.croak
+129,/m/078jl,Snake,animals.snake
+130,/m/07qn4z3,Rattle,animals.rattle
+131,/m/032n05,Whale vocalization,animals.whale
+99,/m/09ddx,Duck,birds.duck
+100,/m/07qdb04,Quack,birds.quack
+101,/m/0dbvp,Goose,birds.goose
+102,/m/07qwf61,Honk,birds.honk
+106,/m/015p6,Bird,birds.bird
+107,/m/020bb7,"Bird vocalization, bird call, bird song",birds.bird
+108,/m/07pggtn,"Chirp, tweet",birds.chirp
+109,/m/07sx8x_,Squawk,birds.squawk
+110,/m/0h0rv,"Pigeon, dove",birds.pigeon
+111,/m/07r_25d,Coo,birds.coo
+112,/m/04s8yn,Crow,birds.crow
+113,/m/07r5c2p,Caw,birds.caw
+114,/m/09d5_,Owl,birds.owl
+115,/m/07r_80w,Hoot,birds.hoot
+116,/m/05_wcq,"Bird flight, flapping wings",birds.bird
+296,/m/0hsrw,"Sailboat, sailing ship",boats.sailboat
+297,/m/056ks2,"Rowboat, canoe, kayak",boats.rowboat
+298,/m/02rlv9,"Motorboat, speedboat",vehicles.motorboat
+299,/m/06q74,Ship,boats.ship
+121,/m/03vt0,Insect,bugs.insect
+122,/m/09xqv,Cricket,bugs.cricket
+123,/m/09f96,Mosquito,bugs.mosquito
+124,/m/0h2mp,"Fly, housefly",bugs.fly
+125,/m/07pjwq1,Buzz,bugs.buzz
+126,/m/01h3n,"Bee, wasp, etc.",bugs.bee
+359,/m/023pjk,"Cutlery, silverware",cooking.cutlery
+360,/m/07pn_8q,Chopping (food),cooking.chopping
+361,/m/0dxrf,Frying (food),cooking.frying
+362,/m/0fx9l,Microwave oven,cooking.microwave
+363,/m/02pjr4,Blender,cooking.blender
+364,/m/02jz0l,"Water tap, faucet",cooking.water
+365,/m/0130jx,Sink (filling or washing),cooking.sink
+366,/m/03dnzn,Bathtub (filling or washing),domestic.bathtub
+367,/m/03wvsk,Hair dryer,domestic.hair
+368,/m/01jt3m,Toilet flush,domestic.toilet
+369,/m/012xff,Toothbrush,domestic.toothbrush
+370,/m/04fgwm,Electric toothbrush,domestic.electric
+371,/m/0d31p,Vacuum cleaner,domestic.vacuum
+375,/m/01lsmm,Scissors,domestic.scissors
+376,/m/02g901,"Electric shaver, electric razor",domestic.electric
+377,/m/05rj2,Shuffling cards,domestic.shuffling
+378,/m/0316dw,Typing,domestic.typing
+379,/m/0c2wf,Typewriter,domestic.typewriter
+380,/m/01m2v,Computer keyboard,domestic.computer
+381,/m/081rb,Writing,domestic.writing
+386,/m/02c8p,"Telephone dialing, DTMF",domestic.telephone
+387,/m/015jpf,Dial tone,domestic.dial
+388,/m/01z47d,Busy signal,domestic.busy
+400,/m/01x3z,Clock,domestic.clock
+401,/m/07qjznt,Tick,domestic.tick
+402,/m/07qjznl,Tick-tock,domestic.tick-tock
+403,/m/0l7xg,Gears,domestic.gears
+404,/m/05zc1,Pulleys,domestic.pulleys
+405,/m/0llzx,Sewing machine,domestic.sewing
+406,/m/02x984l,Mechanical fan,domestic.mechanical
+407,/m/025wky1,Air conditioning,domestic.air
+408,/m/024dl,Cash register,domestic.cash
+409,/m/01m4t,Printer,domestic.printer
+410,/m/0dv5r,Camera,domestic.camera
+411,/m/07bjf,Single-lens reflex camera,domestic.single-lens
+431,/m/083vt,Wood,domestic.wood
+432,/m/07pczhz,Chop,domestic.chop
+433,/m/07pl1bw,Splinter,domestic.splinter
+434,/m/07qs1cx,Crack,domestic.crack
+435,/m/039jq,Glass,domestic.glass
+436,/m/07q7njn,"Chink, clink",domestic.chink
+438,/m/04k94,Liquid,domestic.liquid
+439,/m/07rrlb6,"Splash, splatter",domestic.splash
+440,/m/07p6mqd,Slosh,domestic.slosh
+441,/m/07qlwh6,Squish,domestic.squish
+442,/m/07r5v4s,Drip,domestic.drip
+443,/m/07prgkl,Pour,domestic.pour
+444,/m/07pqc89,"Trickle, dribble",domestic.trickle
+445,/t/dd00088,Gush,domestic.gush
+446,/m/07p7b8y,Fill (with liquid),domestic.fill
+447,/m/07qlf79,Spray,domestic.spray
+448,/m/07ptzwd,Pump (liquid),domestic.pump
+449,/m/07ptfmf,Stir,domestic.stir
+450,/m/0dv3j,Boiling,domestic.boiling
+452,/m/0dl83,Arrow,domestic.arrow
+453,/m/07rqsjt,"Whoosh, swoosh, swish",domestic.whoosh
+454,/m/07qnq_y,"Thump, thud",domestic.thump
+455,/m/07rrh0c,Thunk,domestic.thunk
+459,/m/018w8,Basketball bounce,domestic.basketball
+465,/m/07pqn27,Bouncing,domestic.bouncing
+466,/m/07rbp7_,Whip,domestic.whip
+467,/m/07pyf11,Flap,domestic.flap
+468,/m/07qb_dv,Scratch,domestic.scratch
+469,/m/07qv4k0,Scrape,domestic.scrape
+470,/m/07pdjhy,Rub,domestic.rub
+471,/m/07s8j8t,Roll,domestic.roll
+472,/m/07plct2,Crushing,domestic.crushing
+473,/t/dd00112,"Crumpling, crinkling",domestic.crumpling
+474,/m/07qcx4z,Tearing,domestic.tearing
+475,/m/02fs_r,"Beep, bleep",domestic.beep
+476,/m/07qwdck,Ping,domestic.ping
+477,/m/07phxs1,Ding,domestic.ding
+478,/m/07rv4dm,Clang,domestic.clang
+479,/m/07s02z0,Squeal,domestic.squeal
+480,/m/07qh7jl,Creak,domestic.creak
+481,/m/07qwyj0,Rustle,domestic.rustle
+482,/m/07s34ls,Whir,domestic.whir
+483,/m/07qmpdm,Clatter,domestic.clatter
+484,/m/07p9k1k,Sizzle,domestic.sizzle
+485,/m/07qc9xj,Clicking,domestic.clicking
+486,/m/07rwm0c,Clickety-clack,domestic.clickety-clack
+488,/m/07qyrcz,Plop,domestic.plop
+489,/m/07qfgpx,"Jingle, tinkle",domestic.jingle
+490,/m/07rcgpl,Hum,domestic.hum
+491,/m/07p78v5,Zing,domestic.zing
+492,/t/dd00121,Boing,domestic.boing
+493,/m/07s12q4,Crunch,domestic.crunch
+500,/t/dd00125,"Inside, small room",domestic.inside
+501,/t/dd00126,"Inside, large room or hall",domestic.inside
+502,/t/dd00127,"Inside, public space",domestic.inside
+504,/t/dd00129,"Outside, rural or natural",domestic.outside
+505,/m/01b9nn,Reverberation,domestic.reverberation
+507,/m/096m7z,Noise,domestic.noise
+514,/m/0chx_,White noise,domestic.white
+515,/m/0cj0r,Pink noise,domestic.pink
+516,/m/07p_0gm,Throbbing,domestic.throbbing
+517,/m/01jwx6,Vibration,domestic.vibration
+348,/m/02dgv,Door,doors.door
+349,/m/03wwcy,Doorbell,doors.doorbell
+350,/m/07r67yg,Ding-dong,doors.ding-dong
+351,/m/02y_763,Sliding door,doors.sliding
+352,/m/07rjzl8,Slam,doors.slam
+353,/m/07r4wb8,Knock,doors.knock
+354,/m/07qcpgn,Tap,doors.tap
+355,/m/07q6cd_,Squeak,doors.squeak
+356,/m/0642b4,Cupboard open or close,doors.cupboard
+357,/m/0fqfqc,Drawer open or close,doors.drawer
+358,/m/04brg2,"Dishes, pots, and pans",doors.dishes
+24,/m/015lz1,Singing,music.singing
+25,/m/0l14jd,Choir,music.choir
+26,/m/01swy6,Yodeling,music.yodeling
+27,/m/02bk07,Chant,music.chant
+28,/m/01c194,Mantra,music.mantra
+29,/t/dd00005,Child singing,music.child
+30,/t/dd00006,Synthetic singing,music.synthetic
+31,/m/06bxc,Rapping,music.rapping
+32,/m/02fxyj,Humming,music.humming
+58,/m/0l15bq,Clapping,music.clapping
+132,/m/04rlf,Music,music.music
+133,/m/04szw,Musical instrument,music.musical
+134,/m/0fx80y,Plucked string instrument,music.plucked
+135,/m/0342h,Guitar,music.guitar
+136,/m/02sgy,Electric guitar,music.electric
+137,/m/018vs,Bass guitar,music.bass
+138,/m/042v_gx,Acoustic guitar,music.acoustic
+139,/m/06w87,"Steel guitar, slide guitar",music.steel
+140,/m/01glhc,Tapping (guitar technique),music.tapping
+141,/m/07s0s5r,Strum,music.strum
+142,/m/018j2,Banjo,music.banjo
+143,/m/0jtg0,Sitar,music.sitar
+144,/m/04rzd,Mandolin,music.mandolin
+145,/m/01bns_,Zither,music.zither
+146,/m/07xzm,Ukulele,music.ukulele
+147,/m/05148p4,Keyboard (musical),music.keyboard
+148,/m/05r5c,Piano,music.piano
+149,/m/01s0ps,Electric piano,music.electric
+150,/m/013y1f,Organ,music.organ
+151,/m/03xq_f,Electronic organ,music.electronic
+152,/m/03gvt,Hammond organ,music.hammond
+153,/m/0l14qv,Synthesizer,music.synthesizer
+154,/m/01v1d8,Sampler,music.sampler
+155,/m/03q5t,Harpsichord,music.harpsichord
+156,/m/0l14md,Percussion,music.percussion
+157,/m/02hnl,Drum kit,music.drum
+158,/m/0cfdd,Drum machine,music.drum
+159,/m/026t6,Drum,music.drum
+160,/m/06rvn,Snare drum,music.snare
+161,/m/03t3fj,Rimshot,music.rimshot
+162,/m/02k_mr,Drum roll,music.drum
+163,/m/0bm02,Bass drum,music.bass
+164,/m/011k_j,Timpani,music.timpani
+165,/m/01p970,Tabla,music.tabla
+166,/m/01qbl,Cymbal,music.cymbal
+167,/m/03qtq,Hi-hat,music.hi-hat
+168,/m/01sm1g,Wood block,music.wood
+169,/m/07brj,Tambourine,music.tambourine
+170,/m/05r5wn,Rattle (instrument),music.rattle
+171,/m/0xzly,Maraca,music.maraca
+172,/m/0mbct,Gong,music.gong
+173,/m/016622,Tubular bells,music.tubular
+174,/m/0j45pbj,Mallet percussion,music.mallet
+175,/m/0dwsp,"Marimba, xylophone",music.marimba
+176,/m/0dwtp,Glockenspiel,music.glockenspiel
+177,/m/0dwt5,Vibraphone,music.vibraphone
+178,/m/0l156b,Steelpan,music.steelpan
+179,/m/05pd6,Orchestra,music.orchestra
+180,/m/01kcd,Brass instrument,music.brass
+181,/m/0319l,French horn,music.french
+182,/m/07gql,Trumpet,music.trumpet
+183,/m/07c6l,Trombone,music.trombone
+184,/m/0l14_3,Bowed string instrument,music.bowed
+185,/m/02qmj0d,String section,music.string
+186,/m/07y_7,"Violin, fiddle",music.violin
+187,/m/0d8_n,Pizzicato,music.pizzicato
+188,/m/01xqw,Cello,music.cello
+189,/m/02fsn,Double bass,music.double
+190,/m/085jw,"Wind instrument, woodwind instrument",music.wind
+191,/m/0l14j_,Flute,music.flute
+192,/m/06ncr,Saxophone,music.saxophone
+193,/m/01wy6,Clarinet,music.clarinet
+194,/m/03m5k,Harp,music.harp
+195,/m/0395lw,Bell,music.bell
+196,/m/03w41f,Church bell,music.church
+197,/m/027m70_,Jingle bell,music.jingle
+198,/m/0gy1t2s,Bicycle bell,music.bicycle
+199,/m/07n_g,Tuning fork,music.tuning
+200,/m/0f8s22,Chime,music.chime
+201,/m/026fgl,Wind chime,music.wind
+202,/m/0150b9,Change ringing (campanology),music.change
+203,/m/03qjg,Harmonica,music.harmonica
+204,/m/0mkg,Accordion,music.accordion
+205,/m/0192l,Bagpipes,music.bagpipes
+206,/m/02bxd,Didgeridoo,music.didgeridoo
+207,/m/0l14l2,Shofar,music.shofar
+208,/m/07kc_,Theremin,music.theremin
+209,/m/0l14t7,Singing bowl,music.singing
+210,/m/01hgjl,Scratching (performance technique),music.scratching
+211,/m/064t9,Pop music,music.pop
+212,/m/0glt670,Hip hop music,music.hip
+213,/m/02cz_7,Beatboxing,music.beatboxing
+214,/m/06by7,Rock music,music.rock
+215,/m/03lty,Heavy metal,music.heavy
+216,/m/05r6t,Punk rock,music.punk
+217,/m/0dls3,Grunge,music.grunge
+218,/m/0dl5d,Progressive rock,music.progressive
+219,/m/07sbbz2,Rock and roll,music.rock
+220,/m/05w3f,Psychedelic rock,music.psychedelic
+221,/m/06j6l,Rhythm and blues,music.rhythm
+222,/m/0gywn,Soul music,music.soul
+223,/m/06cqb,Reggae,music.reggae
+224,/m/01lyv,Country,music.country
+225,/m/015y_n,Swing music,music.swing
+226,/m/0gg8l,Bluegrass,music.bluegrass
+227,/m/02x8m,Funk,music.funk
+228,/m/02w4v,Folk music,music.folk
+229,/m/06j64v,Middle Eastern music,music.middle
+230,/m/03_d0,Jazz,music.jazz
+231,/m/026z9,Disco,music.disco
+232,/m/0ggq0m,Classical music,music.classical
+233,/m/05lls,Opera,music.opera
+234,/m/02lkt,Electronic music,music.electronic
+235,/m/03mb9,House music,music.house
+236,/m/07gxw,Techno,music.techno
+237,/m/07s72n,Dubstep,music.dubstep
+238,/m/0283d,Drum and bass,music.drum
+239,/m/0m0jc,Electronica,music.electronica
+240,/m/08cyft,Electronic dance music,music.electronic
+241,/m/0fd3y,Ambient music,music.ambient
+242,/m/07lnk,Trance music,music.trance
+243,/m/0g293,Music of Latin America,music.music
+244,/m/0ln16,Salsa music,music.salsa
+245,/m/0326g,Flamenco,music.flamenco
+246,/m/0155w,Blues,music.blues
+247,/m/05fw6t,Music for children,music.music
+248,/m/02v2lh,New-age music,music.new-age
+249,/m/0y4f8,Vocal music,music.vocal
+250,/m/0z9c,A capella,music.a
+251,/m/0164x2,Music of Africa,music.music
+252,/m/0145m,Afrobeat,music.afrobeat
+253,/m/02mscn,Christian music,music.christian
+254,/m/016cjb,Gospel music,music.gospel
+255,/m/028sqc,Music of Asia,music.music
+256,/m/015vgc,Carnatic music,music.carnatic
+257,/m/0dq0md,Music of Bollywood,music.music
+258,/m/06rqw,Ska,music.ska
+259,/m/02p0sh1,Traditional music,music.traditional
+260,/m/05rwpb,Independent music,music.independent
+261,/m/074ft,Song,music.song
+262,/m/025td0t,Background music,music.background
+263,/m/02cjck,Theme music,music.theme
+264,/m/03r5q_,Jingle (music),music.jingle
+265,/m/0l14gg,Soundtrack music,music.soundtrack
+266,/m/07pkxdp,Lullaby,music.lullaby
+267,/m/01z7dr,Video game music,music.video
+268,/m/0140xf,Christmas music,music.christmas
+269,/m/0ggx5q,Dance music,music.dance
+270,/m/04wptg,Wedding music,music.wedding
+271,/t/dd00031,Happy music,music.happy
+272,/t/dd00033,Sad music,music.sad
+273,/t/dd00034,Tender music,music.tender
+274,/t/dd00035,Exciting music,music.exciting
+275,/t/dd00036,Angry music,music.angry
+276,/t/dd00037,Scary music,music.scary
+456,/m/0b_fwt,Electronic tuner,music.electronic
+457,/m/02rr_,Effects unit,music.effects
+458,/m/07m2kt,Chorus effect,music.chorus
+495,/m/01v_m0,Sine wave,music.sine
+496,/m/0b9m1,Harmonic,music.harmonic
+497,/m/0hdsk,Chirp tone,music.chirp
+498,/m/0c1dj,Sound effect,music.sound
+499,/m/07pt_g0,Pulse,music.pulse
+509,/m/07rgkc5,Static,music.static
+510,/m/06xkwv,Mains hum,music.mains
+511,/m/0g12c5,Distortion,music.distortion
+512,/m/08p9q4,Sidetone,music.sidetone
+0,/m/09x0r,Speech,people.speech
+1,/m/0ytgt,"Child speech, kid speaking",people.child
+2,/m/01h8n0,Conversation,people.conversation
+3,/m/02qldy,"Narration, monologue",people.narration
+4,/m/0261r1,Babbling,people.babbling
+5,/m/0brhx,Speech synthesizer,people.speech
+6,/m/07p6fty,Shout,people.shout
+7,/m/07q4ntr,Bellow,people.bellow
+8,/m/07rwj3x,Whoop,people.whoop
+9,/m/07sr1lc,Yell,people.yell
+10,/t/dd00135,Children shouting,people.children
+12,/m/02rtxlg,Whispering,people.whispering
+13,/m/01j3sz,Laughter,people.laughter
+14,/t/dd00001,Baby laughter,people.baby
+15,/m/07r660_,Giggle,people.giggle
+16,/m/07s04w4,Snicker,people.snicker
+17,/m/07sq110,Belly laugh,people.belly
+18,/m/07rgt08,"Chuckle, chortle",people.chuckle
+20,/t/dd00002,"Baby cry, infant cry",people.baby
+21,/m/07qz6j3,Whimper,people.whimper
+23,/m/07plz5l,Sigh,people.sigh
+33,/m/07s2xch,Groan,people.groan
+34,/m/07r4k75,Grunt,people.grunt
+35,/m/01w250,Whistling,people.whistling
+36,/m/0lyf6,Breathing,people.breathing
+37,/m/07mzm6,Wheeze,people.wheeze
+38,/m/01d3sd,Snoring,people.snoring
+39,/m/07s0dtb,Gasp,people.gasp
+40,/m/07pyy8b,Pant,people.pant
+41,/m/07q0yl5,Snort,people.snort
+42,/m/01b_21,Cough,people.cough
+43,/m/0dl9sf8,Throat clearing,people.throat
+44,/m/01hsr_,Sneeze,people.sneeze
+45,/m/07ppn3j,Sniff,people.sniff
+46,/m/06h7j,Run,people.run
+47,/m/07qv_x_,Shuffle,people.shuffle
+48,/m/07pbtc8,"Walk, footsteps",people.walk
+49,/m/03cczk,"Chewing, mastication",people.chewing
+50,/m/07pdhp0,Biting,people.biting
+51,/m/0939n_,Gargling,people.gargling
+52,/m/01g90h,Stomach rumble,people.stomach
+53,/m/03q5_w,"Burping, eructation",people.burping
+54,/m/02p3nc,Hiccup,people.hiccup
+55,/m/02_nn,Fart,people.fart
+56,/m/0k65p,Hands,people.hands
+57,/m/025_jnm,Finger snapping,people.finger
+59,/m/01jg02,"Heart sounds, heartbeat",people.heart
+60,/m/01jg1z,Heart murmur,people.heart
+61,/m/053hz1,Cheering,people.cheering
+62,/m/028ght,Applause,people.applause
+63,/m/07rkbfh,Chatter,people.chatter
+64,/m/03qtwd,Crowd,people.crowd
+65,/m/07qfr4h,"Hubbub, speech noise, speech babble",people.hubbub
+66,/t/dd00013,Children playing,people.children
+335,/m/0199g,Bicycle,people.bicycle
+336,/m/06_fw,Skateboard,people.skateboard
+372,/m/01s0vc,Zipper (clothing),people.zipper
+373,/m/03v3yw,Keys jangling,people.keys
+374,/m/0242l,Coin (dropping),people.coin
+461,/m/07ryjzk,"Slap, smack",people.slap
+503,/t/dd00128,"Outside, urban or manmade",people.outside
+506,/m/01jnbd,Echo,people.echo
+513,/m/07szfh9,Cacophony,people.cacophony
+518,/m/07c52,Television,people.television
+519,/m/06bz3,Radio,people.radio
+520,/m/07hvw1,Field recording,people.field
+494,/m/028v0c,Silence,silence.silence
+281,/m/0ngt1,Thunder,storm.thunder
+283,/m/06mb1,Rain,storm.rain
+284,/m/07r10fb,Raindrop,storm.raindrop
+285,/t/dd00038,Rain on surface,storm.rain
+322,/m/06d_3,Rail transport,trains.rail
+323,/m/07jdr,Train,trains.train
+324,/m/04zmvq,Train whistle,trains.train
+325,/m/0284vy3,Train horn,trains.train
+326,/m/01g50p,"Railroad car, train wagon",trains.railroad
+327,/t/dd00048,Train wheels squealing,trains.train
+328,/m/0195fx,"Subway, metro, underground",trains.subway
+294,/m/07yv9,Vehicle,vehicles.vehicle
+295,/m/019jd,"Boat, Water vehicle",vehicles.boat
+300,/m/012f08,Motor vehicle (road),vehicles.motor
+301,/m/0k4j,Car,vehicles.car
+302,/m/0912c9,"Vehicle horn, car horn, honking",vehicles.vehicle
+303,/m/07qv_d5,Toot,vehicles.toot
+305,/m/04gxbd,"Power windows, electric windows",vehicles.power
+306,/m/07rknqz,Skidding,vehicles.skidding
+307,/m/0h9mv,Tire squeal,vehicles.tire
+308,/t/dd00134,Car passing by,vehicles.car
+309,/m/0ltv,"Race car, auto racing",vehicles.race
+310,/m/07r04,Truck,vehicles.truck
+311,/m/0gvgw0,Air brake,vehicles.air
+312,/m/05x_td,"Air horn, truck horn",vehicles.air
+313,/m/02rhddq,Reversing beeps,vehicles.reversing
+314,/m/03cl9h,"Ice cream truck, ice cream van",vehicles.ice
+315,/m/01bjv,Bus,vehicles.bus
+320,/m/04_sv,Motorcycle,vehicles.motorcycle
+321,/m/0btp2,"Traffic noise, roadway noise",vehicles.traffic
+337,/m/02mk9,Engine,vehicles.engine
+338,/t/dd00065,Light engine (high frequency),vehicles.light
+339,/m/08j51y,"Dental drill, dentist's drill",vehicles.dental
+342,/t/dd00066,Medium engine (mid frequency),vehicles.medium
+343,/t/dd00067,Heavy engine (low frequency),vehicles.heavy
+344,/m/01h82_,Engine knocking,vehicles.engine
+345,/t/dd00130,Engine starting,vehicles.engine
+346,/m/07pb8fc,Idling,vehicles.idling
+347,/m/07q2z82,"Accelerating, revving, vroom",vehicles.accelerating
+287,/m/0j2kx,Waterfall,water.waterfall
+288,/m/05kq4,Ocean,water.ocean
+289,/m/034srq,"Waves, surf",water.waves
+290,/m/06wzb,Steam,water.steam
+291,/m/07swgks,Gurgling,water.gurgling
+277,/m/03m9d0z,Wind,weather.wind
+278,/m/09t49,Rustling leaves,weather.rustling
+279,/t/dd00092,Wind noise (microphone),weather.wind
+280,/m/0jb2l,Thunderstorm,weather.thunderstorm
+282,/m/0838f,Water,weather.water
+286,/m/0j6m2,Stream,weather.stream
+487,/m/07phhsh,Rumble,weather.rumble
+508,/m/06_y0by,Environmental noise,weather.environmental
+340,/m/01yg9g,Lawn mower,yardcare.lawn
+341,/m/01j4z9,Chainsaw,yardcare.chainsaw
+398,/t/dd00077,Mechanisms,yardcare.mechanisms
+399,/m/02bm9n,"Ratchet, pawl",construction.ratchet
+412,/m/07k1x,Tools,construction.tools
+413,/m/03l9g,Hammer,construction.hammer
+414,/m/03p19w,Jackhammer,construction.jackhammer
+415,/m/01b82r,Sawing,construction.sawing
+416,/m/02p01q,Filing (rasp),construction.filing
+417,/m/023vsd,Sanding,construction.sanding
+418,/m/0_ksk,Power tool,construction.power
+419,/m/01d380,Drill,construction.drill
+462,/m/07rdhzs,"Whack, thwack",construction.whack
