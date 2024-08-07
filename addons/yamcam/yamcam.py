@@ -141,7 +141,20 @@ interpreter = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-logger.debug(f"Input details: {input_details}")
+
+# In DEBUG mode, format input details for ease of readability
+#logger.debug(f"Input details: {input_details}") #original butt-ugly output
+def format_input_details(details):
+    formatted_details = "Input Details:\n"
+    for detail in details:
+        formatted_details += "  -\n"
+        for key, value in detail.items():
+            formatted_details += f"    {key}: {value}\n"
+    return formatted_details
+
+input_details = interpreter.get_input_details()
+logger.debug(format_input_details(input_details))
+
 
 # use csv to deal with col2 instances of quoted strings w/ commas
 
