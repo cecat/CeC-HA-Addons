@@ -1,3 +1,7 @@
+#
+# YamCam - CeC August 2024
+#
+
 import subprocess
 import paho.mqtt.client as mqtt
 import time
@@ -14,7 +18,6 @@ import csv
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-
 
 # Map log level from string to logging constant
 log_levels = {
@@ -38,7 +41,7 @@ logger.info("----------------> ")
 logger.info("----------------> Add-on Started.")
 logger.info("----------------> ")
 
-### Load user config- bail there are YAML problems
+### Load user config; bail there are YAML problems
 
 if not os.path.exists(config_path):
     logger.error(f"Configuration file {config_path} does not exist.")
@@ -65,15 +68,14 @@ except KeyError as e:
 
 ## Set logging level 
 
-
-# Use the logging level specified in the config file (default to INFO)
+# Use the logging level specified in config_path (default to INFO)
 if log_level in log_levels:
     logger.setLevel(log_levels[log_level])
     for handler in logger.handlers:
         handler.setLevel(log_levels[log_level])
     logger.info(f"Logging level set to {log_level}")
 else:
-    logger.warning(f"Invalid log level {log_level} in config file. Using INFO level.")
+    logger.warning(f"Invalid log level {log_level} in config file. Use DEBUG, INFO, WARNING, ERROR, or CRITICAL. Defaulting to INFO.")
     logger.setLevel(logging.INFO)
     for handler in logger.handlers:
         handler.setLevel(logging.INFO)
@@ -95,7 +97,15 @@ except KeyError as e:
 
 ## Log the MQTT settings being used
 
-logger.debug(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
+#logger.debug(f"MQTT settings: host={mqtt_host}, port={mqtt_port}, topic_prefix={mqtt_topic_prefix}, client_id={mqtt_client_id}, user={mqtt_username}\n")
+logger.debug(
+    f"MQTT Settings:\n"
+    f"   Host: {mqtt_host}\n"
+    f"   Port: {mqtt_port}\n"
+    f"   Topic Prefix: {mqtt_topic_prefix}\n"
+    f"   Client ID: {mqtt_client_id}\n"
+    f"   User: {mqtt_username}\n"
+)
 
 ## Extract camera settings (sound sources) 
 
@@ -127,18 +137,15 @@ except Exception as e:
 ### Load YAMNet model using TensorFlow Lite
 
 logger.debug("Load YAMNet")
-#interpreter = tflite.Interpreter(model_path="yamnet.tflite")
 interpreter = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 logger.debug(f"Input details: {input_details}")
 
-#class_names = [name.strip('"') for name in np.loadtxt('yamnet_class_map.csv', delimiter=',', dtype=str, skiprows=1, usecols=3)]
 # use csv to deal with col2 instances of quoted strings w/ commas
 
 class_names = []
-#with open('yamnet_class_map.csv', 'r') as file:
 with open(class_map_path, 'r') as file:
     reader = csv.reader(file)
     next(reader)  # Skip the header

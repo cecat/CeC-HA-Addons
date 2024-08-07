@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 0.0.e
+- Cleaned up, made debug messages more helpful
+
 ## 0.0.d
 - added 4th column to yamnet_class_map.csv to group classes into a smaller
   number of 'super-classes' such as "people," "bird," "weather," or "vehicle."
