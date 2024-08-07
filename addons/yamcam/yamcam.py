@@ -37,9 +37,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> ")
-logger.info("----------------> Add-on Started.")
-logger.info("----------------> ")
+logger.info("----------------> Add-on Started <---------------- ")
 
 ### Load user config; bail there are YAML problems
 
@@ -87,7 +85,7 @@ try:
     mqtt_host = mqtt_settings['host']
     mqtt_port = mqtt_settings['port']
     mqtt_topic_prefix = mqtt_settings['topic_prefix']
-    mqtt_client_id = "yamcamLocal"  # avoid colliding with official version
+    mqtt_client_id = "yamcamgit2"  # avoid colliding with other test versions
     mqtt_username = mqtt_settings['user']
     mqtt_password = mqtt_settings['password']
     mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
@@ -181,39 +179,45 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             '-ac', '1',
             'pipe:1'
         ]
-        
+
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = process.communicate()
-        
+
         if process.returncode == 0:
             with io.BytesIO(stdout) as f:
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
 
-            # Normalize the volume - this seemed like a good idea at the time...
-            #waveform = waveform / np.max(np.abs(waveform))
+            # Normalize the volume
+            # waveform = waveform / np.max(np.abs(waveform))
 
-            # Reshape the waveform to match yamnet's expected input shape
-            expected_length = input_details[0]['shape'][0]
-            if waveform.shape[0] > expected_length:
-                waveform = waveform[:expected_length]
-            elif waveform.shape[0] < expected_length:
-                padding = np.zeros(expected_length - waveform.shape[0], dtype=np.float32)
-                waveform = np.concatenate((waveform, padding))
+            # Process the full waveform in 0.975s segments
+            segment_length = input_details[0]['shape'][0]  # 15600 samples
+            step_size = int(0.975 * 16000 * 0.5)  # 50% overlap
 
-            waveform = waveform.astype(np.float32)
-            
-            interpreter.set_tensor(input_details[0]['index'], waveform)
-            interpreter.invoke()
-            scores = interpreter.get_tensor(output_details[0]['index'])
-            
-            return scores
-        
+            all_scores = []
+
+            for start in range(0, len(waveform) - segment_length + 1, step_size):
+                segment = waveform[start:start + segment_length]
+                segment = segment.astype(np.float32)
+
+                interpreter.set_tensor(input_details[0]['index'], segment)
+                interpreter.invoke()
+                scores = interpreter.get_tensor(output_details[0]['index'])
+
+                all_scores.append(scores)
+
+            # Combine the scores from all segments (this is a simple example, you may need a more sophisticated method)
+            combined_scores = np.mean(all_scores, axis=0)
+
+            return combined_scores
+
         logger.error(f"FFmpeg error (attempt {attempt + 1}/{retries}): {stderr.decode('utf-8')}")
         if "No route to host" in stderr.decode('utf-8'):
             logger.error(f"Verify that the RTSP feed '{rtsp_url}' is correct.")
         time.sleep(5)  # Wait a bit before retrying
 
     return None  # Return None if all attempts fail
+
 
 ####
 #### Main Loop

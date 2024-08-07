@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 0.0.i
+- divide our audio sample into yamnet-sized segments, slightly overlapping
+  and analyze the longer duration rather than just trimming the whole thing 
+  to 0.975s.
+
 ## 0.0.h
 - remove waveform normalization, as it may have killed our accuracy
 
