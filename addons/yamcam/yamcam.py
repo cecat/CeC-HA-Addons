@@ -207,7 +207,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 all_scores.append(scores)
 
             # Combine the scores from all segments (this is a simple example, you may need a more sophisticated method)
-            combined_scores = np.mean(all_scores, axis=0)
+            combined_scores = np.max(all_scores, axis=0)
 
             return combined_scores
 

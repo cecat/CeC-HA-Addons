@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 0.0.j
+- use max pooling to combine the scores of the segments
+
 ## 0.0.i
 - divide our audio sample into yamnet-sized segments, slightly overlapping
   and analyze the longer duration rather than just trimming the whole thing 
