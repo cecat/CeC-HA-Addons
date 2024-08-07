@@ -189,8 +189,8 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             with io.BytesIO(stdout) as f:
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
 
-            # Normalize the volume
-            waveform = waveform / np.max(np.abs(waveform))
+            # Normalize the volume - this seemed like a good idea at the time...
+            #waveform = waveform / np.max(np.abs(waveform))
 
             # Reshape the waveform to match yamnet's expected input shape
             expected_length = input_details[0]['shape'][0]
