@@ -23,18 +23,19 @@ Extensions (AVX) instructions), so it's far from proven.  It's not yet clear
 to me that this will be useful in the end but it is worth a try.
 
 ## Installing
-Be patient the first time you install...  It builds a pretty complicated
-image so the first time
-installation will take 5-10 minutes depending on the speed of your Internet
-connection and of your CPU (it took 13 minutes to build on an RPi-4).
-Subsequent updates will not take nearly so long. (I will try to improve this...
-right now just going for functionality)
+Be patient the first time you install...  We are pulling a very large pre-built
+image (~600MB) for the initial build, so it could easily take 15 minutes for the
+first build.  Subsequent updates, unless major, will build without re-downloading.
+(I will try to improve this...  right now just going for functionality)
 
-## Configuring this Add-on
+## Using and Configuring this Add-on
 
-The code right now has very extensive logging as I am experimenting with things like
-sample frequency and thresholds.  For each sound source, at each reporting interval,
+For each sound source, at each reporting interval,
 we send a MQTT  message to HA of the form "Class (score), Class (score)..."
+This is not very convenient to parse from the HA side. I'm experimenting with
+the best way to format this (the Frigate messages are pretty detailed JSON
+which yields very powerful HA capabilities, but I'm aiming for something
+simpler, as this is a simpler capability).
 
 0. This addon assumes you are running a MQTT broker already. This code
 has (only) been tested with the open source
@@ -88,7 +89,10 @@ You will also see *yamnet_class_map.csv* in this subdirectory. This maps the
 return codes from Yamnet to the human-readable names for those classes. There are
 a whopping 521 sound classes.
 
-There is a Deprecation warning regarding the paho mqtt client and I've given up
-trying to address that for now, as even with GPT4o's help I could not fix it.
+There is a Deprecation warning regarding the paho mqtt client and I've 
+put debugging that on hold. Even with Gemini's and GPT4o's help I've been stumped
+(feeding 4o the release notes and documentation, since it's training data  is only trained on
+cutoff pre-dates the update to paho 2.0). On my to-do list is to try again,
+perhaps with the help of Llama3... 
 
 
