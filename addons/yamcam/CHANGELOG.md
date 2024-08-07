@@ -1,6 +1,17 @@
 
 # Changelog
 
+## 0.0.g
+- Improve the grouping but keeping the entire original display_name for the
+  class, but compressing it into a string with camelCase.
+- you thought I was using hex
+
+## 0.0.f
+- Improved the grouping scheme, so that rather than losing the original class
+  name (e.g., "Honk" and "Hoot" are both in my "birds" group, but I'd like
+  to know if it's a goose or an owl, so rather than the original scheme
+  reporting "bird" we now report "bird.honk" or "bird.hoot"
+
 ## 0.0.e
 - Cleaned up, made debug messages more helpful
 

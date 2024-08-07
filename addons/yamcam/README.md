@@ -90,9 +90,13 @@ You will also see *yamnet_class_map.csv* in this subdirectory. This maps the
 return codes from Yamnet to the human-readable names for those classes. Yamnet has
 a whopping 521 sound classes.  I've added a column to the original yamnet_class_map.csv
 that groups related sounds, creating a composite of the group and the original class of the
-form group.class but (a) making everything lower case and (b) keeping only the first word
-of the original class name.  So the Yamnet class *Middle Eastern music* is grouped into
-my *music* group and will be reported by the addon as *music.middle*.
+form group.class where I also squished the class names ("display_name" in the CSV)
+to remove whitespace and punctuation.
+So the Yamnet class *Middle Eastern music* is grouped into
+my *music* group and will be reported by the addon as *music.middleEasternMusic*.
+This way the original Yamnet class is preserved, but one can ignore and just use the
+group name for simpler uses.  So if you want to create an automation that alerts you
+that someone is playing Rock and roll but not Country, this update will make you happy.
 
 There is a Deprecation warning regarding the paho mqtt client and I've 
 put debugging that on hold. Even with Gemini's and GPT4o's help I've been stumped
