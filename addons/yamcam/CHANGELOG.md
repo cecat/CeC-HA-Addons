@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 0.0.h
+- remove waveform normalization, as it may have killed our accuracy
+
 ## 0.0.g
 - Improve the grouping but keeping the entire original display_name for the
   class, but compressing it into a string with camelCase.
