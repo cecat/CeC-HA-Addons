@@ -5,7 +5,9 @@ July 2024
 ---
 
 ### This is still a work in progress
-It's basically working but I am still finding issues to fix...
+It's basically working but I am not at all happy with its performance even on what seem
+to be fairly clear signals.  So it's under construction still as I experiment with
+various ways to give yamnet a signal that will let it shine.
 
 Use TensorFlow Lite and the YAMNet sound model to characterize 
 sounds deteced by  microphones on remote cameras.

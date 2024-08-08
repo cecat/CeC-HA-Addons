@@ -12,6 +12,8 @@ import io
 import logging
 import tflite_runtime.interpreter as tflite
 import csv
+from scipy.signal import wiener
+
 
 ### setup
 
@@ -186,6 +188,9 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
         if process.returncode == 0:
             with io.BytesIO(stdout) as f:
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
+
+            # Apply Wiener filter to reduce noise
+            waveform = wiener(waveform)
 
             # Normalize the volume
             # waveform = waveform / np.max(np.abs(waveform))

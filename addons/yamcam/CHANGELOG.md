@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 0.0.k
+- add scipy for filtering input waveform to remove white noise before classifying.
+- in this version we'll start with a Wiener filter
+  (not to be confused with a "whiner" filter which would have many uses in other contexts)
+
 ## 0.0.j
 - use max pooling to combine the scores of the segments
 
