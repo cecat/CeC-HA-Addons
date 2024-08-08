@@ -41,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k+--+-+-* ")
+logger.info("----------------> Add-on Started <----------------*k__+--+-+-* ")
 
 ### Load user config; bail there are YAML problems
 
@@ -190,6 +190,9 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
         if process.returncode == 0:
             with io.BytesIO(stdout) as f:
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
+
+            # make sure we have the correct shape 
+            waveform = np.squeeze(waveform)
 
             # dump waveform into a file for inspection
             if not os.path.exists(saveWave_dir):
