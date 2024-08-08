@@ -41,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k__+--+-+-* ")
+logger.info("----------------> Add-on Started <----------------*k---__+--+-+-* ")
 
 ### Load user config; bail there are YAML problems
 
@@ -168,6 +168,28 @@ with open(class_map_path, 'r') as file:
         class_names.append(row[3].strip('"'))
 
 
+### Hack to avoid divide/zero with Wiener filter
+from scipy.ndimage import uniform_filter
+import numpy as np
+
+def safe_wiener(x, mysize=None, noise=None):
+    if mysize is None:
+        mysize = [3] * x.ndim
+    mysize = np.asarray(mysize)
+
+    lMean = uniform_filter(x, mysize, mode='reflect')
+    lVar = uniform_filter(x**2, mysize, mode='reflect') - lMean**2
+
+    if noise is None:
+        noise = np.mean(lVar)
+
+    # Add a small epsilon to local variance to prevent divide by zero
+    epsilon = 1e-10
+    res = (x - lMean) * (1 - noise / (lVar + epsilon))
+    res += lMean
+
+    return res
+
 ### Function to analyze audio using YAMNet
 
 def analyze_audio(rtsp_url, duration=10, retries=3):
@@ -200,11 +222,8 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             else:
                 np.save(saveWave_path, waveform)
 
-            # add a smidge to avoid zero variance ->divide by zero with the Wiener filter
-            waveform += 1e-10
-
             # Apply Wiener filter to reduce background white noise
-            waveform = wiener(waveform)
+            waveform = safe_wiener(waveform)
 
             # Normalize the volume
             # waveform = waveform / np.max(np.abs(waveform))
