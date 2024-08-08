@@ -21,7 +21,7 @@ from scipy.ndimage import uniform_filter
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-saveWave_path = '/cec/waveform.npy'
+saveWave_path = '/config/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
 
 # Map log level from string to logging constant
@@ -42,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k*+ ")
+logger.info("----------------> Add-on Started <----------------****k*+ ")
 
 ### Load user config; bail there are YAML problems
 
