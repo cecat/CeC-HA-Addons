@@ -199,7 +199,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 if not os.path.exists(saveWave_dir):
                     logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
                 else:
-                    loger.debug(f"Copy of wavefile saved in {saveWave_path}.")
+                    logger.debug(f"Copy of wavefile saved in {saveWave_path}.")
                     np.save(saveWave_path, waveform)
 
             # Process the full waveform in 0.975s segments
