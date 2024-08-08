@@ -42,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------<>**k*+ ")
+logger.info("----------------> Add-on Started <----------------<**>k*+ ")
 
 ### Load user config; bail there are YAML problems
 
@@ -194,11 +194,13 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             # make sure we have the correct shape 
             waveform = np.squeeze(waveform)
 
-            # dump waveform into a file for inspection
-            if not os.path.exists(saveWave_dir):
-                logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
-            else:
-                np.save(saveWave_path, waveform)
+            # dump waveform into a file for inspection if we are in DEBUG logging mode
+            if logger.getEffectiveLevel() == logging.DEBUG: 
+                if not os.path.exists(saveWave_dir):
+                    logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
+                else:
+                    loger.debug(f"Copy of wavefile saved in {saveWave_path}."))
+                    np.save(saveWave_path, waveform)
 
             # Process the full waveform in 0.975s segments
             segment_length = input_details[0]['shape'][0]  # 15600 samples
