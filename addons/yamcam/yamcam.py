@@ -65,6 +65,7 @@ try:
     reporting_threshold = general_settings.get('reporting_threshold', 0.4)
     log_level = general_settings.get('log_level', 'INFO').upper()
     top_k = general_settings.get('top_k', 3)
+    sample_duration = general_settings.get('sample_duration', 10)
 except KeyError as e:
     logger.error(f"Missing general settings in the configuration file: {e}")
     raise
@@ -93,7 +94,7 @@ try:
     mqtt_client_id = "yamcamgit2"  # avoid colliding with other test versions
     mqtt_username = mqtt_settings['user']
     mqtt_password = mqtt_settings['password']
-    mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
+    #mqtt_stats_interval = mqtt_settings.get('stats_interval', 30)
 except KeyError as e:
     logger.error(f"Missing MQTT settings in the configuration file: {e}")
     raise
@@ -199,7 +200,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 if not os.path.exists(saveWave_dir):
                     logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
                 else:
-                    logger.debug(f"Copy of wavefile saved in {saveWave_path}.")
+                    logger.debug(f"Copy of wavefile saved in {saveWave_path}. Processing now:")
                     np.save(saveWave_path, waveform)
 
             # Process the full waveform in 0.975s segments
