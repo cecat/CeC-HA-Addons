@@ -39,7 +39,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <---------------- ")
+logger.info("----------------> Add-on Started <----------------*k* ")
 
 ### Load user config; bail there are YAML problems
 
