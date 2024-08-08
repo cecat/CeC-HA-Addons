@@ -42,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k* ")
+logger.info("----------------> Add-on Started <----------------*k*+ ")
 
 ### Load user config; bail there are YAML problems
 
@@ -168,27 +168,6 @@ with open(class_map_path, 'r') as file:
     for row in reader:
         class_names.append(row[3].strip('"'))
 
-
-### Hack to avoid divide/zero with Wiener filter
-
-def safe_wiener(x, mysize=None, noise=None):
-    if mysize is None:
-        mysize = [3] * x.ndim
-    mysize = np.asarray(mysize)
-
-    lMean = uniform_filter(x, mysize, mode='reflect')
-    lVar = uniform_filter(x**2, mysize, mode='reflect') - lMean**2
-
-    if noise is None:
-        noise = np.mean(lVar)
-
-    # Add a small epsilon to local variance to prevent divide by zero
-    epsilon = 1e-10
-    res = (x - lMean) * (1 - noise / (lVar + epsilon))
-    res += lMean
-
-    return res
-
 ### Function to analyze audio using YAMNet
 
 def analyze_audio(rtsp_url, duration=10, retries=3):
@@ -220,12 +199,6 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
             else:
                 np.save(saveWave_path, waveform)
-
-            # Apply Wiener filter to reduce background white noise
-            waveform = safe_wiener(waveform)
-
-            # Normalize the volume
-            # waveform = waveform / np.max(np.abs(waveform))
 
             # Process the full waveform in 0.975s segments
             segment_length = input_details[0]['shape'][0]  # 15600 samples
@@ -268,8 +241,6 @@ while True:
         if scores is not None:
             # Log the scores for the top class names
             top_class_indices = np.argsort(scores[0])[::-1]
-            for i in top_class_indices[:10]:  # Log top 10 scores for better insight
-                logger.debug(f"Camera: {camera_name}, Class: {class_names[i]}, Score: {scores[0][i]}")
             for i in top_class_indices[:10]:  # Log top 10 scores for better insight
                 logger.debug(f"Camera: {camera_name}, Class index: {i}, Class: {class_names[i]}, Score: {scores[0][i]}")
 
