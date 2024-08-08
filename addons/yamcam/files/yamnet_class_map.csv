@@ -84,7 +84,7 @@ index,mid,display_name,Group
 82,/m/03k3r,Horse,animals.horse
 83,/m/07rv9rh,Clip-clop,animals.clipClop
 84,/m/07q5rw0,"Neigh, whinny",animals.neighWhinny
-85,/m/01xq0k1,"Cattle, bovinae",animals.cattleBovinae
+85,/m/01xq0k1,"Cattle, bovinae",birds.cattleBovinae
 86,/m/07rpkh9,Moo,animals.moo
 87,/m/0239kh,Cowbell,animals.cowbell
 88,/m/068zj,Pig,animals.pig
@@ -92,12 +92,12 @@ index,mid,display_name,Group
 90,/m/03fwl,Goat,animals.goat
 91,/m/07q0h5t,Bleat,animals.bleat
 92,/m/07bgp,Sheep,animals.sheep
-93,/m/025rv6n,Fowl,animals.fowl
-94,/m/09b5t,"Chicken, rooster",animals.chickenRooster
-95,/m/07st89h,Cluck,animals.cluck
-96,/m/07qn5dc,"Crowing, cock-a-doodle-doo",animals.crowingCockADoodleDoo
-97,/m/01rd7k,Turkey,animals.turkey
-98,/m/07svc2k,Gobble,animals.gobble
+93,/m/025rv6n,Fowl,birds.fowl
+94,/m/09b5t,"Chicken, rooster",birds.chickenRooster
+95,/m/07st89h,Cluck,birds.cluck
+96,/m/07qn5dc,"Crowing, cock-a-doodle-doo",birds.crowingCockADoodleDoo
+97,/m/01rd7k,Turkey,birds.turkey
+98,/m/07svc2k,Gobble,birds.gobble
 99,/m/09ddx,Duck,birds.duck
 100,/m/07qdb04,Quack,birds.quack
 101,/m/0dbvp,Goose,birds.goose
@@ -484,8 +484,8 @@ index,mid,display_name,Group
 482,/m/07s34ls,Whir,construction.whir
 483,/m/07qmpdm,Clatter,construction.clatter
 484,/m/07p9k1k,Sizzle,construction.sizzle
-485,/m/07qc9xj,Clicking,animals.clicking
-486,/m/07rwm0c,Clickety-clack,animals.clicketyClack
+485,/m/07qc9xj,Clicking,birds.clicking
+486,/m/07rwm0c,Clickety-clack,birds.clicketyClack
 487,/m/07phhsh,Rumble,weather.rumble
 488,/m/07qyrcz,Plop,animals.plop
 489,/m/07qfgpx,"Jingle, tinkle",domestic.jingleTinkle
