@@ -53,11 +53,13 @@ This configuration file will look something like below. Put this file into */con
 
 ```
 general:
-  sample_interval: 8        # Sampling interval (seconds)
-  reporting_threshold: 0.4  # Reporting threshold for sound type scores
-  log_level: INFO           # Default is INFO
-                            # DEBUG->INFO->WARNING->ERROR->CRITICAL for decreasing verbosity
-  top_k: 3                  # Number of top scoring classes to report
+  sample_interval: 15       # Sampling interval (seconds) (default 15)
+                            #     how long to wait between each camera
+  reporting_threshold: 0.5  # Reporting threshold for sound class scores (default 0.4)
+  log_level: DEBUG          # (Default INFO)
+                            # DEBUG->INFO->WARNING->ERROR->CRITICAL for decreasing verbosity 
+  top_k: 3                  # Number of top scoring classes to report (default 3)
+  sample_duration: 10       # Sound sample length (seconds) (default 10) 
 
 
 mqtt:
@@ -67,7 +69,6 @@ mqtt:
   client_id: "yamcam"       # unique, adjust to your taste
   user: "mymqttusername"    # your mqtt username 
   password: "mymqttpassword"#         & password
-  stats_interval: 30        # how often to report (via mqtt) to HA
 
 # coupla examples of Amcrest cam rtsp feeds
 cameras:
