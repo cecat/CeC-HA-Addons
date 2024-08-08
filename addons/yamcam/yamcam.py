@@ -42,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------****k*+ ")
+logger.info("----------------> Add-on Started <----------------<>**k*+ ")
 
 ### Load user config; bail there are YAML problems
 
@@ -242,7 +242,9 @@ while True:
             # Log the scores for the top class names
             top_class_indices = np.argsort(scores[0])[::-1]
             for i in top_class_indices[:10]:  # Log top 10 scores for better insight
-                logger.debug(f"Camera: {camera_name}, Class index: {i}, Class: {class_names[i]}, Score: {scores[0][i]}")
+                #logger.debug(f"Cam: {camera_name}, index: {i}, Class: {class_names[i]}, Score: {scores[0][i]}")
+                logger.debug(f"Cam: {camera_name}, index: {i}, Class: {class_names[i]}, Score: {scores[0][i]:.2f}")
+
 
             # Filter and format the top class names with their scores
             results = []
