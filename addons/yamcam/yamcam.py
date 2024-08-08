@@ -231,6 +231,27 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
 
     return None  # Return None if all attempts fail
 
+### function to compute composite scores for groups of classes
+def group_scores(top_class_indices, class_names, scores):
+    group_scores_dict = {}
+    
+    for i in top_class_indices[:10]:
+        class_name = class_names[i]
+        score = scores[0][i]
+        group = class_name.split('.')[0]
+        
+        if group not in group_scores_dict:
+            group_scores_dict[group] = []
+        group_scores_dict[group].append(score)
+    
+    composite_scores = []
+    for group, group_scores in group_scores_dict.items():
+        max_score = max(group_scores)
+        composite_score = max_score + 0.05 * len(group_scores)
+        composite_scores.append((group, composite_score))
+    
+    return composite_scores
+
 
 ####
 #### Main Loop
@@ -245,9 +266,13 @@ while True:
             # Log the scores for the top class names
             top_class_indices = np.argsort(scores[0])[::-1]
             for i in top_class_indices[:10]:  # Log top 10 scores for better insight
-                #logger.debug(f"Cam: {camera_name}, index: {i}, Class: {class_names[i]}, Score: {scores[0][i]}")
                 logger.debug(f"{camera_name}: index: {i}, Class: {class_names[i]}, Score: {scores[0][i]:.2f}")
 
+
+            # Calculate composite group scores
+            composite_scores = group_scores(top_class_indices, class_names, scores)
+            for group, score in composite_scores:
+                logger.debug(f"Group: {group}, Composite Score: {score:.2f}")
 
             # Filter and format the top class names with their scores
             results = []
