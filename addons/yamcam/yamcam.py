@@ -13,6 +13,7 @@ import logging
 import tflite_runtime.interpreter as tflite
 import csv
 from scipy.signal import wiener
+from scipy.ndimage import uniform_filter
 
 
 ### setup
@@ -41,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k---__+--+-+-* ")
+logger.info("----------------> Add-on Started <----------------*k* ")
 
 ### Load user config; bail there are YAML problems
 
@@ -169,8 +170,6 @@ with open(class_map_path, 'r') as file:
 
 
 ### Hack to avoid divide/zero with Wiener filter
-from scipy.ndimage import uniform_filter
-import numpy as np
 
 def safe_wiener(x, mysize=None, noise=None):
     if mysize is None:
@@ -271,6 +270,8 @@ while True:
             top_class_indices = np.argsort(scores[0])[::-1]
             for i in top_class_indices[:10]:  # Log top 10 scores for better insight
                 logger.debug(f"Camera: {camera_name}, Class: {class_names[i]}, Score: {scores[0][i]}")
+            for i in top_class_indices[:10]:  # Log top 10 scores for better insight
+                logger.debug(f"Camera: {camera_name}, Class index: {i}, Class: {class_names[i]}, Score: {scores[0][i]}")
 
             # Filter and format the top class names with their scores
             results = []
