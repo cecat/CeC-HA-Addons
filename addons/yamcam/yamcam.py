@@ -21,7 +21,7 @@ from scipy.ndimage import uniform_filter
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-saveWave_path = '/data/yamcam-sounds/waveform.npy'
+saveWave_path = '/cec/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
 
 # Map log level from string to logging constant
