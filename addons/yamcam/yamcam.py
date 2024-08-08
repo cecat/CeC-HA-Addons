@@ -21,6 +21,7 @@ config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 saveWave_path = '/data/yamcam-sounds/waveform.npy'
+saveWave_dir = os.path.dirname(saveWave_path)
 
 # Map log level from string to logging constant
 log_levels = {
@@ -40,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k+-+-* ")
+logger.info("----------------> Add-on Started <----------------*k+--+-+-* ")
 
 ### Load user config; bail there are YAML problems
 
@@ -191,7 +192,10 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
 
             # dump waveform into a file for inspection
-            np.save(saveWave_path, waveform)
+            if not os.path.exists(saveWave_dir):
+                logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
+            else:
+                np.save(saveWave_path, waveform)
 
             # add a smidge to avoid zero variance ->divide by zero with the Wiener filter
             waveform += 1e-10
