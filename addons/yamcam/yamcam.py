@@ -42,7 +42,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------<**>k*+ ")
+logger.info("----------------> Add-on Started <----------------<..k ")
 
 ### Load user config; bail there are YAML problems
 
@@ -147,7 +147,6 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 # In DEBUG mode, format input details for ease of readability
-#logger.debug(f"Input details: {input_details}") #original butt-ugly output
 def format_input_details(details):
     formatted_details = "Input Details:\n"
     for detail in details:
@@ -232,6 +231,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
     return None  # Return None if all attempts fail
 
 ### function to compute composite scores for groups of classes
+#   cap scores at 0.95 and don't apply bonus if max score in group >=0.7
 def group_scores(top_class_indices, class_names, scores):
     group_scores_dict = {}
     
@@ -247,7 +247,12 @@ def group_scores(top_class_indices, class_names, scores):
     composite_scores = []
     for group, group_scores in group_scores_dict.items():
         max_score = max(group_scores)
-        composite_score = max_score + 0.05 * len(group_scores)
+        if max_score < 0.7:
+            composite_score = max_score + 0.05 * len(group_scores)
+        else:
+            composite_score = max_score
+        
+        composite_score = min(composite_score, 0.95)
         composite_scores.append((group, composite_score))
     
     return composite_scores
