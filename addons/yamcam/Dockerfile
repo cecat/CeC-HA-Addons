@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TensorFlow Lite runtime and compatible NumPy version
-RUN pip install --no-cache-dir tflite-runtime 'numpy<2.0' paho-mqtt pyyaml
+RUN pip install --no-cache-dir tflite-runtime 'numpy<2.0' paho-mqtt pyyaml scipy
 
 # Copy the local model and class map files from the subdirectory
 COPY files/yamnet.tflite .
