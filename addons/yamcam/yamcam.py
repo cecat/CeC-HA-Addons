@@ -39,7 +39,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-logger.info("----------------> Add-on Started <----------------*k+* ")
+logger.info("----------------> Add-on Started <----------------*k++* ")
 
 ### Load user config; bail there are YAML problems
 
@@ -190,7 +190,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
 
             # Apply Wiener filter to reduce background white noise
-            waveform = wiener(waveform, noise=waveform_var)
+            waveform = wiener(waveform)
 
             # add a smidge to avoid zero variance ->divide by zero in the next step
             waveform = np.where(waveform == 0, 1e-10, waveform)
