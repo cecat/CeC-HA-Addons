@@ -17,7 +17,8 @@
   "logo": "logo.png",
   "icon": "icon.png",
   "map": [
-    "config:rw"
+    "config:rw",
+    "data:rw"
   ],
   "url": "https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam"
 }
