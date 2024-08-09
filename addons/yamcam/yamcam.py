@@ -205,8 +205,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
 
             # Process the full waveform in 0.975s segments
             segment_length = input_details[0]['shape'][0]  # 15600 samples
-		#### TRY 25% overlap ###
-            step_size = int(0.975 * 16000 * 0.25)  # 50% overlap
+            step_size = int(0.975 * 16000 * 0.5)  # 50% overlap
 
             all_scores = []
 
