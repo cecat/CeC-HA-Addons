@@ -120,12 +120,12 @@ index,mid,display_name,Group
 118,/m/06hps,"Rodents, rats, mice",animals.rodentsRatsMice
 119,/m/04rmv,Mouse,animals.mouse
 120,/m/07r4gkf,Patter,animals.patter
-121,/m/03vt0,Insect,bugs.insect
-122,/m/09xqv,Cricket,bugs.cricket
-123,/m/09f96,Mosquito,bugs.mosquito
-124,/m/0h2mp,"Fly, housefly",bugs.flyHousefly
-125,/m/07pjwq1,Buzz,bugs.buzz
-126,/m/01h3n,"Bee, wasp, etc.",bugs.beeWaspEtc.
+121,/m/03vt0,Insect,insects.insect
+122,/m/09xqv,Cricket,insects.cricket
+123,/m/09f96,Mosquito,insects.mosquito
+124,/m/0h2mp,"Fly, housefly",insects.flyHousefly
+125,/m/07pjwq1,Buzz,insects.buzz
+126,/m/01h3n,"Bee, wasp, etc.",insects.beeWaspEtc.
 127,/m/09ld4,Frog,animals.frog
 128,/m/07st88b,Croak,animals.croak
 129,/m/078jl,Snake,animals.snake
