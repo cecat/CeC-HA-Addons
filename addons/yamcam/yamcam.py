@@ -170,6 +170,7 @@ with open(class_map_path, 'r') as file:
 
 ### Function to analyze audio using YAMNet
 # default 10s duration if not specified in config_path
+
 def analyze_audio(rtsp_url, duration=10, retries=3):
     for attempt in range(retries):
         command = [
@@ -213,7 +214,9 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 segment = segment.astype(np.float32)
 
                 # Ensure the input tensor is correctly initialized and filled
-                input_tensor = interpreter.tensor(input_details[0]['index'])()[0]
+                interpreter.resize_tensor_input(input_details[0]['index'], [len(segment)])
+                interpreter.allocate_tensors()
+                input_tensor = interpreter.tensor(input_details[0]['index'])()
                 input_tensor.fill(0)
                 input_tensor[:len(segment)] = segment
 
@@ -233,6 +236,7 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
         time.sleep(5)  # Wait a bit before retrying
 
     return None  # Return None if all attempts fail
+
 
 ### function to compute composite scores for groups of classes
 #   cap scores at 0.95 and don't apply bonus if max score in group >=0.7
