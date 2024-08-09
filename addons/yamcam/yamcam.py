@@ -170,7 +170,6 @@ with open(class_map_path, 'r') as file:
 
 ### Function to analyze audio using YAMNet
 # default 10s duration if not specified in config_path
-
 def analyze_audio(rtsp_url, duration=10, retries=3):
     for attempt in range(retries):
         command = [
@@ -192,11 +191,11 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             with io.BytesIO(stdout) as f:
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
 
-            # make sure we have the correct shape 
+            # Ensure correct shape
             waveform = np.squeeze(waveform)
 
-            # dump waveform into a file for inspection if we are in DEBUG logging mode
-            if logger.getEffectiveLevel() == logging.DEBUG: 
+            # Dump waveform into a file for inspection if in DEBUG logging mode
+            if logger.getEffectiveLevel() == logging.DEBUG:
                 if not os.path.exists(saveWave_dir):
                     logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
                 else:
@@ -213,13 +212,17 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 segment = waveform[start:start + segment_length]
                 segment = segment.astype(np.float32)
 
-                interpreter.set_tensor(input_details[0]['index'], segment)
+                # Ensure the input tensor is correctly initialized and filled
+                input_tensor = interpreter.tensor(input_details[0]['index'])()[0]
+                input_tensor.fill(0)
+                input_tensor[:len(segment)] = segment
+
                 interpreter.invoke()
                 scores = interpreter.get_tensor(output_details[0]['index'])
 
                 all_scores.append(scores)
 
-            # Combine the scores from all segments (this is a simple example, you may need a more sophisticated method)
+            # Combine the scores from all segments (simple max aggregation)
             combined_scores = np.max(all_scores, axis=0)
 
             return combined_scores
