@@ -213,12 +213,8 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 segment = waveform[start:start + segment_length]
                 segment = segment.astype(np.float32)
 
-                # Ensure the input tensor is correctly initialized and filled
-                interpreter.resize_tensor_input(input_details[0]['index'], [segment_length])
-                interpreter.allocate_tensors()
-                input_tensor = interpreter.tensor(input_details[0]['index'])()[0]
-                input_tensor[:segment_length] = segment
-
+                # Set the tensor with the segment data directly
+                interpreter.set_tensor(input_details[0]['index'], segment)
                 interpreter.invoke()
                 scores = interpreter.get_tensor(output_details[0]['index'])
 
