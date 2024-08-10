@@ -1,6 +1,10 @@
 
 # Changelog
 
+## 0.0.l
+- remove all input filtering, etc. as it prevented the model from correctly 
+  identifying anything.  
+
 ## 0.0.k
 - add scipy for filtering input waveform to remove white noise before classifying.
 - in this version we'll start with a Wiener filter

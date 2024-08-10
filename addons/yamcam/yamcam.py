@@ -192,11 +192,11 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
             with io.BytesIO(stdout) as f:
                 waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
 
-            # Ensure correct shape
+            # make sure we have the correct shape 
             waveform = np.squeeze(waveform)
 
-            # Dump waveform into a file for inspection if in DEBUG logging mode
-            if logger.getEffectiveLevel() == logging.DEBUG:
+            # dump waveform into a file for inspection if we are in DEBUG logging mode
+            if logger.getEffectiveLevel() == logging.DEBUG: 
                 if not os.path.exists(saveWave_dir):
                     logger.debug(f"Directory {saveWave_dir} does not exist. Skipping the write operation.")
                 else:
@@ -213,14 +213,13 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
                 segment = waveform[start:start + segment_length]
                 segment = segment.astype(np.float32)
 
-                # Set the tensor with the segment data directly
                 interpreter.set_tensor(input_details[0]['index'], segment)
                 interpreter.invoke()
                 scores = interpreter.get_tensor(output_details[0]['index'])
 
                 all_scores.append(scores)
 
-            # Combine the scores from all segments (simple max aggregation)
+            # Combine the scores from all segments (this is a simple example, you may need a more sophisticated method)
             combined_scores = np.max(all_scores, axis=0)
 
             return combined_scores
@@ -231,7 +230,6 @@ def analyze_audio(rtsp_url, duration=10, retries=3):
         time.sleep(5)  # Wait a bit before retrying
 
     return None  # Return None if all attempts fail
-
 
 ### function to compute composite scores for groups of classes
 #   cap scores at 0.95 and don't apply bonus if max score in group >=0.7
