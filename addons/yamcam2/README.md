@@ -8,7 +8,7 @@ to characterize sounds deteced by  microphones on networked cameras.
 *It does not record or keep any sound samples after analyzing them*. It
 takes brief (see settings) samples using FFMPEG and scores sound types 
 detected, based on a YAMnet's 520 sound classes.
-(This is version2 - previous version was an experiment that has here
+(This is version2 - previous version (yamcam) was an experiment that has here
 been nearly completely rewritten.)
 
 
