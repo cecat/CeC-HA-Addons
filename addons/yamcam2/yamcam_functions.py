@@ -138,18 +138,28 @@ def start_mqtt(config):
 
     #----- REPORT via MQTT -----#
 
-def report(sound_types_str, mqtt_client, mqtt_topic_prefix, camera_name):
+#def report(sound_types_str, mqtt_client, mqtt_topic_prefix, camera_name):
+def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
+
     if mqtt_client.is_connected():
-        logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {sound_types_str}")
+        #logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {sound_types_str}")
         try:
+            payload = {
+                'camera_name': camera_name,
+                'sound_types': results
+            }
+            payload_json = json.dumps(payload)
+
+            logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {payload_json}")
+
             result = mqtt_client.publish(
                 f"{mqtt_topic_prefix}/{camera_name}_sound_types",
-                sound_types_str
+                payload_json
             )
             result.wait_for_publish()
                                                                                
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.info(f"{camera_name}: {sound_types_str}")
+                logger.info(f"{camera_name}: {payload_json}")
             else:      
                 logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
         except Exception as e:

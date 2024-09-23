@@ -6,6 +6,7 @@ import time
 import numpy as np
 import logging
 import csv
+import json
 from yamcam_functions import (
         set_configuration, log_levels, logger,
         start_mqtt, load_model,
@@ -86,22 +87,28 @@ while True:
             if group_classes:
                 for group, score in composite_scores_sorted:
                     if score >= reporting_threshold:  # Use reporting_threshold from config
-                        results.append(f"{group} ({score:.2f})")
+                        #results.append(f"{group} ({score:.2f})")
+                        results.append({'class': group, 'score': round(score, 2)})
                     if len(results) >= report_k:
                         break
             else:
                 for i in top_class_indices:
                     score = scores[i]
                     if score >= reporting_threshold:  # Use reporting_threshold from config
-                        results.append(f"{class_names[i]} ({score:.2f})")
+                        #results.append(f"{class_names[i]} ({score:.2f})")
+                        results.append({'class': class_names[i], 'score': round(score, 2)})
                     if len(results) >= report_k:
                         break
 
+            if not results:
+                results = [{'class': '(none)', 'score': 0.0}]
+
             # Report via MQTT
-            sound_types_str = ', '.join(results)
-            if not sound_types_str:  # If nothing scored high enough, log as "(none)"
-                sound_types_str = "(none)"
-            report(sound_types_str, mqtt_client, mqtt_topic_prefix, camera_name)
+            #sound_types_str = ', '.join(results)
+            #if not sound_types_str:  # If nothing scored high enough, log as "(none)"
+            #    sound_types_str = "(none)"
+            #report(sound_types_str, mqtt_client, mqtt_topic_prefix, camera_name)
+            report(results, mqtt_client, mqtt_topic_prefix, camera_name)
 
         else:
             logger.error(f"Failed to analyze audio for {camera_name}")
