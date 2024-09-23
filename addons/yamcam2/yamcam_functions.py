@@ -11,6 +11,7 @@ import os
 import numpy as np
 import io
 import logging
+import json
 
 # Module-level variables
 interpreter = None
