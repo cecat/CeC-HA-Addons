@@ -1,4 +1,4 @@
-# Modified YAMNet Sound Class Scheme for Convenience Integrating with Home Assistant.
+## Modified YAMNet Sound Class Scheme for Convenience Integrating with Home Assistant.
 
 This directory contains the YAMNet *tflite* model (*yamnet.tflite*)
 and a *yamnet_class_map.csv*, a file that maps YAMNet output codes to
