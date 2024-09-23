@@ -3,7 +3,7 @@
   "url": "https://github.com/cecat/CeC-HA-Addons",
   "resources": [
     "https://github.com/cecat/CeC-HA-Addons/raw/main/addons/camera-volume/config.json",
-    "https://github.com/cecat/CeC-HA-Addons/raw/main/addons/yamcam/config.json"
+    "https://github.com/cecat/CeC-HA-Addons/raw/main/addons/yamcam2/config.json"
   ]
 }
 
