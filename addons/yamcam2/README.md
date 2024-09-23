@@ -78,7 +78,7 @@ general:
 mqtt:
   host: "x.x.x.x"           # Your MQTT server (commonly the IP addr of your HA server)
   port: 1883                # Default unless you specifically changed it in your broker
-  topic_prefix: "HA/sensor" # adjust to your taste
+  topic_prefix: "sounds"    # adjust to your taste
   client_id: "yamcam"       # adjust to your taste
   user: "mymqttusername"    # your mqtt username on your broker (e.g., Home Asst server) 
   password: "mymqttpassword"#         & password
@@ -136,7 +136,7 @@ in order of decreasing verbosity.
 
 - *host*: Typically this will be the hostname or IP address for your Home Assistant server.
 - *port*: MQTT by default uses port 1883.
-- *topic_prefix*: Should be of the form "xxx/yyy" according to how you manage your MQTT
+- *topic_prefix*: Should be of the form "abc" or "foo/bar" according to how you manage your MQTT
 usage in Home Assistant.  The addon will append the name of the camera (from your
 configuration file), with the detected sound classes as the payload to this topic.
 - *client_id*: This is unique to the add-on for managing MQTT connections and traffic.
