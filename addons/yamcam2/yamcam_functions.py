@@ -115,7 +115,7 @@ def start_mqtt(config):
         logger.error(f"Missing MQTT settings in the configuration file: {e}")
         raise
     logger.debug(
-        f"Check MQTT Settings:\n"
+        f"MQTT Settings:\n"
         f"   Host: {mqtt_host} ;  Port: {mqtt_port}\n"
         f"   Topic Prefix: {mqtt_topic_prefix}\n"
         f"   Client ID: {mqtt_client_id}\n"
