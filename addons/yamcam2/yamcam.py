@@ -11,7 +11,7 @@ from yamcam_functions import (
         set_configuration, logger,
         start_mqtt, load_model,
         set_sources, format_input_details, analyze_audio, group_scores, 
-        report, set_log_level
+        report, set_log_level, rank_sounds
 )
 import yamcam_config
 
@@ -73,7 +73,7 @@ while True:
 
         if scores is not None:
             # Sort and rank scores
-            results = rankings(scores, group_classes)
+            results = rank_sounds(scores, group_classes)
 
             # Report via MQTT
             report(results, mqtt_client, mqtt_topic_prefix, camera_name)
