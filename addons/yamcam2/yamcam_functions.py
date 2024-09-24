@@ -109,7 +109,7 @@ def start_mqtt():
     #mqtt_client_id = mqtt_settings['client_id']
     #mqtt_username = mqtt_settings['user']
     #mqtt_password = mqtt_settings['password']
-    mqtt_host = yamcam_config.mqtt_hose
+    mqtt_host = yamcam_config.mqtt_host
     mqtt_port = yamcam_config.mqtt_port
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
     mqtt_client_id = yamcam_config.mqtt_client_id
