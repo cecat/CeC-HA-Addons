@@ -101,7 +101,7 @@ def on_connect(client, userdata, flags, rc, properties=None):
 
     #----- START ME UP -----#
 
-def start_mqtt(config):
+def start_mqtt():
     #mqtt_settings = config['mqtt']
     #mqtt_host = mqtt_settings['host']
     #mqtt_port = mqtt_settings['port']
