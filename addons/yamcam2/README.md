@@ -74,7 +74,7 @@ general:
   report_k: 3               # Number of top scoring groups or classes to report (default 3)
   reporting_threshold: 0.5  # Reporting threshold for sound class scores (default 0.4)
   group_classes: true       # Default true, report by group rather than the original YAMNet classes
-  rollup = 0                # option to score across n minutes, 0 = don't
+  aggregation_method: max   # Use max or mean to pool scores across segments of a collected sample
   log_level: DEBUG          # (Default INFO)
                             # DEBUG->INFO->WARNING->ERROR->CRITICAL for decreasing verbosity 
 mqtt:
@@ -123,13 +123,18 @@ scores below this value (from 0.0 to 1.0).
 option to *false* will ignore these groupings and just report the native classes, however, they
 will still be prepended with groupnames (which are not part of the original YAMNet mappings).
 
-- *rollup*: We may wish to integrate scores across a longer period of time, such as
+- *aggregation_method*: YAMNet analyzes 0.96s samples. For longer *sample_duration*
+we divide the waveform into multiple segments, each 0.96s, overlapped by 50%.  The method
+specified here is used to create a score for the collection of segments. The choices are 
+*mean* or *max*. 
+
 5 or 10 minutes (or longer).  If non-zero, *rollup* option will take all of the
 *report_k* scores over *roll_up* minutes and report the *report_k* top scores across
 that period.  This will filter out momentary sounds, while persistent sound types
 (e.g., someone playing music or a conversation or television) will stand
 out.  Reporting will also be done with an interval of *rollup* minutes rather than
 the shorter intervals related to sample_interfal plus camera processing times.
+
 - *log_level*: Level of detail to be logged. Levels are
 DEBUG->INFO->WARNING->ERROR->CRITICAL
 in order of decreasing verbosity.
