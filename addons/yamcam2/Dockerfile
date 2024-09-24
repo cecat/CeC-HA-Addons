@@ -19,6 +19,7 @@ COPY files/yamnet_class_map.csv .
 # Copy the yamcam.py script and functions
 COPY yamcam.py .
 COPY yamcam_functions.py .
+COPY yamcam_config.py .
 
 # Set entrypoint
 CMD ["python", "yamcam.py"]

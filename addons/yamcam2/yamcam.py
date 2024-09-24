@@ -51,25 +51,16 @@ with open(class_map_path, 'r') as file:
 #            (see config for definitions)
 
              ## cameras = sound sources
-#camera_settings = set_sources(config)
 camera_settings = yamcam_config.camera_settings
 
              ## general settings
-#general_settings = config['general']
-#sample_interval = general_settings.get('sample_interval', 15)
-#group_classes = general_settings.get('group_classes', True)
-#sample_duration = general_settings.get('sample_duration', 3)
-#aggregation_method = general_settings.get('aggregation_method', 'max')
 sample_interval = yamcam_config.sample_interval
 group_classes = yamcam_config.group_classes
 sample_duration = yamcam_config.sample_duration
 aggregation_method = yamcam_config.aggregation_method
 
              ## MQTT settings
-#mqtt_topic_prefix = config['mqtt']['topic_prefix']
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
-
-
 
 ############# Main Loop #############
 
