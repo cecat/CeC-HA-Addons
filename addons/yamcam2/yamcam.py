@@ -72,8 +72,8 @@ while True:
         scores = analyze_audio(rtsp_url, duration=sample_duration)
 
         if scores is not None:
-            # Sort and rank scores
-            results = rank_sounds(scores, group_classes)
+            # Sort and rank scores, create json payload
+            results = rank_sounds(scores, group_classes, camera_name)
 
             # Report via MQTT
             report(results, mqtt_client, mqtt_topic_prefix, camera_name)

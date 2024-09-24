@@ -299,7 +299,7 @@ def analyze_audio(rtsp_url, duration=5):
     #     -  cap scores at 0.95 
     #     -  don't apply bonus if max score in group >=0.7
 
-def rank_sounds (scores, group_classes):
+def rank_sounds (camera_name, scores, group_classes):
 
              ## get config settings
     reporting_threshold = yamcam_config.reporting_threshold
