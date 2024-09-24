@@ -88,6 +88,7 @@ while True:
                 for group, score in composite_scores_sorted:
                     if score >= reporting_threshold:  # Use reporting_threshold from config
                         #results.append(f"{group} ({score:.2f})")
+                        score_python_float = float(score)
                         results.append({'class': group, 'score': round(score, 2)})
                     if len(results) >= report_k:
                         break
@@ -96,6 +97,7 @@ while True:
                     score = scores[i]
                     if score >= reporting_threshold:  # Use reporting_threshold from config
                         #results.append(f"{class_names[i]} ({score:.2f})")
+                        score_python_float = float(score)
                         results.append({'class': class_names[i], 'score': round(score, 2)})
                     if len(results) >= report_k:
                         break
