@@ -55,7 +55,7 @@ reporting_threshold = general_settings.get('reporting_threshold', 0.4)
 sample_duration = general_settings.get('sample_duration', 3)
 top_k = general_settings.get('top_k', 10)
 report_k = general_settings.get('report_k', 3)
-aggregation_method = general_settings.get('aggregation', 'max')
+aggregation_method = general_settings.get('aggregation_method', 'max')
 mqtt_topic_prefix = config['mqtt']['topic_prefix']
 
 

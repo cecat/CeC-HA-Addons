@@ -139,11 +139,9 @@ def start_mqtt(config):
 
     #----- REPORT via MQTT -----#
 
-#def report(sound_types_str, mqtt_client, mqtt_topic_prefix, camera_name):
 def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
 
     if mqtt_client.is_connected():
-        #logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {sound_types_str}")
         try:
             payload = {
                 'camera_name': camera_name,
@@ -175,8 +173,7 @@ def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
 
 def load_model(model_path):
     global interpreter, input_details, output_details
-    # check to see if we are using a Coral TPU
-
+    # for tpu - check to see if we are using a Coral TPU
     # if no tpu
     logger.debug("Loading YAMNet model")
     interpreter = tflite.Interpreter(model_path=model_path)
@@ -263,7 +260,8 @@ def analyze_audio(rtsp_url, duration=5, method='max'):
             all_scores = np.vstack(all_scores)  # Shape: (num_segments, num_classes)
 
             # Aggregate the scores across segments
-            # config var 'aggregation' is either max (default), mean, or sum
+            # config var 'aggregation_method' ('method' here)
+            # is either max (default), mean, or sum
 
             if method == 'mean':
                 combined_scores = np.mean(all_scores, axis=0)
