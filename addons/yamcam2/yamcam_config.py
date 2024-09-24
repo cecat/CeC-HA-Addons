@@ -33,16 +33,16 @@ noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented 
              ## cameras = sound sources
 try:
     camera_settings = config['cameras']
-    except KeyError as e:
-        logger.error(f"Missing camera settings in the configuration file: {e}")
-        raise
+except KeyError as e:
+    logger.error(f"Missing camera settings in the configuration file: {e}")
+    raise
 
              ## MQTT settings
 try:
     mqtt_settings = config['mqtt']
-    except KeyError as e:
-        logger.error(f"Missing camera settings in the configuration file: {e}")
-        raise
+except KeyError as e:
+    logger.error(f"Missing camera settings in the configuration file: {e}")
+    raise
 
 mqtt_topic_prefix = config['mqtt']['topic_prefix']
 mqtt_host = mqtt_settings['host']
