@@ -99,49 +99,54 @@ cameras:
 
 **General configuration variables**
 
-- *sample_interval*: Wait time (seconds) between cycling through the sound
+- **sample_interval**: Wait time (seconds) between cycling through the sound
 sources (ffmpeg, analyze, calculate scores, report via MQTT) so sample_interval
 for n cameras (on a low-end Celeron CPU it takes about 2s to process audio and report) is actually
 (sample_duration+2) * n + sample_interval.  So three with 3s *sample_duration* will take about
 15s to process, and if *sample_interval* is 15 then it each camera will get sampled about once
 every (3+2)*3 + 15 = 30s.
 
-- *sample_duration*: Sound sample length (seconds) (default 3). YAMNet operates on 16 KHz 
+- **sample_duration**: Sound sample length (seconds) (default 3). YAMNet operates on 16 KHz 
 frames, maximum 15,360 samples -- so it operates on 0.96s duration frames.  To analyze across
 longer durations we segment the waveform into 0.96s frames with 50% overlap, then combine the
 scores across the segments by taking the max of scores for each class.
 
-- *top_k*: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes.
+- **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes.
 
-- *report_k*: After analyzing top scores, we report the report_k highest scoring
+- **report_k**: After analyzing top scores, we report the report_k highest scoring
 classes (generally a subset of top_k).
 
-- *reporting_threshold*: Default 0.4 - When reporting to scores we ignore any classes with
+- **reporting_threshold**: Default 0.4 - When reporting to scores we ignore any classes with
 scores below this value (from 0.0 to 1.0).
 
-- *group_classes*: See note below re modifying the sound class maps to group them.  Setting this
+- **group_classes**: See note below re modifying the sound class maps to group them.  Setting this
 option to *false* will ignore these groupings and just report the native classes, however, they
 will still be prepended with groupnames (which are not part of the original YAMNet mappings).
 
-- *aggregation_method*: YAMNet analyzes 0.96s samples. For longer *sample_duration*
+- **aggregation_method**: YAMNet analyzes 0.96s samples. For longer *sample_duration*
 we divide the waveform into multiple segments, each 0.96s, overlapped by 50%.  The method
 specified here is used to create a score for the collection of segments. The choices are 
 *mean* or *max*. 
 
-- *log_level*: Level of detail to be logged. Levels are
+- **log_level**: Level of detail to be logged. Levels are
 DEBUG->INFO->WARNING->ERROR->CRITICAL
 in order of decreasing verbosity.
 
 **MQTT configuration variables**
 
-- *host*: Typically this will be the hostname or IP address for your Home Assistant server.
-- *port*: MQTT by default uses port 1883.
-- *topic_prefix*: Should be of the form "abc" or "foo/bar" according to how you manage your MQTT
+- **host**: Typically this will be the hostname or IP address for your Home Assistant server.
+
+- **port**: MQTT by default uses port 1883.
+
+- **topic_prefix**: Should be of the form "abc" or "foo/bar" according to how you manage your MQTT
 usage in Home Assistant.  The addon will append the name of the camera (from your
 configuration file), with the detected sound classes as the payload to this topic.
-- *client_id*: This is unique to the add-on for managing MQTT connections and traffic.
-- *user*: Here you will use the username/login on your server (e.g., that you set up for MQTT).
-- *password*: The password to the username/login you are using as *user*.
+
+- **client_id**: This is unique to the add-on for managing MQTT connections and traffic.
+
+- **user**: Here you will use the username/login on your server (e.g., that you set up for MQTT).
+
+- **password**: The password to the username/login you are using as *user*.
 
 ## Modified YAMNet Sound Class Scheme for Convenience Integrating with Home Assistant.
 
@@ -180,9 +185,9 @@ The code only pulls the n classes with the highest scores (n = *top_k* in the
 *microphones.yaml* configuration file) and then calculates a group score from
 these.  For example, if there are three *music_classname* scores in the top_k,
 the group score combines them as follows:
-1. If the highest score (*max_score*) among those in the same group >= 0.7,
+- If the highest score (*max_score*) among those in the same group >= 0.7,
 group_score = max_score
-2. Else group_score = max_score + 0.05(group_count), where group_count is the number of classes from that group are in the top_k scores. (group_score is capped at 0.95).
+- Else group_score = max_score + 0.05(group_count), where group_count is the number of classes from that group are in the top_k scores. (group_score is capped at 0.95).
 
 Flipping the config variable *group_classes* to *false* will result in reporting
 all *top_k* classes without grouping them or calculating group scores.  They will
