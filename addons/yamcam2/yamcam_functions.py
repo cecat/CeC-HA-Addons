@@ -147,14 +147,14 @@ def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
         try:
             payload = {
                 'camera_name': camera_name,
-                'sound_types': results
+                'sound_classes': results
             }
             payload_json = json.dumps(payload)
 
             logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {payload_json}")
 
             result = mqtt_client.publish(
-                f"{mqtt_topic_prefix}/{camera_name}_sound_types",
+                f"{mqtt_topic_prefix}/{camera_name}",
                 payload_json
             )
             result.wait_for_publish()
