@@ -54,29 +54,45 @@ we send a MQTT  message to HA of the form *topic_prefix* {json payload} where th
 json payload includes *camera_name* followed by *class*, *score* pairs, with up to *report_k*
 classes/scores reported.  Example:
 '''
-sounds/frontyardcam, {"camera_name": "frontyardcam", "sound_types": [{"class": "water", "score": 0.56}, {"class": "birds", "score": 0.53}, {"class": "animals", "score": 0.51}]}
+{
+    "camera_name": "pondcam",
+    "sound_classes": [
+        {
+            "class": "animals",
+            "score": 0.65
+        },
+        {
+            "class": "birds",
+            "score": 0.61
+        },
+        {
+            "class": "domestic",
+            "score": 0.38
+        }
+    ]
+}
 '''
 
 #### Sample Configuration File
 
 ```
 general:
-  sample_interval: 15        # Sampling interval (seconds) (default 15)
-  sample_duration: 3         # Sound sample length (seconds) (default 3) 
-  top_k: 10                  # Number of top scoring classes to analyze (default 10)
-  report_k: 3                # Number of top scoring groups or classes to report (default 3)
-  reporting_threshold: 0.5   # Reporting threshold for sound class scores (default 0.4)
-  group_classes: true        # Default true, report by group rather than the original YAMNet classes
-  aggregation_method: max    # Use max (default) or mean to pool scores across segments of a collected sample
-  log_level: DEBUG           # Default INFO. In order of decreasing verbosity:
-                             # DEBUG->INFO->WARNING->ERROR->CRITICAL 
+  sample_interval: 15           # Sampling interval (seconds) (default 15)
+  sample_duration: 3            # Sound sample length (seconds) (default 3) 
+  top_k: 10                     # Number of top scoring classes to analyze (default 10)
+  report_k: 3                   # Number of top scoring groups or classes to report (default 3)
+  reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
+  group_classes: true           # Default true, report by group rather than the original YAMNet classes
+  aggregation_method: max       # Use max (default) or mean to pool scores across segments of a collected sample
+  log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
+                                # DEBUG->INFO->WARNING->ERROR->CRITICAL 
 mqtt:
-  host: "x.x.x.x"            # Your MQTT server (commonly the IP addr of your HA server)
-  port: 1883                 # Default unless you specifically changed it in your broker
-  topic_prefix: "sounds"     # adjust to your taste
-  client_id: "yamcam"        # adjust to your taste
-  user: "mymqttusername"     # your mqtt username on your broker (e.g., Home Asst server) 
-  password: "mymqttpassword" #         & password
+  host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
+  port: 1883                    # Default unless you specifically changed it in your broker
+  topic_prefix: "yamcam/sounds" # adjust to your taste
+  client_id: "yamcam"           # adjust to your taste
+  user: "mymqttusername"        # your mqtt username on your broker (e.g., Home Asst server) 
+  password: "mymqttpassword"    #         & password
 
 # examples of Amcrest and UniFi NVR camera rtsp feeds
 cameras:
