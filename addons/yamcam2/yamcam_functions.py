@@ -12,6 +12,7 @@ import numpy as np
 import io
 import logging
 import json
+import yamcam_config
 
 # Module-level variables
 interpreter = None
@@ -24,16 +25,6 @@ output_details = None
 saveWave_path = '/config/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
 
-# Set up logging
-
-# Map log level from string to logging constant
-log_levels = {
-    'DEBUG': logging.DEBUG,
-    'INFO': logging.INFO,
-    'WARNING': logging.WARNING,
-    'ERROR': logging.ERROR,
-    'CRITICAL': logging.CRITICAL
-}
 
 ############# SETUP #############
 
@@ -67,8 +58,15 @@ def set_configuration(config_path):
     #----- SET LOG LEVEL FROM CONFIG -----#
 
 def set_log_level(config):
-    general_settings = config['general']
-    log_level = general_settings.get('log_level', 'INFO').upper()
+    # Map log level from string to logging constant
+    log_levels = {
+        'DEBUG': logging.DEBUG,
+        'INFO': logging.INFO,
+        'WARNING': logging.WARNING,
+        'ERROR': logging.ERROR,
+        'CRITICAL': logging.CRITICAL
+    }
+    log_level = yamcam_config.log_level
     if log_level in log_levels:
         logger.setLevel(log_levels[log_level])
         for handler in logger.handlers:
@@ -104,17 +102,20 @@ def on_connect(client, userdata, flags, rc, properties=None):
     #----- START ME UP -----#
 
 def start_mqtt(config):
-    try:
-        mqtt_settings = config['mqtt']
-        mqtt_host = mqtt_settings['host']
-        mqtt_port = mqtt_settings['port']
-        mqtt_topic_prefix = mqtt_settings['topic_prefix']
-        mqtt_client_id = mqtt_settings['client_id']
-        mqtt_username = mqtt_settings['user']
-        mqtt_password = mqtt_settings['password']
-    except KeyError as e:
-        logger.error(f"Missing MQTT settings in the configuration file: {e}")
-        raise
+    #mqtt_settings = config['mqtt']
+    #mqtt_host = mqtt_settings['host']
+    #mqtt_port = mqtt_settings['port']
+    #mqtt_topic_prefix = mqtt_settings['topic_prefix']
+    #mqtt_client_id = mqtt_settings['client_id']
+    #mqtt_username = mqtt_settings['user']
+    #mqtt_password = mqtt_settings['password']
+    mqtt_host = yamcam_config.mqtt_hose
+    mqtt_port = yamcam_config.mqtt_port
+    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
+    mqtt_client_id = yamcam_config.mqtt_client_id
+    mqtt_username = yamcam_config.mqtt_username
+    mqtt_password = yamcam_config.mqtt_password
+        
     logger.debug(
         f"MQTT Settings:\n"
         f"   Host: {mqtt_host} ;  Port: {mqtt_port}\n"
@@ -139,7 +140,9 @@ def start_mqtt(config):
 
     #----- REPORT via MQTT -----#
 
-def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
+#def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
+def report(results, mqtt_client, camera_name):
+    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
     if mqtt_client.is_connected():
         try:
@@ -149,11 +152,9 @@ def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
             }
             payload_json = json.dumps(payload)
 
-            #logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {payload_json}")
             logger.debug(f"MQTT: {mqtt_topic_prefix}, {payload_json}")
 
             result = mqtt_client.publish(
-                #f"{mqtt_topic_prefix}/{camera_name}",
                 f"{mqtt_topic_prefix}",
                 payload_json
             )
@@ -205,8 +206,7 @@ def analyze_audio(rtsp_url, duration=5):
     retries = 3
     max_retries = 10
     retry_delay = 2
-    general_settings = config['general']
-    aggregation_method = general_settings.get('aggregation_method', 'max')
+    aggregation_method = yamcam_config.aggregation_method
 
     for attempt in range(retries):
         try:
@@ -301,11 +301,10 @@ def analyze_audio(rtsp_url, duration=5):
 def rankings (scores, group_classes):
 
              ## get config settings
-    general_settings = config['general']
-    reporting_threshold = general_settings.get('reporting_threshold', 0.4)
-    top_k = general_settings.get('top_k', 10)
-    report_k = general_settings.get('report_k', 3)
-    noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented for now
+    reporting_threshold = yamcam_config.reporting_threshold
+    top_k = yamcam_config.top_k
+    report_k = yamcam_config.report_k
+    noise_threshold = yamcam_config.noise_threshold
 
                 # Log the scores for the top class names
     top_class_indices = np.argsort(scores)[::-1]

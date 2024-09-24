@@ -13,21 +13,24 @@ from yamcam_functions import (
         set_sources, format_input_details, analyze_audio, group_scores, 
         report, set_log_level
 )
+import yamcam_config
 
 
 ############# SETUP #############
 
 #----------- PATHS -------------#
-config_path = '/config/microphones.yaml'
+#config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 
 #---------- SET UP -----------#
 # read config, set logging level, and fire up MQTT
 
-config = set_configuration(config_path)
-set_log_level(config)
-mqtt_client = start_mqtt(config)
+#config = set_configuration(config_path)
+#set_log_level(config)
+set_log_level()
+#mqtt_client = start_mqtt(config)
+mqtt_client = start_mqtt()
 
 #----------- LOAD MODEL and CLASSES -------------#
 ### Load YAMNet model using TensorFlow Lite
@@ -48,17 +51,23 @@ with open(class_map_path, 'r') as file:
 #            (see config for definitions)
 
              ## cameras = sound sources
-camera_settings = set_sources(config)
+#camera_settings = set_sources(config)
+camera_settings = yamcam_config.camera_settings
 
              ## general settings
-general_settings = config['general']
-sample_interval = general_settings.get('sample_interval', 15)
-group_classes = general_settings.get('group_classes', True)
-sample_duration = general_settings.get('sample_duration', 3)
-aggregation_method = general_settings.get('aggregation_method', 'max')
+#general_settings = config['general']
+#sample_interval = general_settings.get('sample_interval', 15)
+#group_classes = general_settings.get('group_classes', True)
+#sample_duration = general_settings.get('sample_duration', 3)
+#aggregation_method = general_settings.get('aggregation_method', 'max')
+sample_interval = yamcam_config.sample_interval
+group_classes = yamcam_config.group_classes
+sample_duration = yamcam_config.sample_duration
+aggregation_method = yamcam_config.aggregation_method
 
              ## MQTT settings
-mqtt_topic_prefix = config['mqtt']['topic_prefix']
+#mqtt_topic_prefix = config['mqtt']['topic_prefix']
+mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
 
 
