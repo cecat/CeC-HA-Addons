@@ -68,22 +68,22 @@ functions.  These are explained below.
 
 ```
 general:
-  sample_interval: 15       # Sampling interval (seconds) (default 15)
-  sample_duration: 3        # Sound sample length (seconds) (default 3) 
-  top_k: 10                 # Number of top scoring classes to analyze (default 10)
-  report_k: 3               # Number of top scoring groups or classes to report (default 3)
-  reporting_threshold: 0.5  # Reporting threshold for sound class scores (default 0.4)
-  group_classes: true       # Default true, report by group rather than the original YAMNet classes
-  aggregation_method: max   # Use max or mean to pool scores across segments of a collected sample
-  log_level: DEBUG          # (Default INFO)
-                            # DEBUG->INFO->WARNING->ERROR->CRITICAL for decreasing verbosity 
+  sample_interval: 15        # Sampling interval (seconds) (default 15)
+  sample_duration: 3         # Sound sample length (seconds) (default 3) 
+  top_k: 10                  # Number of top scoring classes to analyze (default 10)
+  report_k: 3                # Number of top scoring groups or classes to report (default 3)
+  reporting_threshold: 0.5   # Reporting threshold for sound class scores (default 0.4)
+  group_classes: true        # Default true, report by group rather than the original YAMNet classes
+  aggregation_method: max    # Use max (default) or mean to pool scores across segments of a collected sample
+  log_level: DEBUG           # Default INFO. In order of decreasing verbosity:
+                             # DEBUG->INFO->WARNING->ERROR->CRITICAL 
 mqtt:
-  host: "x.x.x.x"           # Your MQTT server (commonly the IP addr of your HA server)
-  port: 1883                # Default unless you specifically changed it in your broker
-  topic_prefix: "sounds"    # adjust to your taste
-  client_id: "yamcam"       # adjust to your taste
-  user: "mymqttusername"    # your mqtt username on your broker (e.g., Home Asst server) 
-  password: "mymqttpassword"#         & password
+  host: "x.x.x.x"            # Your MQTT server (commonly the IP addr of your HA server)
+  port: 1883                 # Default unless you specifically changed it in your broker
+  topic_prefix: "sounds"     # adjust to your taste
+  client_id: "yamcam"        # adjust to your taste
+  user: "mymqttusername"     # your mqtt username on your broker (e.g., Home Asst server) 
+  password: "mymqttpassword" #         & password
 
 # examples of Amcrest and UniFi NVR camera rtsp feeds
 cameras:
@@ -127,13 +127,6 @@ will still be prepended with groupnames (which are not part of the original YAMN
 we divide the waveform into multiple segments, each 0.96s, overlapped by 50%.  The method
 specified here is used to create a score for the collection of segments. The choices are 
 *mean* or *max*. 
-
-5 or 10 minutes (or longer).  If non-zero, *rollup* option will take all of the
-*report_k* scores over *roll_up* minutes and report the *report_k* top scores across
-that period.  This will filter out momentary sounds, while persistent sound types
-(e.g., someone playing music or a conversation or television) will stand
-out.  Reporting will also be done with an interval of *rollup* minutes rather than
-the shorter intervals related to sample_interfal plus camera processing times.
 
 - *log_level*: Level of detail to be logged. Levels are
 DEBUG->INFO->WARNING->ERROR->CRITICAL
