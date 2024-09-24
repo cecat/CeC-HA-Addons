@@ -54,13 +54,8 @@ camera_settings = set_sources(config)
 general_settings = config['general']
 sample_interval = general_settings.get('sample_interval', 15)
 group_classes = general_settings.get('group_classes', True)
-reporting_threshold = general_settings.get('reporting_threshold', 0.4)
 sample_duration = general_settings.get('sample_duration', 3)
-top_k = general_settings.get('top_k', 10)
-report_k = general_settings.get('report_k', 3)
 aggregation_method = general_settings.get('aggregation_method', 'max')
-sample_duration = general_settings.get('sample_duration', 3)
-noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented for now
 
              ## MQTT settings
 mqtt_topic_prefix = config['mqtt']['topic_prefix']
@@ -74,7 +69,7 @@ while True:
 
         # Analyze audio from RTSP source
         rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
-        scores = analyze_audio(rtsp_url, duration=sample_duration, method=aggregation_method)
+        scores = analyze_audio(rtsp_url, duration=sample_duration)
 
         if scores is not None:
             # Sort and rank scores

@@ -200,10 +200,13 @@ def format_input_details(details):
 
 ############# ANALYZE AUDIO ##############
 
-def analyze_audio(rtsp_url, duration=5, method='max'):
+def analyze_audio(rtsp_url, duration=5):
+    # tuning
     retries = 3
     max_retries = 10
     retry_delay = 2
+    general_settings = config['general']
+    aggregation_method = general_settings.get('aggregation_method', 'max')
 
     for attempt in range(retries):
         try:
@@ -296,6 +299,13 @@ def analyze_audio(rtsp_url, duration=5, method='max'):
     #     -  don't apply bonus if max score in group >=0.7
 
 def rankings (scores, group_classes):
+
+             ## get config settings
+    general_settings = config['general']
+    reporting_threshold = general_settings.get('reporting_threshold', 0.4)
+    top_k = general_settings.get('top_k', 10)
+    report_k = general_settings.get('report_k', 3)
+    noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented for now
 
                 # Log the scores for the top class names
     top_class_indices = np.argsort(scores)[::-1]
