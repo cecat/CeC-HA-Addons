@@ -78,7 +78,7 @@ while True:
 
         if scores is not None:
             # Log the scores for the top class names
-            #top_class_indices = np.argsort(scores)[::-1]
+            top_class_indices = np.argsort(scores)[::-1]
             top_class_indices = [i for i in top_class_indices[:top_k] if scores[i] >= noise_threshold]
 
             for i in top_class_indices[:top_k]:  # Log only top_k scores
