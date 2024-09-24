@@ -1,4 +1,4 @@
-# config.py
+# yamcam_config.py
 import yaml
 
 config_path = '/config/microphones.yaml'
@@ -6,16 +6,16 @@ config_path = '/config/microphones.yaml'
 try:
     with open(config_path) as f:
         config = yaml.safe_load(f)
-    except yaml.YAMLError as e:
-        logger.error(f"Error reading YAML file {config_path}: {e}")
-        raise
+except yaml.YAMLError as e:
+    logger.error(f"Error reading YAML file {config_path}: {e}")
+    raise
 
              ## general settings
 try:
     general_settings = config['general']
-    except KeyError as e:
-        logger.error(f"Missing general settings in the configuration file: {e}")
-        raise
+except KeyError as e:
+    logger.error(f"Missing general settings in the configuration file: {e}")
+    raise
 
 log_level = general_settings.get('log_level', 'INFO').upper()
 sample_interval = general_settings.get('sample_interval', 15)
