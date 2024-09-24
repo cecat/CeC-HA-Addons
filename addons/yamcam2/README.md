@@ -8,8 +8,8 @@ to characterize sounds deteced by  microphones on networked cameras.
 *It does not record or keep any sound samples after analyzing them*. It
 takes brief (see settings) samples using FFMPEG and scores sound types 
 detected, based on a YAMnet's 520 sound classes.
-(This is version2 - previous version (yamcam) was an experiment that has here
-been nearly completely rewritten.)
+
+The project relies on MQTT for communicating with Home Assistant.
 
 
 ## How to Use
@@ -38,21 +38,6 @@ Select the **YAMNet Camera Sounds** add-on.
 - On your Home Assistant, go to **Settings** --> **Add-ons** and click the reload 
 (arrow circling a clock) icon in the upper right of that page.  The add-on should appear.
 
-
-### Set up Configuration for the Add-on
-
-For each sound source, at each reporting interval,
-we send a MQTT  message to HA of the form "Class1 (score1), Class2 (score2)..."
-This is not very convenient to parse from the HA side. I'm experimenting with
-the best way to format this (Frigate messages are pretty detailed JSON
-which yields very powerful HA capabilities, but I'm aiming for something
-simpler, as this is a simpler capability).
-
-This addon uses MQTT to communicate with Home Assistant. It's been tested
-with the open source
-[Mosquitto broker](https://github.com/home-assistant/addons/tree/master/mosquitto) 
-from the *Official add-ons* repository.
-
 ### Create the Add-on Configuration File
 
 Create a file in your Home Assistant directory */config* named
@@ -63,6 +48,14 @@ in Frigate (if you use Frigate), some of which may have embedded credentials
 
 The config file also includes many knobs you can use to customize how the addon
 functions.  These are explained below.
+
+For each sound source, at each reporting interval,
+we send a MQTT  message to HA of the form *topic_prefix* {json payload} where the 
+json payload includes *camera_name* followed by *class*, *score* pairs, with up to *report_k*
+classes/scores reported.  Example:
+'''
+sounds/frontyardcam, {"camera_name": "frontyardcam", "sound_types": [{"class": "water", "score": 0.56}, {"class": "birds", "score": 0.53}, {"class": "animals", "score": 0.51}]}
+'''
 
 #### Sample Configuration File
 
@@ -202,6 +195,11 @@ names, the original yamnet class map is included in */files* so one can replace
   - Home Assistant Framework
 - Key Dependencies
   - MQTT
+
+This addon uses MQTT to communicate with Home Assistant. It's been tested
+with the open source
+[Mosquitto broker](https://github.com/home-assistant/addons/tree/master/mosquitto) 
+from the *Official add-ons* repository.
 
 ### Other Notes
 
