@@ -47,7 +47,10 @@ with open(class_map_path, 'r') as file:
 #----------- PULL things we need from CONFIG -------------#
 #            (see config for definitions)
 
+             ## cameras = sound sources
 camera_settings = set_sources(config)
+
+             ## general settings
 general_settings = config['general']
 sample_interval = general_settings.get('sample_interval', 15)
 group_classes = general_settings.get('group_classes', True)
@@ -56,7 +59,12 @@ sample_duration = general_settings.get('sample_duration', 3)
 top_k = general_settings.get('top_k', 10)
 report_k = general_settings.get('report_k', 3)
 aggregation_method = general_settings.get('aggregation_method', 'max')
+sample_duration = general_settings.get('sample_duration', 3)
+noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented for now
+
+             ## MQTT settings
 mqtt_topic_prefix = config['mqtt']['topic_prefix']
+
 
 
 ############# Main Loop #############
@@ -70,7 +78,9 @@ while True:
 
         if scores is not None:
             # Log the scores for the top class names
-            top_class_indices = np.argsort(scores)[::-1]
+            #top_class_indices = np.argsort(scores)[::-1]
+            top_class_indices = [i for i in top_class_indices[:top_k] if scores[i] >= noise_threshold]
+
             for i in top_class_indices[:top_k]:  # Log only top_k scores
                 logger.debug(f"{camera_name}:{class_names[i]} {scores[i]:.2f}")
 
