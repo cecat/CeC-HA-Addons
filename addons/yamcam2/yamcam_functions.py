@@ -149,10 +149,12 @@ def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
             }
             payload_json = json.dumps(payload)
 
-            logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {payload_json}")
+            #logger.debug(f"MQTT: {mqtt_topic_prefix}/{camera_name}, {payload_json}")
+            logger.debug(f"MQTT: {mqtt_topic_prefix}, {payload_json}")
 
             result = mqtt_client.publish(
-                f"{mqtt_topic_prefix}/{camera_name}",
+                #f"{mqtt_topic_prefix}/{camera_name}",
+                f"{mqtt_topic_prefix}",
                 payload_json
             )
             result.wait_for_publish()
