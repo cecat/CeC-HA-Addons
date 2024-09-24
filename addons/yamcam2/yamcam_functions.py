@@ -207,7 +207,7 @@ def analyze_audio(rtsp_url, duration=5):
     retries = 3
     max_retries = 10
     retry_delay = 2
-    aggregation_method = yamcam_config.aggregation_method
+    method = yamcam_config.aggregation_method
 
     for attempt in range(retries):
         try:
