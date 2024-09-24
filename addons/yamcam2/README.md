@@ -120,7 +120,8 @@ frames, maximum 15,360 samples -- so it operates on 0.96s duration frames.  To a
 longer durations we segment the waveform into 0.96s frames with 50% overlap, then combine the
 scores across the segments by taking the max of scores for each class.
 
-- **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes.
+- **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes. However,
+we ignore classes with confidence levels below 0.1.
 
 - **report_k**: After analyzing top scores, we report the report_k highest scoring
 classes (generally a subset of top_k).
