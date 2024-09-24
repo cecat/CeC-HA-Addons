@@ -57,7 +57,7 @@ def set_configuration(config_path):
 
     #----- SET LOG LEVEL FROM CONFIG -----#
 
-def set_log_level(config):
+def set_log_level():
     # Map log level from string to logging constant
     log_levels = {
         'DEBUG': logging.DEBUG,
