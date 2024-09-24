@@ -86,19 +86,19 @@ while True:
             results = []
             if group_classes:
                 for group, score in composite_scores_sorted:
-                    if score >= reporting_threshold:  # Use reporting_threshold from config
-                        #results.append(f"{group} ({score:.2f})")
+                    if score >= reporting_threshold:  
                         score_python_float = float(score)
-                        results.append({'class': group, 'score': round(score, 2)})
+                        rounded_score = round(score_python_float, 2)
+                        results.append({'class': group, 'score': rounded_score})
                     if len(results) >= report_k:
                         break
             else:
                 for i in top_class_indices:
                     score = scores[i]
-                    if score >= reporting_threshold:  # Use reporting_threshold from config
-                        #results.append(f"{class_names[i]} ({score:.2f})")
+                    if score >= reporting_threshold:  
                         score_python_float = float(score)
-                        results.append({'class': class_names[i], 'score': round(score, 2)})
+                        rounded_score = round(score_python_float, 2)
+                        results.append({'class': class_names[i], 'score': rounded_score})
                     if len(results) >= report_k:
                         break
 
@@ -106,10 +106,6 @@ while True:
                 results = [{'class': '(none)', 'score': 0.0}]
 
             # Report via MQTT
-            #sound_types_str = ', '.join(results)
-            #if not sound_types_str:  # If nothing scored high enough, log as "(none)"
-            #    sound_types_str = "(none)"
-            #report(sound_types_str, mqtt_client, mqtt_topic_prefix, camera_name)
             report(results, mqtt_client, mqtt_topic_prefix, camera_name)
 
         else:
