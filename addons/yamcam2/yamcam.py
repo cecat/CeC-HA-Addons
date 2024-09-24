@@ -8,7 +8,7 @@ import logging
 import csv
 import json
 from yamcam_functions import (
-        set_configuration, log_levels, logger,
+        set_configuration, logger,
         start_mqtt, load_model,
         set_sources, format_input_details, analyze_audio, group_scores, 
         report, set_log_level
