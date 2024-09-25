@@ -19,17 +19,12 @@ import yamcam_config
 ############# SETUP #############
 
 #----------- PATHS -------------#
-#config_path = '/config/microphones.yaml'
-class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 
 #---------- SET UP -----------#
-# read config, set logging level, and fire up MQTT
+# set logging level, fire up MQTT
 
-#config = set_configuration(config_path)
-#set_log_level(config)
 set_log_level()
-#mqtt_client = start_mqtt(config)
 mqtt_client = start_mqtt()
 
 #----------- LOAD MODEL and CLASSES -------------#

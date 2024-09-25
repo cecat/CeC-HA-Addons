@@ -1,7 +1,10 @@
 # yamcam_config.py
 import yaml
 
+# File paths
 config_path = '/config/microphones.yaml'
+class_map_path = 'yamnet_class_map.csv'
+
 
 try:
     with open(config_path) as f:
