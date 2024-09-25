@@ -5,7 +5,6 @@
 import time
 import numpy as np
 import logging
-import csv
 import json
 from yamcam_functions import (
         set_configuration, logger,
