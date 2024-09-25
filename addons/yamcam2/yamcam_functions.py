@@ -285,6 +285,7 @@ def compute_sleep_time (sample_duration, camera_settings):
     number_of_sources = len(camera_settings)
     processing_time_per_source = 2  # Adjust as needed
     total_time_spent = number_of_sources * (sample_duration + processing_time_per_source)
+    logger.debug(f"sampling/processing time is {total_time_spent}, while sample_interval is {sample_interval")
     sleep_duration = sample_interval - total_time_spent
     sleep_duration = max(sleep_duration, 0)  # Ensure sleep_duration is not negative
     
