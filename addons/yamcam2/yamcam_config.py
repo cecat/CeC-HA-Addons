@@ -1,6 +1,7 @@
 # yamcam_config.py
 import yaml
 import csv
+from yamcam_functions import logger
 
 # File paths
 config_path = '/config/microphones.yaml'
