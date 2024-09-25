@@ -3,6 +3,8 @@ import yaml
 import csv
 import logging
 import time
+import tflite_runtime.interpreter as tflite
+
 
 # File paths
 config_path = '/config/microphones.yaml'

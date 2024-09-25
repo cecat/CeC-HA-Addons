@@ -6,7 +6,6 @@
 import subprocess
 import paho.mqtt.client as mqtt
 import yaml
-import tflite_runtime.interpreter as tflite
 import os
 import numpy as np
 import io
