@@ -3,7 +3,6 @@
 #
 
 import time
-import numpy as np
 import logging
 import json
 from yamcam_functions import (
@@ -12,13 +11,10 @@ from yamcam_functions import (
         set_sources, format_input_details, analyze_audio, group_scores, 
         report, set_log_level, rank_sounds
 )
-import yamcam_config
+import yamcam_config # all setup and config happens here
 
 
 ############# SETUP #############
-
-#----------- PATHS -------------#
-model_path = 'yamnet.tflite'
 
 #---------- SET UP -----------#
 # set logging level, fire up MQTT
@@ -26,10 +22,6 @@ model_path = 'yamnet.tflite'
 set_log_level()
 mqtt_client = start_mqtt()
 
-#----------- LOAD MODEL and CLASSES -------------#
-### Load YAMNet model using TensorFlow Lite
-
-load_model(model_path)
 
 #----------- PULL things we need from CONFIG -------------#
 #            (see config for definitions)

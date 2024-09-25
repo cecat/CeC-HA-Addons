@@ -170,34 +170,8 @@ def report(results, mqtt_client, camera_name):
         logger.error("MQTT client is not connected. Skipping publish.")
 
 
-##### SOUND and MODEL FUNCTIONS #####
+############# SOUND FUNCTIONS ##############
 
-    #----- LOAD INFERENCE MODEL -----#
-
-def load_model(model_path):
-    global interpreter, input_details, output_details
-    # for tpu - check to see if we are using a Coral TPU
-    # if no tpu
-    logger.debug("Loading YAMNet model")
-    interpreter = tflite.Interpreter(model_path=model_path)
-    interpreter.allocate_tensors()
-    input_details = interpreter.get_input_details()
-    output_details = interpreter.get_output_details()
-    logger.debug("YAMNet model loaded. Input details: ")
-    logger.debug(format_input_details(input_details))
-    # tpu logic here
-
-
-    #----- Easy reading for debug logging -----#
-
-def format_input_details(details):
-    formatted_details = "Input Details:\n"
-    for detail in details:  
-        formatted_details += "  -\n"
-        for key, value in detail.items():
-            formatted_details += f"    {key}: {value}\n"
-    return formatted_details
-                            
 
 ############# ANALYZE AUDIO ##############
 

@@ -5,7 +5,9 @@ import csv
 # File paths
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
+model_path = 'yamnet.tflite'
 
+##################### Get Configuration ################# 
 
 try:
     with open(config_path) as f:
@@ -55,6 +57,34 @@ mqtt_topic_prefix = mqtt_settings['topic_prefix']
 mqtt_client_id = mqtt_settings['client_id']
 mqtt_username = mqtt_settings['user']
 mqtt_password = mqtt_settings['password']
+
+
+##################### Set up YAMNet Model ################# 
+
+             ######## Load YAMNet model using TensorFlow Lite ########  
+
+global interpreter, input_details, output_details
+# for tpu - check to see if we are using a Coral TPU
+# if no tpu
+logger.debug("Loading YAMNet model")
+interpreter = tflite.Interpreter(model_path=model_path)
+interpreter.allocate_tensors()
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+logger.debug("YAMNet model loaded. Input details: ")
+logger.debug(format_input_details(input_details))
+# else --- tpu logic here
+
+
+    #----- Easy reading for debug logging -----#
+
+def format_input_details(details):
+    formatted_details = "Input Details:\n"
+    for detail in details:
+        formatted_details += "  -\n"
+        for key, value in detail.items():
+            formatted_details += f"    {key}: {value}\n"
+    return formatted_details
 
 
              ######## YAMNet Class_names ########  
