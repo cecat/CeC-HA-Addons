@@ -55,6 +55,9 @@ class CameraAudioStream:
         logger.info(f"Started audio stream for {self.camera_name}")
 
     def read_stream(self):
+
+        logger.debug(f"Started reading stream for {self.camera_name}")
+
         self.buffer_size = 31200  # 16 kHz * 0.975 seconds * 2 bytes/sample
 
         incomplete_read_attempts = 0
@@ -63,7 +66,9 @@ class CameraAudioStream:
         while self.running:
             try:
                 # Read raw audio data from the stream
+                logger.debug(f"Attempting to read from stream for {self.camera_name}")
                 raw_audio = self.process.stdout.read(self.buffer_size)
+                logger.debug(f"Read completed for {self.camera_name}, read size: {len(raw_audio)}")
 
                 # Capture and log FFmpeg stderr to diagnose issues
                 stderr_output = self.process.stderr.read().decode()
