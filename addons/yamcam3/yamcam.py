@@ -13,6 +13,7 @@ import yamcam_config # all setup and config happens here
 from yamcam_config import logger
 
 #---- start MQTT session ----#
+
 mqtt_client = start_mqtt()
 
 

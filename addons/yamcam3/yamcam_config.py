@@ -28,7 +28,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-logger.info("\n-----------> YamCam STARTING <-----------  \n")
+logger.info("\n-----------> YamCam3 STARTING <-----------  \n")
 
 ##################### Get Configuration ################# 
 
@@ -51,10 +51,10 @@ log_level            = general_settings.get('log_level', 'INFO').upper()
 sample_interval      = general_settings.get('sample_interval', 15)
 group_classes        = general_settings.get('group_classes', True)
 sample_duration      = general_settings.get('sample_duration', 3)
-aggregation_method   = general_settings.get('aggregation_method', 'max')
 reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
 top_k                = general_settings.get('top_k', 10)
 report_k             = general_settings.get('report_k', 3)
+aggregation_method   = general_settings.get('aggregation_method', 'max')
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   # undocumented for now
 
              ######## cameras = sound sources ######## 
@@ -63,17 +63,6 @@ try:
 except KeyError as e:
     logger.error(f"Missing camera settings in the configuration file: {e}")
     raise
-
-             ######## Check sample_interval vs sampling+processing time ########  
-
-number_of_sources = len(camera_settings)
-process_time = number_of_sources * (sample_duration + 2) # ~2s to process audio
-if process_time >= sample_interval:
-    logger.info(
-        f"sampling+processing time for {number_of_sources} sources and {sample_duration}s samples is "
-        f"{process_time}s, while sample_interval is {sample_interval}s. "
-        f"Setting sample_interval to 0, so the effective sample_interval will be {process_time}s."
-    )   
 
 
              ######## MQTT settings ########  
