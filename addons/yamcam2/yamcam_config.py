@@ -97,7 +97,6 @@ else:
     logger.setLevel(logging.INFO)
     for handler in logger.handlers:
         handler.setLevel(logging.INFO)
-return
 
 ##################### Set up YAMNet Model ################# 
 
