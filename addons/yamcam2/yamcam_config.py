@@ -28,7 +28,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-logger.info("-----------> YamCam STARTING <-----------  ")
+logger.info("\n-----------> YamCam STARTING <-----------  \n")
 
 ##################### Get Configuration ################# 
 
