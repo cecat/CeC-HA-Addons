@@ -8,7 +8,7 @@ import json
 from yamcam_functions import (
         start_mqtt,
         analyze_audio, group_scores,
-        report, rank_sounds
+        report, rank_sounds, compute_sleep_time
 )
 import yamcam_config # all setup and config happens here
 
