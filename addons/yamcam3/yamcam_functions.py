@@ -100,136 +100,56 @@ def report(results, mqtt_client, camera_name):
 
 ############# ANALYZE AUDIO STREAM ##############
 
-# yamcam_functions.py
+# Segment settings for analyze_audio_waveform function
+
+segment_length = input_details[0]['shape'][0]  # YAMNet requirements
+overlap        = 0.5  # 50% overlap between segments
+step_size      = int(segment_length * overlap)  # Step size for sliding window
 
 def analyze_audio_waveform(waveform):
-    # Ensure waveform has correct shape
-    waveform = np.squeeze(waveform).astype(np.float32)
+    try:
+        # Ensure waveform is a 1D array of float32 values between -1 and 1
+        waveform = np.squeeze(waveform).astype(np.float32)
+        if waveform.ndim != 1:
+            logger.error("Waveform must be a 1D array.")
+            return None
 
-    # Process the full waveform in segments
-    segment_length = input_details[0]['shape'][0]
-    step_size = int(segment_length * 0.5)  # 50% overlap
+        # Split waveform into overlapping segments
+        all_scores = []
+        for start in range(0, len(waveform) - segment_length + 1, step_size):
+            segment = waveform[start:start + segment_length]
+            segment = np.expand_dims(segment, axis=0)  # Reshape to model input
 
-    all_scores = []
-    for start in range(0, len(waveform) - segment_length + 1, step_size):
-        segment = waveform[start:start + segment_length]
-        if len(segment) < segment_length:
-            break  # Skip incomplete segment
-        interpreter.set_tensor(input_details[0]['index'], segment)
-        interpreter.invoke()
-        scores = interpreter.get_tensor(output_details[0]['index'])
-        all_scores.append(scores)
+            # Set input tensor and invoke interpreter
+            interpreter.set_tensor(input_details[0]['index'], segment)
+            interpreter.invoke()
 
-    if not all_scores:
-        logger.error("No scores available for analysis. Skipping this round.")
-        if log_level == 'DEBUG':
-            time.sleep(2) #wait 2s so the logs don't scroll away
+            # Get and store the output scores
+            scores = interpreter.get_tensor(output_details[0]['index'])
+            all_scores.append(scores)
+
+        if len(all_scores) == 0:
+            logger.error("No scores available for analysis.")
+            return None
+
+        # Combine scores from all segments based on the selected aggregation method
+        all_scores = np.vstack(all_scores)  # Shape: (num_segments, num_classes)
+
+        if aggregation_method == 'mean':
+            combined_scores = np.mean(all_scores, axis=0)
+        elif aggregation_method == 'max':
+            combined_scores = np.max(all_scores, axis=0)
+        elif aggregation_method == 'sum':
+            combined_scores = np.sum(all_scores, axis=0)
+        else:
+            logger.error(f"Unknown aggregation method: {aggregation_method}")
+            return None
+
+        return combined_scores
+
+    except Exception as e:
+        logger.error(f"Error processing waveform: {e}")
         return None
-
-    all_scores = np.vstack(all_scores)
-    # Aggregate the scores
-    if aggregation_method == 'mean':
-        combined_scores = np.mean(all_scores, axis=0)
-    elif aggregation_method == 'max':
-        combined_scores = np.max(all_scores, axis=0)
-    elif aggregation_method == 'sum':
-        combined_scores = np.sum(all_scores, axis=0)
-    else:
-        raise ValueError(f"Unknown aggregation method: {aggregation_method}")
-
-    return combined_scores
-
-
-############# ANALYZE AUDIO ##############
-
-def analyze_audio(rtsp_url, duration=5):
-    # fine-tuning parameters
-    retries = 3
-    max_retries = 10
-    retry_delay = 2
-    overlap = 0.5
-
-    for attempt in range(retries):
-        try:
-            command = [
-                'ffmpeg',
-                '-y',
-                '-rtsp_transport', 'tcp',  # Use TCP for RTSP transport
-                '-i', rtsp_url,
-                '-t', str(duration),
-                '-map', '0:a:0',  # Select only the first audio stream (ignore video)
-                '-f', 'wav',
-                '-acodec', 'pcm_s16le',
-                '-ar', '16000',  # Resample to 16 kHz
-                '-ac', '1',
-                'pipe:1'
-            ]
-            # log the exact command we are executing
-            logger.debug(f"Execute: {command}")
-
-            process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = process.communicate()
-
-            if process.returncode != 0:
-                logger.error(f"FFmpeg failed with error code: {process.returncode}, stderr: {stderr.decode()}")
-                raise Exception("FFmpeg failed")
-
-            # Process the audio data using YAMNet or other analysis tools
-
-            with io.BytesIO(stdout) as f:
-                waveform = np.frombuffer(f.read(), dtype=np.int16) / 32768.0
-
-            # Ensure waveform has the correct shape
-            waveform = np.squeeze(waveform)
-
-            # Process the full waveform in segments
-            segment_length = input_details[0]['shape'][0]  # For example, 15600 samples
-            step_size = int(segment_length * overlap)  # segment overlap
-
-            all_scores = []
-            for start in range(0, len(waveform) - segment_length + 1, step_size):
-                segment = waveform[start:start + segment_length]
-                segment = segment.astype(np.float32)
-
-                interpreter.set_tensor(input_details[0]['index'], segment)
-                interpreter.invoke()
-                scores = interpreter.get_tensor(output_details[0]['index'])
-                all_scores.append(scores)
-
-            # Check if all_scores is empty before attempting to combine
-            if len(all_scores) == 0:
-                logger.error("No scores available for analysis. Skipping this round.")
-                return None
-
-            # Combine the scores from all segments
-            # Stack all_scores into a 2D array of shape (num_segments, num_classes)
-            all_scores = np.vstack(all_scores)  # Shape: (num_segments, num_classes)
-
-            # Aggregate the scores across segments
-            # config var 'aggregation_method'
-            # is either max (default), mean, or sum
-
-            if aggregation_method == 'mean':
-                combined_scores = np.mean(all_scores, axis=0)
-            elif aggregation_method == 'max':
-                combined_scores = np.max(all_scores, axis=0)
-            elif aggregation_method == 'sum':
-                combined_scores = np.sum(all_scores, axis=0)
-            else:
-                raise ValueError(f"Unknown aggregation method: {aggregation_method}")
-
-            return combined_scores
-
-        except Exception as e:
-            logger.error(f"Error running FFmpeg: {e}")
-            if attempt < max_retries:
-                logger.info(f"Retrying in {retry_delay} seconds...")
-                time.sleep(retry_delay)
-                retry_delay *= 2  # Implement exponential backoff
-            else:
-                raise  # Re-raise the exception after exhausting retries
-
-    return None  # Return None if all attempts fail
 
 
 ############# COMPUTE SCORES ##############
@@ -316,20 +236,4 @@ def group_scores(top_class_indices, class_names, scores):
         composite_scores.append((group, composite_score))
 
     return composite_scores
-
-
-############# COMPUTE DELAY ##############
-    # -  account for sampling and processing time 
-    #    (otherwise our actual interval is sampling/processing time + sample_interval
-    # -  minimum zero (as many sources and/or long sample_duration could be >sample_interval)
-
-def compute_sleep_time (sample_duration, camera_settings):
-
-    number_of_sources = len(camera_settings)
-    processing_time_per_source = 2  # Adjust as needed
-    total_time_spent = number_of_sources * (sample_duration + processing_time_per_source)
-    sleep_duration = sample_interval - total_time_spent
-    sleep_duration = max(sleep_duration, 0)  # Ensure sleep_duration is not negative
-    
-    return sleep_duration
 
