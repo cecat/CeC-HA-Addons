@@ -1,4 +1,8 @@
-# yamcam_config.py
+#
+# yamcam_config.py # config and setup for yamcam
+#
+# CeC - September 2024
+
 import yaml
 import csv
 import logging
@@ -63,10 +67,9 @@ except KeyError as e:
 try:
     mqtt_settings = config['mqtt']
 except KeyError as e:
-    logger.error(f"Missing camera settings in the configuration file: {e}")
+    logger.error(f"Missing mqtt settings in the configuration file: {e}")
     raise
 
-mqtt_topic_prefix = config['mqtt']['topic_prefix']
 mqtt_host = mqtt_settings['host']
 mqtt_port = mqtt_settings['port']
 mqtt_topic_prefix = mqtt_settings['topic_prefix']
@@ -108,7 +111,7 @@ def format_input_details(details):
 
              ######## Load YAMNet model using TensorFlow Lite ########  
 
-global interpreter, input_details, output_details
+#global interpreter, input_details, output_details
 # for tpu - check to see if we are using a Coral TPU
 # if no tpu
 logger.debug("Loading YAMNet model")

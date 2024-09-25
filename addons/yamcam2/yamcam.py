@@ -1,13 +1,11 @@
 #
-# YamCam - CeC August 2024
+# yamcam2 - CeC September 2024
 #
 
 import time
 import logging
-import json
 from yamcam_functions import (
-        start_mqtt, 
-        set_sources, analyze_audio, group_scores, 
+        start_mqtt, analyze_audio, 
         report, rank_sounds
 )
 import yamcam_config # all setup and config happens here

@@ -1,5 +1,5 @@
 #
-# Functions for YamCam add-on
+# yamcam_functions - Functions for yamcam2
 # 
 # CeC - September 2024
 
@@ -11,7 +11,6 @@ import numpy as np
 import io
 import logging
 import json
-import time
 import yamcam_config
 from yamcam_config import interpreter, input_details, output_details, logger, aggregation_method
 
@@ -22,33 +21,6 @@ logger = yamcam_config.logger
 #
 saveWave_path = '/config/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
-
-
-############# CONFIGURE ##############
-
-def set_configuration(config_path):
-
-    #----- LOAD DICTIONARY -----#
-    if not os.path.exists(config_path):
-        logger.error(f"Configuration file {config_path} does not exist.")
-        raise FileNotFoundError(f"Configuration file {config_path} does not exist.")
-    try:
-        with open(config_path) as f:
-            config = yaml.safe_load(f)
-    except yaml.YAMLError as e:
-        logger.error(f"Error reading YAML file {config_path}: {e}")
-        raise
-    return config
-
-    #----- SOUND SOURCES -----#
-
-def set_sources(config):
-    try:
-        camera_settings = config['cameras']
-    except KeyError as e:
-        logger.error(f"Missing camera settings in the configuration file: {e}")
-        raise
-    return camera_settings
 
 
 ############# COMMUNICATIONS ##############
@@ -84,7 +56,7 @@ def start_mqtt():
     try:
         mqtt_client.connect(mqtt_host, mqtt_port, 60)
         mqtt_client.loop_start()
-        logger.debug("MQTT client connected successfully to {mqtt_host}:{mqtt_port}.")
+        logger.debug(f"MQTT client connected successfully to {mqtt_host}:{mqtt_port}.")
     except Exception as e:
         logger.error(f"Failed to connect to MQTT broker: {e}")
 
@@ -201,7 +173,7 @@ def analyze_audio(rtsp_url, duration=5):
             elif aggregation_method == 'sum':
                 combined_scores = np.sum(all_scores, axis=0)
             else:
-                raise ValueError(f"Unknown aggregation method: {method}")
+                raise ValueError(f"Unknown aggregation method: {aggregation_method}")
 
             return combined_scores
 
@@ -270,8 +242,7 @@ def rank_sounds (scores, group_classes, camera_name):
 
         if not results:
             results = [{'class': '(none)', 'score': 0.0}]
-        else:
-            return results
+        return results
 
 
 ##### GROUP Composite Scores #####
