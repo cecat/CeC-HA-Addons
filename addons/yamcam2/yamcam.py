@@ -9,6 +9,7 @@ from yamcam_functions import (
         report, rank_sounds, compute_sleep_time
 )
 import yamcam_config # all setup and config happens here
+from yamcam_config import logger
 
 #---- start MQTT session ----#
 mqtt_client = start_mqtt()
