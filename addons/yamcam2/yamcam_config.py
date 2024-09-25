@@ -1,12 +1,27 @@
 # yamcam_config.py
 import yaml
 import csv
-from yamcam_functions import logger
+import logging
+import time
 
 # File paths
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
+
+###
+##################### Set up Logging ################# 
+
+# set logging to INFO and include timestamps
+# user can select different logging level via /config/microphones.yaml
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
+
 
 ##################### Get Configuration ################# 
 

@@ -6,7 +6,6 @@ import time
 import logging
 import json
 from yamcam_functions import (
-        set_configuration, logger,
         start_mqtt, load_model,
         set_sources, format_input_details, analyze_audio, group_scores, 
         report, set_log_level, rank_sounds

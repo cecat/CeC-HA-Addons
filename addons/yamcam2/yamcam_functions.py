@@ -27,19 +27,6 @@ saveWave_path = '/config/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
 
 
-############# SETUP #############
-
-# set logging to INFO and include timestamps
-# config file lets user select different logging level
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
-)
-logger = logging.getLogger(__name__)
-
-
 ############# CONFIGURE ##############
 
 def set_configuration(config_path):
