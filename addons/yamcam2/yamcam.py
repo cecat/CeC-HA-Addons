@@ -6,7 +6,7 @@ import time
 import logging
 from yamcam_functions import (
         start_mqtt, analyze_audio, 
-        report, rank_sounds, sleep_time
+        report, rank_sounds, compute_sleep_time
 )
 import yamcam_config # all setup and config happens here
 
@@ -47,7 +47,7 @@ while True:
             logger.error(f"Failed to analyze audio for {camera_name}")
 
     # account for sampling and processing time
-    sleep_duration = sleep_time(sample_duration, camera_settings)
+    sleep_duration = compute_sleep_time(sample_duration, camera_settings)
     logger.debug(f"Sleeping for {sleep_duration}s")
     time.sleep(sleep_duration)
 
