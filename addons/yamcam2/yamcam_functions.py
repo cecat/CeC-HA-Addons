@@ -246,9 +246,8 @@ def rank_sounds (scores, group_classes, camera_name):
 
 
 ##### GROUP Composite Scores #####
-
-    #     -  cap scores at 0.95 
-    #     -  don't apply bonus if max score in group >=0.7
+    # -  cap scores at 0.95 
+    # -  don't apply bonus if max score in group >=0.7
 
 def group_scores(top_class_indices, class_names, scores):
     group_scores_dict = {}
@@ -275,3 +274,16 @@ def group_scores(top_class_indices, class_names, scores):
 
     return composite_scores
 
+
+############# COMPUTE DELAY ##############
+    # -  account for sampling and processing time 
+    #    (otherwise our actual interval is sampling/processing time + sample_interval
+    # -  minimum zero (as many sources and/or long sample_duration could be >sample_interval)
+
+def sleep_time (sample_duration, camera_settings)
+    number_of_sources = len(camera_settings)
+    processing_time_per_source = 2  # Adjust as needed
+    total_time_spent = number_of_sources * (sample_duration + processing_time_per_source)
+    sleep_time = sample_interval - total_time_spent
+    sleep_time = max(sleep_time, 0)  # Ensure sleep_time is not negative
+    return sleep_duration
