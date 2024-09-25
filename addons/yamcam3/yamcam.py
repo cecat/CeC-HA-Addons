@@ -40,7 +40,7 @@ def analyze_callback(camera_name, waveform):
     else:
         logger.error(f"Failed to analyze audio for {camera_name}")
 
-############# Main Loop #############
+############# Main #############
 
 # Create and start streams for each camera
 streams = []
