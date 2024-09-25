@@ -6,18 +6,11 @@ import time
 import logging
 from yamcam_functions import (
         start_mqtt, analyze_audio, 
-        report, rank_sounds
+        report, rank_sounds, compute_delay
 )
 import yamcam_config # all setup and config happens here
 
-
-############# SETUP #############
-
-#---------- SET UP -----------#
-# set logging level, fire up MQTT
-
-logger = yamcam_config.logger
-
+#---- start MQTT session ----#
 mqtt_client = start_mqtt()
 
 
@@ -28,10 +21,8 @@ mqtt_client = start_mqtt()
 camera_settings = yamcam_config.camera_settings
 
              ## general settings
-sample_interval = yamcam_config.sample_interval
 group_classes = yamcam_config.group_classes
 sample_duration = yamcam_config.sample_duration
-aggregation_method = yamcam_config.aggregation_method
 
              ## MQTT settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
@@ -55,5 +46,8 @@ while True:
         else:
             logger.error(f"Failed to analyze audio for {camera_name}")
 
-    time.sleep(sample_interval)
+    # account for sampling and processing time
+    sleep_duration = sleep_time(sample_duration, camera_settings)
+    logger.debug(f"Sleeping for {sleep_duration}s")
+    time.sleep(sleep_duration))
 
