@@ -37,16 +37,6 @@ mqtt_client = start_mqtt()
 
 load_model(model_path)
 
-# build the class_names dictionary from the Yamnet class map csv
-
-class_names = []
-with open(class_map_path, 'r') as file:
-    reader = csv.reader(file)
-    next(reader)  # Skip the header
-    for row in reader:
-        class_names.append(row[2].strip('"'))
-
-
 #----------- PULL things we need from CONFIG -------------#
 #            (see config for definitions)
 

@@ -10,7 +10,7 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
-             ## general settings
+             ######### general settings ######## 
 try:
     general_settings = config['general']
 except KeyError as e:
@@ -30,14 +30,14 @@ top_k = general_settings.get('top_k', 10)
 report_k = general_settings.get('report_k', 3)
 noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented for now
 
-             ## cameras = sound sources
+             ######## cameras = sound sources ######## 
 try:
     camera_settings = config['cameras']
 except KeyError as e:
     logger.error(f"Missing camera settings in the configuration file: {e}")
     raise
 
-             ## MQTT settings
+             ######## MQTT settings ########  
 try:
     mqtt_settings = config['mqtt']
 except KeyError as e:
@@ -52,3 +52,14 @@ mqtt_client_id = mqtt_settings['client_id']
 mqtt_username = mqtt_settings['user']
 mqtt_password = mqtt_settings['password']
 
+
+             ######## YAMNet Class_names ########  
+
+# build the class_names dictionary from the Yamnet class map csv
+
+class_names = []
+with open(class_map_path, 'r') as file:
+    reader = csv.reader(file)
+    next(reader)  # Skip the header
+    for row in reader:
+        class_names.append(row[2].strip('"'))

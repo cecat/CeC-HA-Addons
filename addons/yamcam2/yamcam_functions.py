@@ -306,6 +306,7 @@ def rank_sounds (scores, group_classes, camera_name):
     top_k = yamcam_config.top_k
     report_k = yamcam_config.report_k
     noise_threshold = yamcam_config.noise_threshold
+    class_names = yamcam_config.class_names
 
                 # Log the scores for the top class names
     top_class_indices = np.argsort(scores)[::-1]
