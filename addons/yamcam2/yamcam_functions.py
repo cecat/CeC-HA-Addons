@@ -85,7 +85,7 @@ def report(results, mqtt_client, camera_name):
             result.wait_for_publish()
                                                                                
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.info(f"{camera_name}: {payload_json}")
+                logger.info(f"{{payload_json}")
             else:      
                 logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
         except Exception as e:
