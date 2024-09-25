@@ -12,7 +12,12 @@ import yamcam_config
 
 logger = yamcam_config.logger
 
+###################################
+
 class CameraAudioStream:
+
+    ##### Init #####
+
     def __init__(self, camera_name, rtsp_url, sample_duration, analyze_callback):
         self.camera_name = camera_name
         self.rtsp_url = rtsp_url
@@ -23,6 +28,8 @@ class CameraAudioStream:
         self.running = False
         self.buffer_size = int(16000 * sample_duration * 2)  # 16kHz, 16-bit audio
         self.lock = threading.Lock()
+
+    ##### Start #####
 
     def start(self):
         command = [
@@ -46,25 +53,34 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
+    ##### Read_stream #####
+
     def read_stream(self):
+        incomplete_read_attempts = 0  # Counter for consecutive incomplete reads
+        max_incomplete_attempts = 5   # Maximum allowed incomplete reads before stopping
+
         while self.running:
             try:
-                # Read raw audio data from the stream
                 raw_audio = self.process.stdout.read(self.buffer_size)
-
-                # Check if the audio read is complete or if the process has stalled
                 if not raw_audio or len(raw_audio) < self.buffer_size:
+                    incomplete_read_attempts += 1
                     logger.error(f"Incomplete audio capture for {self.camera_name}. Buffer size: {len(raw_audio)}")
-                    break
 
-                # Convert raw audio bytes to numpy array
+                # Stop after multiple incomplete reads, indicating a persistent issue
+                    if incomplete_read_attempts >= max_incomplete_attempts:
+                        logger.error(f"Stopping stream for {self.camera_name} after {max_incomplete_attempts} incomplete reads.")
+                        break
+                    continue
+
+            # Reset counter if a complete read is successful
+                incomplete_read_attempts = 0
+
+            # Convert raw audio bytes to numpy array
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                 waveform = np.squeeze(waveform)
-
-                # Ensure waveform length matches segment requirements
                 logger.debug(f"Waveform length: {len(waveform)}")
 
-                # Call the analyze callback if waveform length is sufficient
+            # Call the analyze callback if waveform length is sufficient
                 if len(waveform) >= segment_length:
                     self.analyze_callback(self.camera_name, waveform)
                 else:
@@ -75,6 +91,9 @@ class CameraAudioStream:
                 break
 
         self.stop()
+
+
+    ##### Stop #####
 
     def stop(self):
         with self.lock:
