@@ -25,6 +25,7 @@ output_details = None
 saveWave_path = '/config/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
 
+logger = yamcam_config.logger
 
 ############# CONFIGURE ##############
 
@@ -64,13 +65,6 @@ def on_connect(client, userdata, flags, rc, properties=None):
     #----- START ME UP -----#
 
 def start_mqtt():
-    #mqtt_settings = config['mqtt']
-    #mqtt_host = mqtt_settings['host']
-    #mqtt_port = mqtt_settings['port']
-    #mqtt_topic_prefix = mqtt_settings['topic_prefix']
-    #mqtt_client_id = mqtt_settings['client_id']
-    #mqtt_username = mqtt_settings['user']
-    #mqtt_password = mqtt_settings['password']
     mqtt_host = yamcam_config.mqtt_host
     mqtt_port = yamcam_config.mqtt_port
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
