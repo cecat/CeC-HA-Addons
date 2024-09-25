@@ -12,7 +12,7 @@ import io
 import logging
 import json
 import yamcam_config
-from yamcam_config import interpreter, input_details, output_details, logger, aggregation_method
+from yamcam_config import interpreter, input_details, output_details, logger, aggregation_method, sample_interval
 
 logger = yamcam_config.logger
 
