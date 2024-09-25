@@ -15,13 +15,7 @@ import time
 import yamcam_config
 from yamcam_config import interpreter, input_details, output_details, logger, aggregation_method
 
-
 logger = yamcam_config.logger
-
-# Module-level variables
-interpreter = None
-input_details = None
-output_details = None
 
 #
 # for heavy debug early on; relevant code commented out for the moment
