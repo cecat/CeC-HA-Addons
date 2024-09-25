@@ -34,13 +34,15 @@ class CameraAudioStream:
     def start(self):
         command = [
             'ffmpeg',
+            '-fflags', 'nobuffer',
+            '-flags', 'low_delay',
             '-rtsp_transport', 'tcp',
             '-i', self.rtsp_url,
             '-f', 's16le',
             '-acodec', 'pcm_s16le',
             '-ac', '1',
             '-ar', '16000',
-            '-'
+            '-',
         ]
         self.process = subprocess.Popen(
             command,
@@ -56,31 +58,37 @@ class CameraAudioStream:
     ##### Read_stream #####
 
     def read_stream(self):
-        incomplete_read_attempts = 0  # Counter for consecutive incomplete reads
-        max_incomplete_attempts = 5   # Maximum allowed incomplete reads before stopping
+        incomplete_read_attempts = 0
+        max_incomplete_attempts = 5
 
         while self.running:
             try:
+                # Read raw audio data from the stream, increasing read size slightly
                 raw_audio = self.process.stdout.read(self.buffer_size)
+
+                # Log the actual size read to track how much data is being received
+                logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
+
+                # If the read is incomplete, increase attempts and log the details
                 if not raw_audio or len(raw_audio) < self.buffer_size:
                     incomplete_read_attempts += 1
                     logger.error(f"Incomplete audio capture for {self.camera_name}. Buffer size: {len(raw_audio)}")
 
-                # Stop after multiple incomplete reads, indicating a persistent issue
+                    # Stop after max incomplete attempts
                     if incomplete_read_attempts >= max_incomplete_attempts:
                         logger.error(f"Stopping stream for {self.camera_name} after {max_incomplete_attempts} incomplete reads.")
                         break
                     continue
 
-            # Reset counter if a complete read is successful
+                # Reset counter if read is successful
                 incomplete_read_attempts = 0
 
-            # Convert raw audio bytes to numpy array
+                # Convert raw audio bytes to numpy array
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                 waveform = np.squeeze(waveform)
                 logger.debug(f"Waveform length: {len(waveform)}")
 
-            # Call the analyze callback if waveform length is sufficient
+                # Call the analyze callback if waveform length is sufficient
                 if len(waveform) >= segment_length:
                     self.analyze_callback(self.camera_name, waveform)
                 else:
@@ -91,7 +99,6 @@ class CameraAudioStream:
                 break
 
         self.stop()
-
 
     ##### Stop #####
 
