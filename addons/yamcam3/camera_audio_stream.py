@@ -46,33 +46,33 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
-def read_stream(self):
-    while self.running:
-        try:
-            # Read raw audio data from the stream
-            raw_audio = self.process.stdout.read(self.buffer_size)
+    def read_stream(self):
+        while self.running:
+            try:
+                # Read raw audio data from the stream
+                raw_audio = self.process.stdout.read(self.buffer_size)
 
-            # Check if the audio read is complete or if the process has stalled
-            if not raw_audio or len(raw_audio) < self.buffer_size:
-                logger.error(f"Incomplete audio capture for {self.camera_name}. Buffer size: {len(raw_audio)}")
+                # Check if the audio read is complete or if the process has stalled
+                if not raw_audio or len(raw_audio) < self.buffer_size:
+                    logger.error(f"Incomplete audio capture for {self.camera_name}. Buffer size: {len(raw_audio)}")
+                    break
+
+                # Convert raw audio bytes to numpy array
+                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                waveform = np.squeeze(waveform)
+
+                # Ensure waveform length matches segment requirements
+                logger.debug(f"Waveform length: {len(waveform)}")
+
+                # Call the analyze callback if waveform length is sufficient
+                if len(waveform) >= segment_length:
+                    self.analyze_callback(self.camera_name, waveform)
+                else:
+                    logger.error(f"Waveform too short for analysis: {len(waveform)} < {segment_length}")
+
+            except Exception as e:
+                logger.error(f"Error reading stream for {self.camera_name}: {e}")
                 break
 
-            # Convert raw audio bytes to numpy array
-            waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-            waveform = np.squeeze(waveform)
-
-            # Ensure waveform length matches segment requirements
-            logger.debug(f"Waveform length: {len(waveform)}")
-
-            # Call the analyze callback if waveform length is sufficient
-            if len(waveform) >= segment_length:
-                self.analyze_callback(self.camera_name, waveform)
-            else:
-                logger.error(f"Waveform too short for analysis: {len(waveform)} < {segment_length}")
-
-        except Exception as e:
-            logger.error(f"Error reading stream for {self.camera_name}: {e}")
-            break
-
-    self.stop()
+        self.stop()
 
