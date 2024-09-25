@@ -113,6 +113,8 @@ def analyze_audio_waveform(waveform):
         if waveform.ndim != 1:
             logger.error("Waveform must be a 1D array.")
             return None
+        
+        logger.debug(f"Waveform length: {len(waveform)}")
 
         # Split waveform into overlapping segments
         all_scores = []
@@ -120,21 +122,35 @@ def analyze_audio_waveform(waveform):
             segment = waveform[start:start + segment_length]
             segment = np.expand_dims(segment, axis=0)  # Reshape to model input
 
-            # Set input tensor and invoke interpreter
-            interpreter.set_tensor(input_details[0]['index'], segment)
-            interpreter.invoke()
+            # Log segment details
+            logger.debug(f"Segment shape: {segment.shape}")
 
-            # Get and store the output scores
-            scores = interpreter.get_tensor(output_details[0]['index'])
-            all_scores.append(scores)
+            try:
+                # Set input tensor and invoke interpreter
+                interpreter.set_tensor(input_details[0]['index'], segment)
+                interpreter.invoke()
+
+                # Get and store the output scores
+                scores = interpreter.get_tensor(output_details[0]['index'])
+                logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
+
+                if scores.size == 0:
+                    logger.error("Scores tensor is empty.")
+                else:
+                    all_scores.append(scores)
+
+            except Exception as e:
+                logger.error(f"Error during interpreter invocation: {e}")
 
         if len(all_scores) == 0:
             logger.error("No scores available for analysis.")
             return None
 
-        # Combine scores from all segments based on the selected aggregation method
-        all_scores = np.vstack(all_scores)  # Shape: (num_segments, num_classes)
+        # Combine scores from all segments
+        all_scores = np.vstack(all_scores)
+        logger.debug(f"Combined scores shape: {all_scores.shape}")
 
+        # Aggregate scores based on the selected method
         if aggregation_method == 'mean':
             combined_scores = np.mean(all_scores, axis=0)
         elif aggregation_method == 'max':
