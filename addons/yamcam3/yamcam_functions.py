@@ -98,6 +98,45 @@ def report(results, mqtt_client, camera_name):
 
 ############# SOUND FUNCTIONS ##############
 
+############# ANALYZE AUDIO STREAM ##############
+
+# yamcam_functions.py
+
+def analyze_audio_waveform(waveform):
+    # Ensure waveform has correct shape
+    waveform = np.squeeze(waveform).astype(np.float32)
+
+    # Process the full waveform in segments
+    segment_length = input_details[0]['shape'][0]
+    step_size = int(segment_length * 0.5)  # 50% overlap
+
+    all_scores = []
+    for start in range(0, len(waveform) - segment_length + 1, step_size):
+        segment = waveform[start:start + segment_length]
+        if len(segment) < segment_length:
+            break  # Skip incomplete segment
+        interpreter.set_tensor(input_details[0]['index'], segment)
+        interpreter.invoke()
+        scores = interpreter.get_tensor(output_details[0]['index'])
+        all_scores.append(scores)
+
+    if not all_scores:
+        logger.error("No scores available for analysis. Skipping this round.")
+        return None
+
+    all_scores = np.vstack(all_scores)
+    # Aggregate the scores
+    if aggregation_method == 'mean':
+        combined_scores = np.mean(all_scores, axis=0)
+    elif aggregation_method == 'max':
+        combined_scores = np.max(all_scores, axis=0)
+    elif aggregation_method == 'sum':
+        combined_scores = np.sum(all_scores, axis=0)
+    else:
+        raise ValueError(f"Unknown aggregation method: {aggregation_method}")
+
+    return combined_scores
+
 
 ############# ANALYZE AUDIO ##############
 
