@@ -28,6 +28,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+logger.info("-----------> YamCam STARTING <-----------  ")
 
 ##################### Get Configuration ################# 
 
@@ -71,7 +72,7 @@ if process_time >= sample_interval:
     logger.info(
         f"sampling+processing time for {number_of_sources} sources and {sample_duration}s samples is "
         f"{process_time}s, while sample_interval is {sample_interval}s. "
-        f"Setting sample_interval to 0, so the effective sample_interval will be {process_time}s"
+        f"Setting sample_interval to 0, so the effective sample_interval will be {process_time}s."
     )   
 
 
