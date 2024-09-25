@@ -18,6 +18,8 @@ import yamcam_config # all setup and config happens here
 #---------- SET UP -----------#
 # set logging level, fire up MQTT
 
+logger = yamcam_config.logger
+
 mqtt_client = start_mqtt()
 
 

@@ -11,8 +11,12 @@ import numpy as np
 import io
 import logging
 import json
-import yamcam_config
 import time
+import yamcam_config
+from yamcam_config import interpreter, input_details, output_details, logger, aggregation_method
+
+
+logger = yamcam_config.logger
 
 # Module-level variables
 interpreter = None
@@ -20,12 +24,11 @@ input_details = None
 output_details = None
 
 #
-# Basic Setup
+# for heavy debug early on; relevant code commented out for the moment
 #
 saveWave_path = '/config/waveform.npy'
 saveWave_dir = os.path.dirname(saveWave_path)
 
-logger = yamcam_config.logger
 
 ############# CONFIGURE ##############
 
@@ -131,11 +134,11 @@ def report(results, mqtt_client, camera_name):
 ############# ANALYZE AUDIO ##############
 
 def analyze_audio(rtsp_url, duration=5):
-    # tuning
+    # fine-tuning parameters
     retries = 3
     max_retries = 10
     retry_delay = 2
-    method = yamcam_config.aggregation_method
+    overlap = 0.5
 
     for attempt in range(retries):
         try:
@@ -172,7 +175,7 @@ def analyze_audio(rtsp_url, duration=5):
 
             # Process the full waveform in segments
             segment_length = input_details[0]['shape'][0]  # For example, 15600 samples
-            step_size = int(segment_length * 0.5)  # 50% overlap
+            step_size = int(segment_length * overlap)  # segment overlap
 
             all_scores = []
             for start in range(0, len(waveform) - segment_length + 1, step_size):
@@ -194,14 +197,14 @@ def analyze_audio(rtsp_url, duration=5):
             all_scores = np.vstack(all_scores)  # Shape: (num_segments, num_classes)
 
             # Aggregate the scores across segments
-            # config var 'aggregation_method' ('method' here)
+            # config var 'aggregation_method'
             # is either max (default), mean, or sum
 
-            if method == 'mean':
+            if aggregation_method == 'mean':
                 combined_scores = np.mean(all_scores, axis=0)
-            elif method == 'max':
+            elif aggregation_method == 'max':
                 combined_scores = np.max(all_scores, axis=0)
-            elif method == 'sum':
+            elif aggregation_method == 'sum':
                 combined_scores = np.sum(all_scores, axis=0)
             else:
                 raise ValueError(f"Unknown aggregation method: {method}")
