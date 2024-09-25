@@ -141,7 +141,6 @@ def start_mqtt():
 
     #----- REPORT via MQTT -----#
 
-#def report(results, mqtt_client, mqtt_topic_prefix, camera_name):
 def report(results, mqtt_client, camera_name):
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 

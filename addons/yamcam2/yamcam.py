@@ -60,7 +60,7 @@ while True:
             results = rank_sounds(scores, group_classes, camera_name)
 
             # Report via MQTT
-            report(results, mqtt_client, mqtt_topic_prefix, camera_name)
+            report(results, mqtt_client, camera_name)
 
         else:
             logger.error(f"Failed to analyze audio for {camera_name}")
