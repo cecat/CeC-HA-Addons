@@ -79,6 +79,16 @@ mqtt_password = mqtt_settings['password']
 
 ##################### Set up YAMNet Model ################# 
 
+             ######## Easy reading for debug logging ########
+
+def format_input_details(details):
+    formatted_details = "Input Details:\n"
+    for detail in details:
+        formatted_details += "  -\n"
+        for key, value in detail.items():
+            formatted_details += f"    {key}: {value}\n"
+    return formatted_details
+
              ######## Load YAMNet model using TensorFlow Lite ########  
 
 global interpreter, input_details, output_details
@@ -94,15 +104,6 @@ logger.debug(format_input_details(input_details))
 # else --- tpu logic here
 
 
-    #----- Easy reading for debug logging -----#
-
-def format_input_details(details):
-    formatted_details = "Input Details:\n"
-    for detail in details:
-        formatted_details += "  -\n"
-        for key, value in detail.items():
-            formatted_details += f"    {key}: {value}\n"
-    return formatted_details
 
 
              ######## YAMNet Class_names ########  
