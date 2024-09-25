@@ -67,7 +67,7 @@ except KeyError as e:
              ######## Check sample_interval vs sampling+processing time ########  
 
 number_of_sources = len(camera_settings)
-process_time = number_of_sources * (sample_duration + 2) # ~2s to process audio
+process_time = number_of_sources * (sample_duration + 3) # 2-3s to process audio
 if process_time >= sample_interval:
     logger.info(
         f"sampling+processing time for {number_of_sources} sources and {sample_duration}s samples is "

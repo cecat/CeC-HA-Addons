@@ -283,7 +283,7 @@ def group_scores(top_class_indices, class_names, scores):
 def compute_sleep_time (sample_duration, camera_settings):
 
     number_of_sources = len(camera_settings)
-    processing_time_per_source = 2  # Adjust as needed
+    processing_time_per_source = 3  # on wimpy Celeron it's 2-3s... be conservative
     total_time_spent = number_of_sources * (sample_duration + processing_time_per_source)
     sleep_duration = sample_interval - total_time_spent
     sleep_duration = max(sleep_duration, 0)  # Ensure sleep_duration is not negative
