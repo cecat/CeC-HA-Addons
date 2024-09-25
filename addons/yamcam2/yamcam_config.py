@@ -11,11 +11,11 @@ import tflite_runtime.interpreter as tflite
 
 
 # File paths
+
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 
-###
 ##################### Set up Logging ################# 
 
 # set logging to INFO and include timestamps
@@ -46,19 +46,19 @@ except KeyError as e:
     logger.error(f"Missing general settings in the configuration file: {e}")
     raise
 
-log_level = general_settings.get('log_level', 'INFO').upper()
-sample_interval = general_settings.get('sample_interval', 15)
-group_classes = general_settings.get('group_classes', True)
-sample_duration = general_settings.get('sample_duration', 3)
-aggregation_method = general_settings.get('aggregation_method', 'max')
-reporting_threshold = general_settings.get('reporting_threshold', 0.4)
-top_k = general_settings.get('top_k', 10)
-report_k = general_settings.get('report_k', 3)
-noise_threshold = general_settings.get('noise_threshold', 0.1)   # undocumented for now
+log_level            = general_settings.get('log_level', 'INFO').upper()
+sample_interval      = general_settings.get('sample_interval', 15)
+group_classes        = general_settings.get('group_classes', True)
+sample_duration      = general_settings.get('sample_duration', 3)
+aggregation_method   = general_settings.get('aggregation_method', 'max')
+reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
+top_k                = general_settings.get('top_k', 10)
+report_k             = general_settings.get('report_k', 3)
+noise_threshold      = general_settings.get('noise_threshold', 0.1)   # undocumented for now
 
              ######## cameras = sound sources ######## 
 try:
-    camera_settings = config['cameras']
+    camera_settings  = config['cameras']
 except KeyError as e:
     logger.error(f"Missing camera settings in the configuration file: {e}")
     raise
@@ -70,21 +70,21 @@ except KeyError as e:
     logger.error(f"Missing mqtt settings in the configuration file: {e}")
     raise
 
-mqtt_host = mqtt_settings['host']
-mqtt_port = mqtt_settings['port']
-mqtt_topic_prefix = mqtt_settings['topic_prefix']
-mqtt_client_id = mqtt_settings['client_id']
-mqtt_username = mqtt_settings['user']
-mqtt_password = mqtt_settings['password']
+mqtt_host            = mqtt_settings['host']
+mqtt_port            = mqtt_settings['port']
+mqtt_topic_prefix    = mqtt_settings['topic_prefix']
+mqtt_client_id       = mqtt_settings['client_id']
+mqtt_username        = mqtt_settings['user']
+mqtt_password        = mqtt_settings['password']
 
              ######### Set Log Level ######## 
-    # Map log level from string to logging constant
+
 log_levels = {
-    'DEBUG': logging.DEBUG,
-    'INFO': logging.INFO,
-    'WARNING': logging.WARNING,
-    'ERROR': logging.ERROR,
-    'CRITICAL': logging.CRITICAL
+    'DEBUG'    : logging.DEBUG,
+    'INFO'     : logging.INFO,
+    'WARNING'  : logging.WARNING,
+    'ERROR'    : logging.ERROR,
+    'CRITICAL' : logging.CRITICAL
 }
 if log_level in log_levels:
     logger.setLevel(log_levels[log_level])
@@ -92,7 +92,7 @@ if log_level in log_levels:
         handler.setLevel(log_levels[log_level])
     logger.info(f"Logging level: {log_level}")
 else:
-    logger.warning(f"Invalid log level {log_level} in config file. Use DEBUG, INFO, WARNING, ERROR, or CRITICAL. Defaulting to INFO.")
+    logger.warning(f"Invalid log level {log_level}; Defaulting to INFO.")
     logger.setLevel(logging.INFO)
     for handler in logger.handlers:
         handler.setLevel(logging.INFO)
@@ -111,20 +111,16 @@ def format_input_details(details):
 
              ######## Load YAMNet model using TensorFlow Lite ########  
 
-#global interpreter, input_details, output_details
-# for tpu - check to see if we are using a Coral TPU
+# todo: for tpu - check to see if we are using a Coral TPU
 # if no tpu
 logger.debug("Loading YAMNet model")
-interpreter = tflite.Interpreter(model_path=model_path)
+interpreter    = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
-input_details = interpreter.get_input_details()
+input_details  = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 logger.debug("YAMNet model loaded. Input details: ")
 logger.debug(format_input_details(input_details))
 # else --- tpu logic here
-
-
-
 
              ######## YAMNet Class_names ########  
 
