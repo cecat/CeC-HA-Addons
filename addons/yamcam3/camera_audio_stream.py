@@ -15,9 +15,6 @@ logger = yamcam_config.logger
 ###################################
 
 class CameraAudioStream:
-
-    ##### Init #####
-
     def __init__(self, camera_name, rtsp_url, sample_duration, analyze_callback):
         self.camera_name = camera_name
         self.rtsp_url = rtsp_url
@@ -29,14 +26,16 @@ class CameraAudioStream:
         self.buffer_size = int(16000 * sample_duration * 2)  # 16kHz, 16-bit audio
         self.lock = threading.Lock()
 
-    ##### Start #####
-
     def start(self):
         command = [
             'ffmpeg',
             '-fflags', 'nobuffer',
             '-flags', 'low_delay',
             '-rtsp_transport', 'tcp',
+            '-probesize', '50M',
+            '-analyzeduration', '10M',
+            '-reorder_queue_size', '0',
+            '-use_wallclock_as_timestamps', '1',
             '-i', self.rtsp_url,
             '-f', 's16le',
             '-acodec', 'pcm_s16le',
@@ -47,7 +46,7 @@ class CameraAudioStream:
         self.process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
             bufsize=0
         )
         self.running = True
@@ -55,16 +54,21 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
-    ##### Read_stream #####
-
     def read_stream(self):
+        self.buffer_size = 31200  # 16 kHz * 0.975 seconds * 2 bytes/sample
+
         incomplete_read_attempts = 0
         max_incomplete_attempts = 5
 
         while self.running:
             try:
-                # Read raw audio data from the stream, increasing read size slightly
+                # Read raw audio data from the stream
                 raw_audio = self.process.stdout.read(self.buffer_size)
+
+                # Capture and log FFmpeg stderr to diagnose issues
+                stderr_output = self.process.stderr.read().decode()
+                if stderr_output:
+                    logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
 
                 # Log the actual size read to track how much data is being received
                 logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
@@ -88,19 +92,17 @@ class CameraAudioStream:
                 waveform = np.squeeze(waveform)
                 logger.debug(f"Waveform length: {len(waveform)}")
 
-                # Call the analyze callback if waveform length is sufficient
-                if len(waveform) >= segment_length:
+                # Ensure the waveform is the exact size expected by YAMNet
+                if len(waveform) == 15600:
                     self.analyze_callback(self.camera_name, waveform)
                 else:
-                    logger.error(f"Waveform too short for analysis: {len(waveform)} < {segment_length}")
+                    logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
 
             except Exception as e:
                 logger.error(f"Error reading stream for {self.camera_name}: {e}")
                 break
 
         self.stop()
-
-    ##### Stop #####
 
     def stop(self):
         with self.lock:
@@ -112,3 +114,4 @@ class CameraAudioStream:
                 self.process.wait()
                 self.process = None
             logger.info(f"Stopped audio stream for {self.camera_name}")
+
