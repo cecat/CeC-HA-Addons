@@ -55,7 +55,6 @@ class CameraAudioStream:
         logger.info(f"Started audio stream for {self.camera_name}")
 
     def read_stream(self):
-
         logger.debug(f"Started reading stream for {self.camera_name}")
 
         self.buffer_size = 31200  # 16 kHz * 0.975 seconds * 2 bytes/sample
@@ -71,9 +70,12 @@ class CameraAudioStream:
                 logger.debug(f"Read completed for {self.camera_name}, read size: {len(raw_audio)}")
 
                 # Capture and log FFmpeg stderr to diagnose issues
-                stderr_output = self.process.stderr.read().decode()
-                if stderr_output:
-                    logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+                try:
+                    stderr_output = self.process.stderr.read().decode()
+                    if stderr_output:
+                        logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+                except Exception as e:
+                    logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
 
                 # Log the actual size read to track how much data is being received
                 logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
@@ -93,13 +95,20 @@ class CameraAudioStream:
                 incomplete_read_attempts = 0
 
                 # Convert raw audio bytes to numpy array
-                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                waveform = np.squeeze(waveform)
-                logger.debug(f"Waveform length: {len(waveform)}")
+                try:
+                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                    waveform = np.squeeze(waveform)
+                    logger.debug(f"Waveform length: {len(waveform)}")
+                except Exception as e:
+                    logger.error(f"Error processing raw audio for {self.camera_name}: {e}")
+                    break
 
                 # Ensure the waveform is the exact size expected by YAMNet
                 if len(waveform) == 15600:
-                    self.analyze_callback(self.camera_name, waveform)
+                    try:
+                        self.analyze_callback(self.camera_name, waveform)
+                    except Exception as e:
+                        logger.error(f"Error analyzing audio for {self.camera_name}: {e}")
                 else:
                     logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
 
@@ -108,6 +117,7 @@ class CameraAudioStream:
                 break
 
         self.stop()
+
 
     def stop(self):
         with self.lock:
