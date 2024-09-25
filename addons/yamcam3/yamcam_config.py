@@ -120,7 +120,7 @@ interpreter    = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
 input_details  = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
-logger.debug("YAMNet model loaded. Input details: ")
+logger.debug("YAMNet model loaded.")
 logger.debug(format_input_details(input_details))
 # else --- tpu logic here
 
