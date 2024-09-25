@@ -67,11 +67,11 @@ except KeyError as e:
 
 process_time = len(camera_settings) * (sample_duration + 2) # ~2s to process audio
 if process_time >= sample_interval:
-logger.info(
-    f"sampling+processing time for {number_of_sources} sources and {sample_duration}s samples is "
-    f"{process_time}s, while sample_interval is {sample_interval}s. "
-    f"Setting sample_interval to 0, so the effective sample_interval will be {process_time}s"
-)   
+    logger.info(
+        f"sampling+processing time for {number_of_sources} sources and {sample_duration}s samples is "
+        f"{process_time}s, while sample_interval is {sample_interval}s. "
+        f"Setting sample_interval to 0, so the effective sample_interval will be {process_time}s"
+    )   
 
 
 
