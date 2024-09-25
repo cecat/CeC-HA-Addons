@@ -76,3 +76,13 @@ class CameraAudioStream:
 
         self.stop()
 
+    def stop(self):
+        with self.lock:
+            if not self.running:
+                return
+            self.running = False
+            if self.process:
+                self.process.terminate()
+                self.process.wait()
+                self.process = None
+            logger.info(f"Stopped audio stream for {self.camera_name}")
