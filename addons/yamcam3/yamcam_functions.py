@@ -122,6 +122,7 @@ def analyze_audio_waveform(waveform):
 
     if not all_scores:
         logger.error("No scores available for analysis. Skipping this round.")
+        time.sleep(2) #wait 2s so the logs don't scroll away
         return None
 
     all_scores = np.vstack(all_scores)
