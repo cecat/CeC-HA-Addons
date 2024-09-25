@@ -49,6 +49,5 @@ while True:
 
     # account for sampling and processing time
     sleep_duration = compute_sleep_time(sample_duration, camera_settings)
-    logger.debug(f"Sleeping for {sleep_duration}s")
     time.sleep(sleep_duration)
 
