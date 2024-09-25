@@ -34,6 +34,7 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
+
              ######### general settings ######## 
 try:
     general_settings = config['general']
@@ -76,6 +77,27 @@ mqtt_client_id = mqtt_settings['client_id']
 mqtt_username = mqtt_settings['user']
 mqtt_password = mqtt_settings['password']
 
+             ######### Set Log Level ######## 
+    # Map log level from string to logging constant
+log_levels = {
+    'DEBUG': logging.DEBUG,
+    'INFO': logging.INFO,
+    'WARNING': logging.WARNING,
+    'ERROR': logging.ERROR,
+    'CRITICAL': logging.CRITICAL
+}
+log_level = yamcam_config.log_level
+if log_level in log_levels:
+    logger.setLevel(log_levels[log_level])
+    for handler in logger.handlers:
+        handler.setLevel(log_levels[log_level])
+    logger.info(f"Logging level: {log_level}")
+else:
+    logger.warning(f"Invalid log level {log_level} in config file. Use DEBUG, INFO, WARNING, ERROR, or CRITICAL. Defaulting to INFO.")
+    logger.setLevel(logging.INFO)
+    for handler in logger.handlers:
+        handler.setLevel(logging.INFO)
+return
 
 ##################### Set up YAMNet Model ################# 
 

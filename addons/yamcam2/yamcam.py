@@ -8,7 +8,7 @@ import json
 from yamcam_functions import (
         start_mqtt, 
         set_sources, analyze_audio, group_scores, 
-        report, set_log_level, rank_sounds
+        report, rank_sounds
 )
 import yamcam_config # all setup and config happens here
 
@@ -18,7 +18,6 @@ import yamcam_config # all setup and config happens here
 #---------- SET UP -----------#
 # set logging level, fire up MQTT
 
-set_log_level()
 mqtt_client = start_mqtt()
 
 

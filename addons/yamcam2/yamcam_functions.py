@@ -42,31 +42,6 @@ def set_configuration(config_path):
         raise
     return config
 
-    #----- SET LOG LEVEL FROM CONFIG -----#
-
-def set_log_level():
-    # Map log level from string to logging constant
-    log_levels = {
-        'DEBUG': logging.DEBUG,
-        'INFO': logging.INFO,
-        'WARNING': logging.WARNING,
-        'ERROR': logging.ERROR,
-        'CRITICAL': logging.CRITICAL
-    }
-    log_level = yamcam_config.log_level
-    if log_level in log_levels:
-        logger.setLevel(log_levels[log_level])
-        for handler in logger.handlers:
-            handler.setLevel(log_levels[log_level])
-        logger.info(f"Logging level: {log_level}")
-    else:
-        logger.warning(f"Invalid log level {log_level} in config file. Use DEBUG, INFO, WARNING, ERROR, or CRITICAL. Defaulting to INFO.")
-        logger.setLevel(logging.INFO)
-        for handler in logger.handlers:
-            handler.setLevel(logging.INFO)
-    return
-
-
     #----- SOUND SOURCES -----#
 
 def set_sources(config):
