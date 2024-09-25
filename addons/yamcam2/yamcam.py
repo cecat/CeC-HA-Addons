@@ -57,5 +57,6 @@ while True:
         else:
             logger.error(f"Failed to analyze audio for {camera_name}")
 
-    time.sleep(sample_interval)
+    time_to_sleep = compute_sleep_time(sample_duration, camera_settings)
+    time.sleep(time_to_sleep))
 
