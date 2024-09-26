@@ -107,6 +107,7 @@ class CameraAudioStream:
         logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
         # Loop to accumulate audio data until the full buffer size is reached
+        logger.debug(f"compare len(raw_audio) with self.buffer_size")
         while len(raw_audio) < self.buffer_size:
             logger.debug("get a chunk")
             try:
