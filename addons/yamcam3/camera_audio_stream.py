@@ -8,8 +8,10 @@ import subprocess
 import threading
 import numpy as np
 import logging
-import yamcam_config
 import select
+import yamcam_config
+from yamcam_config import interpreter, input_details, output_details
+
 
 logger = yamcam_config.logger
 
@@ -108,7 +110,6 @@ class CameraAudioStream:
         logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
 
         # Proceed with further processing of raw_audio as needed
-        # Proceed with further processing of raw_audio as needed
         if len(raw_audio) == self.buffer_size:
             try:
                 # Convert raw audio bytes to waveform
@@ -125,7 +126,7 @@ class CameraAudioStream:
                     interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
                     interpreter.invoke()
                     scores = interpreter.get_tensor(output_details[0]['index'])
-                    
+
                     if len(scores) == 0:
                         logger.error("No scores available for analysis.")
                         return None
