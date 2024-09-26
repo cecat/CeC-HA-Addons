@@ -4,8 +4,8 @@
 #
 
 import yaml
-import logging
 import csv
+import logging
 import tflite_runtime.interpreter as tflite
 
 # File paths
@@ -33,12 +33,12 @@ except yaml.YAMLError as e:
 
 # General settings
 general_settings = config.get('general', {})
-log_level = general_settings.get('log_level', 'INFO').upper()
-top_k = general_settings.get('top_k', 10)
-report_k = general_settings.get('report_k', 3)
-reporting_threshold = general_settings.get('reporting_threshold', 0.3)
-group_classes = general_settings.get('group_classes', True)
-noise_threshold = general_settings.get('noise_threshold', 0.1)
+log_level            = general_settings.get('log_level', 'INFO').upper()
+group_classes        = general_settings.get('group_classes', True)
+reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
+top_k                = general_settings.get('top_k', 10)
+report_k             = general_settings.get('report_k', 3)
+noise_threshold      = general_settings.get('noise_threshold', 0.1)   # undocumented for now
 
 # Set Log Level
 log_levels = {
@@ -50,14 +50,24 @@ log_levels = {
 }
 logger.setLevel(log_levels.get(log_level, logging.INFO))
 
-# MQTT settings
-mqtt_settings = config.get('mqtt', {})
-mqtt_host = mqtt_settings.get('host', 'localhost')
-mqtt_port = mqtt_settings.get('port', 1883)
-mqtt_topic_prefix = mqtt_settings.get('topic_prefix', 'yamcam/sounds')
-mqtt_client_id = mqtt_settings.get('client_id', 'yamcam')
-mqtt_username = mqtt_settings.get('user', '')
-mqtt_password = mqtt_settings.get('password', '')
+try:
+    camera_settings  = config['cameras']
+except KeyError as e:
+    logger.error(f"Missing camera settings in the configuration file: {e}")
+    raise
+
+try:
+    mqtt_settings = config['mqtt']
+except KeyError as e:
+    logger.error(f"Missing mqtt settings in the configuration file: {e}")
+    raise
+
+mqtt_host            = mqtt_settings['host']
+mqtt_port            = mqtt_settings['port']
+mqtt_topic_prefix    = mqtt_settings['topic_prefix']
+mqtt_client_id       = mqtt_settings['client_id']
+mqtt_username        = mqtt_settings['user']
+mqtt_password        = mqtt_settings['password']
 
 # Load YAMNet model
 logger.debug("Loading YAMNet model")
@@ -74,7 +84,4 @@ with open(class_map_path, 'r') as file:
     next(reader)  # Skip the header
     for row in reader:
         class_names.append(row[2].strip('"'))
-
-# Camera settings
-camera_settings = config.get('cameras', {})
 
