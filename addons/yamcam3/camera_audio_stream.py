@@ -74,6 +74,22 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
+
+    def invoke_with_timeout(interpreter, timeout=5):
+        def target():
+            try:
+                interpreter.invoke()
+            except Exception as e:
+                logger.error(f"Error during interpreter invocation: {e}")
+
+        thread = threading.Thread(target=target)
+        thread.start()
+        thread.join(timeout)
+        if thread.is_alive():
+            logger.error("Interpreter invocation timed out.")
+            return False
+        return True
+
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
 
@@ -124,7 +140,12 @@ class CameraAudioStream:
                 if len(waveform) == 15600:
                     # Set the interpreter tensor with the correct 1D shape
                     interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
-                    interpreter.invoke()
+
+                    # Use the timeout mechanism to invoke the interpreter
+                    if not invoke_with_timeout(interpreter):
+                        logger.error("Failed to analyze audio due to interpreter timeout.")
+                        return None
+
                     scores = interpreter.get_tensor(output_details[0]['index'])
 
                     if len(scores) == 0:
@@ -141,6 +162,7 @@ class CameraAudioStream:
         # Handle any cleanup or stopping logic if the stream is no longer viable
         if not self.running:
             self.stop()
+
 
 
     def stop(self):
