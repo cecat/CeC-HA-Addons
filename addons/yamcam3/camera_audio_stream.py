@@ -68,17 +68,31 @@ class CameraAudioStream:
         logger.info(f"Started audio stream for {self.camera_name}")
 
 
+
+    def read_stderr(self):
+        """Thread function to continuously read FFmpeg stderr."""
+        while self.running:
+            try:
+                stderr_output = self.process.stderr.readline().decode()
+                if stderr_output:
+                    logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+            except Exception as e:
+                logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
+                break
+
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
-
         self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
         raw_audio = b""
         logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
+        # Start a thread to read stderr concurrently
+        stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
+        stderr_thread.start()
+
         # Use select to check if there's data ready to be read from stdout
-        while len(raw_audio) < self.buffer_size:
-            # Check if there is data to read within a 2-second timeout
-            ready = select.select([self.process.stdout], [], [], 2)
+        while len(raw_audio) < self.buffer_size and self.running:
+            ready = select.select([self.process.stdout], [], [], 2)  # 2-second timeout
             if ready[0]:
                 chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                 if not chunk:
@@ -90,19 +104,10 @@ class CameraAudioStream:
                 logger.error(f"No data available to read from {self.camera_name} within timeout.")
                 break
 
-        # Check if the total read audio is incomplete
         if len(raw_audio) < self.buffer_size:
             logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
         else:
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
-
-        # Handle FFmpeg stderr output
-        try:
-            stderr_output = self.process.stderr.read(1024).decode()
-            if stderr_output:
-                logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
-        except Exception as e:
-            logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
 
         logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
 
@@ -115,9 +120,13 @@ class CameraAudioStream:
         else:
             logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
+        # Handle any cleanup or stopping logic if the stream is no longer viable
         if not self.running:
             self.stop()
 
+        # Ensure stderr reading stops
+        self.running = False
+        stderr_thread.join()  # Wait for the stderr thread to finish
 
     def stop(self):
         with self.lock:
