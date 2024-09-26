@@ -109,36 +109,53 @@ class CameraAudioStream:
 
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
+
+        # Set the buffer size to match the expected size for YAMNet
+        self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
+
+        # Initialize raw_audio as an empty byte string to accumulate audio data
         raw_audio = b""
         logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
-        # Start a thread to read stderr concurrently
+        # Set up a thread to read FFmpeg stderr concurrently
         stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
         stderr_thread.start()
 
+        # Loop to accumulate audio data until the full buffer size is reached
         while len(raw_audio) < self.buffer_size:
             try:
-                # Use select to add a timeout to the read operation
-                rlist, _, _ = select.select([self.process.stdout], [], [], 5)  # 5-second timeout
-                if not rlist:
-                    logger.error(f"Timeout reading from stdout for {self.camera_name}")
-                    break
                 chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                 if not chunk:
                     logger.error(f"Failed to read additional data from {self.camera_name}")
                     break
                 raw_audio += chunk
                 logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
-            except Exception as e:
-                logger.error(f"Error while reading stream for {self.camera_name}: {e}")
-                break
 
+        except Exception as e:
+            logger.error(f"Error reading from FFmpeg stdout for {self.camera_name}: {e}")
+            self.stop()
+            return
+
+        # Stop reading if the stderr thread detects an error
+        stderr_thread.join(timeout=5)  # Wait for the stderr thread to finish or timeout
+        if stderr_thread.is_alive():
+            logger.error(f"FFmpeg stderr reading thread timed out for {self.camera_name}.")
+            self.stop()
+            return
+
+        # Check if the total read audio is incomplete
         if len(raw_audio) < self.buffer_size:
             logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
         else:
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
-            self.analyze_callback(self.camera_name, raw_audio)
 
+        # Process the raw audio data if the buffer is complete
+        if len(raw_audio) == self.buffer_size:
+            self.score_segment(raw_audio)
+        else:
+            logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
+
+        # Handle any cleanup or stopping logic if the stream is no longer viable
         if not self.running:
             self.stop()
 
