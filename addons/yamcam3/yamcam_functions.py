@@ -5,251 +5,79 @@
 # yamcam_functions - Functions for yamcam2
 # 
 
-import subprocess
-import paho.mqtt.client as mqtt
-import yaml
-import os
 import numpy as np
-import io
 import logging
-import json
+import paho.mqtt.client as mqtt
 import yamcam_config
-from yamcam_config import interpreter, input_details, output_details, logger, aggregation_method, sample_interval
 
 logger = yamcam_config.logger
+interpreter = yamcam_config.interpreter
+input_details = yamcam_config.input_details
+output_details = yamcam_config.output_details
+class_names = yamcam_config.class_names
+mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
-#
-# for heavy debug early on; relevant code commented out for the moment
-#
-saveWave_path = '/config/waveform.npy'
-saveWave_dir = os.path.dirname(saveWave_path)
+# MQTT Client Setup
+mqtt_client = None
 
-
-############# COMMUNICATIONS ##############
-
-def on_connect(client, userdata, flags, rc, properties=None):
+def on_connect(client, userdata, flags, rc):
     if rc == 0:
-        logger.debug("Connected to MQTT broker")
+        logger.debug("Connected to MQTT Broker successfully.")
     else:
-        logger.error("Failed to connect to MQTT broker. Check MQTT settings.")
-
-    #----- START ME UP -----#
+        logger.error(f"Failed to connect to MQTT Broker with return code {rc}")
 
 def start_mqtt():
-    mqtt_host = yamcam_config.mqtt_host
-    mqtt_port = yamcam_config.mqtt_port
-    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
-    mqtt_client_id = yamcam_config.mqtt_client_id
-    mqtt_username = yamcam_config.mqtt_username
-    mqtt_password = yamcam_config.mqtt_password
-        
-    logger.debug(
-        f"MQTT Settings:\n"
-        f"   Host: {mqtt_host} ;  Port: {mqtt_port}\n"
-        f"   Topic Prefix: {mqtt_topic_prefix}\n"
-        f"   Client ID: {mqtt_client_id}\n"
-        f"   User: {mqtt_username}\n"
-    )
-
-    mqtt_client = mqtt.Client(client_id=mqtt_client_id, protocol=mqtt.MQTTv5)
-    mqtt_client.username_pw_set(mqtt_username, mqtt_password)
+    global mqtt_client
+    mqtt_client = mqtt.Client(client_id=yamcam_config.mqtt_client_id)
+    mqtt_client.username_pw_set(yamcam_config.mqtt_username, yamcam_config.mqtt_password)
     mqtt_client.on_connect = on_connect
+    mqtt_client.connect(yamcam_config.mqtt_host, yamcam_config.mqtt_port, 60)
+    mqtt_client.loop_start()
 
+def report(camera_name, message):
+    global mqtt_client
+    if mqtt_client:
+        topic = f"{mqtt_topic_prefix}/{camera_name}"
+        mqtt_client.publish(topic, message)
+        logger.debug(f"Published message to {topic}: {message}")
+
+# Analyzing audio waveform and handling scores
+def analyze_audio_waveform(camera_name, raw_audio):
     try:
-        mqtt_client.connect(mqtt_host, mqtt_port, 60)
-        mqtt_client.loop_start()
-        logger.debug(f"MQTT client connected successfully to {mqtt_host}:{mqtt_port}.")
+        waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+        waveform = np.squeeze(waveform)
+        logger.debug(f"Waveform length: {len(waveform)}, Segment shape: {waveform.shape}")
+
+        if len(waveform) == 15600:
+            interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
+            interpreter.invoke()
+            scores = interpreter.get_tensor(output_details[0]['index'])
+            logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
+
+            ranked_scores = rank_sounds(scores, yamcam_config.top_k)
+            grouped_scores = group_scores(ranked_scores, yamcam_config.group_classes)
+            report(camera_name, grouped_scores)
+
+        else:
+            logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
     except Exception as e:
-        logger.error(f"Failed to connect to MQTT broker: {e}")
+        logger.error(f"Error during waveform analysis for {camera_name}: {e}")
 
-    return mqtt_client  
+# Ranking and grouping scores
+def rank_sounds(scores, top_k):
+    indices = np.argsort(-scores[0])[:top_k]
+    ranked = [(class_names[i], scores[0][i]) for i in indices]
+    logger.debug(f"Ranked sounds: {ranked}")
+    return ranked
 
-
-    #----- REPORT via MQTT -----#
-
-def report(results, mqtt_client, camera_name):
-    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
-
-    if mqtt_client.is_connected():
-        try:
-            payload = {
-                'camera_name': camera_name,
-                'sound_classes': results
-            }
-            payload_json = json.dumps(payload)
-
-            logger.debug(f"MQTT: {mqtt_topic_prefix}, {payload_json}")
-
-            result = mqtt_client.publish(
-                f"{mqtt_topic_prefix}",
-                payload_json
-            )
-            result.wait_for_publish()
-                                                                               
-            if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.info(f"\n{payload_json}")
-            else:      
-                logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
-        except Exception as e:
-            logger.error(f"Failed to publish MQTT message: {e}")
-    else:                
-        logger.error("MQTT client is not connected. Skipping publish.")
-
-
-############# SOUND FUNCTIONS ##############
-
-############# ANALYZE AUDIO STREAM ##############
-
-# Segment settings for analyze_audio_waveform function
-
-segment_length = input_details[0]['shape'][0]  # YAMNet requirements
-overlap        = 0.5  # 50% overlap between segments
-step_size      = int(segment_length * overlap)  # Step size for sliding window
-
-def analyze_audio_waveform(waveform):
-    try:
-        # Ensure waveform is a 1D array of float32 values between -1 and 1
-        waveform = np.squeeze(waveform).astype(np.float32)
-        if waveform.ndim != 1:
-            logger.error("Waveform must be a 1D array.")
-            return None
-        
-        logger.debug(f"Waveform length: {len(waveform)}")
-
-        # Split waveform into overlapping segments
-        all_scores = []
-        for start in range(0, len(waveform) - segment_length + 1, step_size):
-            segment = waveform[start:start + segment_length]
-            segment = np.expand_dims(segment, axis=0)  # Reshape to model input
-
-            # Log segment details
-            logger.debug(f"Segment shape: {segment.shape}")
-
-            try:
-                # Set input tensor and invoke interpreter
-                interpreter.set_tensor(input_details[0]['index'], segment)
-                interpreter.invoke()
-
-                # Get and store the output scores
-                scores = interpreter.get_tensor(output_details[0]['index'])
-                logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
-
-                if scores.size == 0:
-                    logger.error("Scores tensor is empty.")
-                else:
-                    all_scores.append(scores)
-
-            except Exception as e:
-                logger.error(f"Error during interpreter invocation: {e}")
-
-        if len(all_scores) == 0:
-            logger.error("No scores available for analysis.")
-            return None
-
-        # Combine scores from all segments
-        all_scores = np.vstack(all_scores)
-        logger.debug(f"Combined scores shape: {all_scores.shape}")
-
-        # Aggregate scores based on the selected method
-        if aggregation_method == 'mean':
-            combined_scores = np.mean(all_scores, axis=0)
-        elif aggregation_method == 'max':
-            combined_scores = np.max(all_scores, axis=0)
-        elif aggregation_method == 'sum':
-            combined_scores = np.sum(all_scores, axis=0)
-        else:
-            logger.error(f"Unknown aggregation method: {aggregation_method}")
-            return None
-
-        return combined_scores
-
-    except Exception as e:
-        logger.error(f"Error processing waveform: {e}")
-        return None
-
-
-############# COMPUTE SCORES ##############
-
-##### Tease out the Sounds #####
-
-    #     -  cap scores at 0.95 
-    #     -  don't apply bonus if max score in group >=0.7
-
-def rank_sounds (scores, group_classes, camera_name):
-
-             ## get config settings
-    reporting_threshold = yamcam_config.reporting_threshold
-    top_k = yamcam_config.top_k
-    report_k = yamcam_config.report_k
-    noise_threshold = yamcam_config.noise_threshold
-    class_names = yamcam_config.class_names
-
-                # Log the scores for the top class names
-    top_class_indices = np.argsort(scores)[::-1]
-    top_class_indices = [i for i in top_class_indices[:top_k] if scores[i] >= noise_threshold]
-
-    for i in top_class_indices[:top_k]:  # Log only top_k scores
-        logger.debug(f"{camera_name}:{class_names[i]} {scores[i]:.2f}")
-
-            # Calculate composite group scores
-        composite_scores = group_scores(top_class_indices, class_names, [scores])
-        for group, score in composite_scores:
-            logger.debug(f"{camera_name}:{group} {score:.2f}")
-
-            # Sort in descending order
-        composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
-
-            # Filter and format the top class names with their scores
-        results = []
-        if group_classes:
-            for group, score in composite_scores_sorted:
-                if score >= reporting_threshold:
-                    score_python_float = float(score)
-                    rounded_score = round(score_python_float, 2)
-                    results.append({'class': group, 'score': rounded_score})
-                if len(results) >= report_k:
-                    break
-        else:
-            for i in top_class_indices:
-                score = scores[i]
-                if score >= reporting_threshold:
-                    score_python_float = float(score)
-                    rounded_score = round(score_python_float, 2)
-                    results.append({'class': class_names[i], 'score': rounded_score})
-                if len(results) >= report_k:
-                    break
-
-        if not results:
-            results = [{'class': '(none)', 'score': 0.0}]
-        return results
-
-
-##### GROUP Composite Scores #####
-    # -  cap scores at 0.95 
-    # -  don't apply bonus if max score in group >=0.7
-
-def group_scores(top_class_indices, class_names, scores):
-    group_scores_dict = {}
-
-    for i in top_class_indices[:10]:
-        class_name = class_names[i]
-        score = scores[0][i]
-        group = class_name.split('.')[0]
-
-        if group not in group_scores_dict:
-            group_scores_dict[group] = []
-        group_scores_dict[group].append(score)
-
-    composite_scores = []
-    for group, group_scores in group_scores_dict.items():
-        max_score = max(group_scores)
-        if max_score < 0.7:
-            composite_score = max_score + 0.05 * len(group_scores)
-        else:
-            composite_score = max_score
-
-        composite_score = min(composite_score, 0.95)
-        composite_scores.append((group, composite_score))
-
-    return composite_scores
+def group_scores(ranked_scores, group_classes):
+    if group_classes:
+        grouped = {}
+        for name, score in ranked_scores:
+            group = name.split('.')[0]  # Assuming format <group>.<original_class>
+            grouped[group] = grouped.get(group, 0) + score
+        logger.debug(f"Grouped scores: {grouped}")
+        return grouped
+    else:
+        return ranked_scores
 
