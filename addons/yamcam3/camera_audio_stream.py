@@ -80,6 +80,22 @@ class CameraAudioStream:
                 logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
                 break
 
+    def invoke_with_timeout(self, interpreter, timeout=5):
+        """Invoke the interpreter with a timeout to prevent hanging."""
+        def target():
+            try:
+                interpreter.invoke()
+            except Exception as e:
+                logger.error(f"Error during interpreter invocation: {e}")
+
+        thread = threading.Thread(target=target)
+        thread.start()
+        thread.join(timeout)
+        if thread.is_alive():
+            logger.error("Interpreter invocation timed out.")
+            return False
+        return True
+
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
         self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
@@ -114,19 +130,35 @@ class CameraAudioStream:
         # Process the raw audio data if the buffer is complete
         if len(raw_audio) == self.buffer_size:
             try:
-                self.analyze_callback(self.camera_name, raw_audio)
+                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                waveform = np.squeeze(waveform)
+                logger.debug(f"Waveform length: {len(waveform)}")
+                logger.debug(f"Segment shape: {waveform.shape}")
+
+                if len(waveform) == 15600:
+                    interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
+                    # Use the timeout mechanism to invoke the interpreter
+                    if not self.invoke_with_timeout(interpreter):
+                        logger.error("Failed to analyze audio due to interpreter timeout.")
+                        return None
+
+                    scores = interpreter.get_tensor(output_details[0]['index'])
+                    logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
+
+                    # Proceed with analysis using analyze_callback
+                    self.analyze_callback(self.camera_name, scores)
+                else:
+                    logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
+
             except Exception as e:
                 logger.error(f"Error during analysis callback for {self.camera_name}: {e}")
         else:
             logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
-        # Handle any cleanup or stopping logic if the stream is no longer viable
-        if not self.running:
-            self.stop()
-
         # Ensure stderr reading stops
         self.running = False
         stderr_thread.join()  # Wait for the stderr thread to finish
+
 
     def stop(self):
         with self.lock:
