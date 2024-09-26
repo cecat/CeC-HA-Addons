@@ -28,22 +28,39 @@ class CameraAudioStream:
         self.lock = threading.Lock()
 
     def start(self):
+        # Adjustable parameters
+        self.ffmpeg_probesize = '50M'            # Amount of data to probe
+        self.ffmpeg_analyzeduration = '10M'      # Duration to analyze input stream
+        self.ffmpeg_max_delay = '500000'         # Max delay in microseconds
+        self.ffmpeg_use_low_delay = True         # Toggle low delay mode
+        self.ffmpeg_use_nobuffer = True          # Toggle nobuffer mode
+
+        # Construct the command with adjustable parameters
         command = [
             'ffmpeg',
-            '-fflags', 'nobuffer',
-            '-flags', 'low_delay',
-            '-rtsp_transport', 'tcp',
-            '-probesize', '50M',
-            '-analyzeduration', '10M',
-            '-reorder_queue_size', '0',
-            '-use_wallclock_as_timestamps', '1',
-            '-i', self.rtsp_url,
-            '-f', 's16le',
-            '-acodec', 'pcm_s16le',
-            '-ac', '1',
-            '-ar', '16000',
-            '-',
+            '-rtsp_transport', 'tcp',  # Transport mode
+            '-i', self.rtsp_url,        # Input RTSP URL
+            '-f', 's16le',              # Output format (raw audio)
+            '-acodec', 'pcm_s16le',     # Audio codec (PCM 16-bit little-endian)
+            '-ac', '1',                 # Mono audio
+            '-ar', '16000',             # Sample rate: 16 kHz
+            '-reorder_queue_size', '0', # Disable reordering to reduce latency
+            '-use_wallclock_as_timestamps', '1',  # Use real-time timestamps
+            '-probesize', self.ffmpeg_probesize,  # Adjustable probesize
+            '-analyzeduration', self.ffmpeg_analyzeduration,  # Adjustable analyzeduration
+            '-max_delay', self.ffmpeg_max_delay,  # Adjustable max delay
         ]
+
+        # Conditionally add flags based on toggles
+        if self.ffmpeg_use_low_delay:
+            command.extend(['-flags', 'low_delay'])
+        if self.ffmpeg_use_nobuffer:
+            command.extend(['-fflags', 'nobuffer'])
+
+        # Redirect to standard output for processing
+        command.append('-')
+
+        # Start the FFmpeg process with the constructed command
         self.process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -58,77 +75,53 @@ class CameraAudioStream:
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
 
-        self.buffer_size = 31200  # 16 kHz * 0.975 seconds * 2 bytes/sample
+        # Initialize raw_audio as an empty byte string to accumulate audio data
+        raw_audio = b""
+        logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
-        incomplete_read_attempts = 0
-        max_incomplete_attempts = 5
+        # Loop to accumulate audio data until the full buffer size is reached
+        while len(raw_audio) < self.buffer_size:
+            chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+            if not chunk:
+                logger.error(f"Failed to read additional data from {self.camera_name}")
+                break
+            raw_audio += chunk
+            logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
 
-        while self.running:
+        # Check if the total read audio is incomplete
+        if len(raw_audio) < self.buffer_size:
+            logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
+        else:
+            logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
+
+        # Continue with the rest of your read_stream logic using raw_audio
+        try:
+            stderr_output = self.process.stderr.read(1024).decode()
+            if stderr_output:
+                logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+        except Exception as e:
+            logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
+
+        logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
+
+        # Proceed with further processing of raw_audio as needed
+        if len(raw_audio) == self.buffer_size:
             try:
-                total_audio = b""
-                while len(total_audio) < self.buffer_size:
-                    chunk = self.process.stdout.read(self.buffer_size - len(total_audio))
-                    if not chunk:
-                        break
-                    total_audio += chunk
-                if len(total_audio) < self.buffer_size:
-                    logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(total_audio)}")
-                else:
-                    logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
-
-                # Capture and log FFmpeg stderr to diagnose issues
-                try:
-                    # Check if there's data available on stderr before reading
-                    rlist, _, _ = select.select([self.process.stderr], [], [], 0.1)  # 0.1 second timeout
-                    if rlist:
-                        stderr_output = self.process.stderr.read(1024).decode()  # Read only 1024 bytes at a time
-                        if stderr_output:
-                            logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
-                    else:
-                        logger.debug(f"No stderr output available for {self.camera_name}.")
-                except Exception as e:
-                    logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
-
-                # Log the actual size read to track how much data is being received
-                logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
-
-                # If the read is incomplete, increase attempts and log the details
-                if not raw_audio or len(raw_audio) < self.buffer_size:
-                    incomplete_read_attempts += 1
-                    logger.error(f"Incomplete audio capture for {self.camera_name}. Buffer size: {len(raw_audio)}")
-
-                    # Stop after max incomplete attempts
-                    if incomplete_read_attempts >= max_incomplete_attempts:
-                        logger.error(f"Stopping stream for {self.camera_name} after {max_incomplete_attempts} incomplete reads.")
-                        break
-                    continue
-
-                # Reset counter if read is successful
-                incomplete_read_attempts = 0
-
-                # Convert raw audio bytes to numpy array
-                try:
-                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                    waveform = np.squeeze(waveform)
-                    logger.debug(f"Waveform length: {len(waveform)}")
-                except Exception as e:
-                    logger.error(f"Error processing raw audio for {self.camera_name}: {e}")
-                    break
-
-                # Ensure the waveform is the exact size expected by YAMNet
+                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                waveform = np.squeeze(waveform)
+                logger.debug(f"Waveform length: {len(waveform)}")
                 if len(waveform) == 15600:
-                    try:
-                        self.analyze_callback(self.camera_name, waveform)
-                    except Exception as e:
-                        logger.error(f"Error analyzing audio for {self.camera_name}: {e}")
+                    self.analyze_callback(self.camera_name, waveform)
                 else:
                     logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
-
             except Exception as e:
-                logger.error(f"Error reading stream for {self.camera_name}: {e}")
-                break
+                logger.error(f"Error processing raw audio for {self.camera_name}: {e}")
+        else:
+            logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
-        self.stop()
+        # Handle any cleanup or stopping logic if the stream is no longer viable
+        if not self.running:
+            self.stop()
 
 
     def stop(self):
