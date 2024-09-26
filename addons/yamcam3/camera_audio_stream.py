@@ -67,13 +67,32 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
+#
+# CURRENT VERSION
+#    def invoke_with_timeout(self, interpreter, timeout=5):
+#        def target():
+#            try:
+#                interpreter.invoke()
+#            except Exception as e:
+#                logger.error(f"Error during interpreter invocation: {e}")
+#
+#        thread = threading.Thread(target=target)
+#        thread.start()
+#        thread.join(timeout)
+#        if thread.is_alive():
+#            logger.error("Interpreter invocation timed out.")
+#            return False
+#        return True
+#
+# DUMMY TEST VERSION
     def invoke_with_timeout(self, interpreter, timeout=5):
         def target():
             try:
+                logger.debug("Starting interpreter invocation.")
                 interpreter.invoke()
+                logger.debug("Interpreter invocation completed.")
             except Exception as e:
                 logger.error(f"Error during interpreter invocation: {e}")
-
         thread = threading.Thread(target=target)
         thread.start()
         thread.join(timeout)
@@ -81,6 +100,7 @@ class CameraAudioStream:
             logger.error("Interpreter invocation timed out.")
             return False
         return True
+
 
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
