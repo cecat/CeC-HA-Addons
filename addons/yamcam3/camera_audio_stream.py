@@ -108,6 +108,7 @@ class CameraAudioStream:
 
         # Loop to accumulate audio data until the full buffer size is reached
         while len(raw_audio) < self.buffer_size:
+            logger.debug("get a chunk")
             try:
                 chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                 if not chunk:
@@ -120,11 +121,13 @@ class CameraAudioStream:
                 break
 
         # Check if the total read audio is incomplete
+        logger.debug ("check len(raw_audio) vs buffer_size)")
         if len(raw_audio) < self.buffer_size:
             logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
         else:
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
 
+        logger.debug("get stderr output")
         # Handle FFmpeg stderr output directly
         try:
             stderr_output = self.process.stderr.read(1024).decode()
