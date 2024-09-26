@@ -5,6 +5,7 @@
 import subprocess
 import threading
 import numpy as np
+import select
 import logging
 import yamcam_config
 
@@ -66,32 +67,35 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
+
     def read_stream(self):
-        
         logger.debug(f"Started reading stream for {self.camera_name}")
-        
-        # Set the buffer size to match the expected size for YAMNet
+
         self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
-        
-        # Initialize raw_audio as an empty byte string to accumulate audio data
         raw_audio = b""
         logger.debug(f"Attempting to read from stream for {self.camera_name}")
-        
-        # Loop to accumulate audio data until the full buffer size is reached
+
+        # Use select to check if there's data ready to be read from stdout
         while len(raw_audio) < self.buffer_size:
-            chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
-            if not chunk:
-                logger.error(f"Failed to read additional data from {self.camera_name}")
+            # Check if there is data to read within a 2-second timeout
+            ready = select.select([self.process.stdout], [], [], 2)
+            if ready[0]:
+                chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+                if not chunk:
+                    logger.error(f"Failed to read additional data from {self.camera_name}")
+                    break
+                raw_audio += chunk
+                logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
+            else:
+                logger.error(f"No data available to read from {self.camera_name} within timeout.")
                 break
-            raw_audio += chunk
-            logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
-            
+
         # Check if the total read audio is incomplete
         if len(raw_audio) < self.buffer_size:
             logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
         else:
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
-            
+
         # Handle FFmpeg stderr output
         try:
             stderr_output = self.process.stderr.read(1024).decode()
@@ -101,6 +105,7 @@ class CameraAudioStream:
             logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
 
         logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
+
         # Process the raw audio data if the buffer is complete
         if len(raw_audio) == self.buffer_size:
             try:
@@ -109,9 +114,10 @@ class CameraAudioStream:
                 logger.error(f"Error during analysis callback for {self.camera_name}: {e}")
         else:
             logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
-        # Handle any cleanup or stopping logic if the stream is no longer viable
+
         if not self.running:
             self.stop()
+
 
     def stop(self):
         with self.lock:
