@@ -16,15 +16,16 @@ logger = yamcam_config.logger
 ###################################
 
 class CameraAudioStream:
-    def __init__(self, camera_name, rtsp_url, analyze_callback):
+
+    def __init__(self, camera_name, rtsp_url):
         self.camera_name = camera_name
         self.rtsp_url = rtsp_url
-        self.analyze_callback = analyze_callback
         self.process = None
         self.thread = None
         self.running = False
-        self.buffer_size = 31200  # Yamnet needs 15,600 samples, 2B per sample
+        self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
         self.lock = threading.Lock()
+
 
     def start(self):
         # Adjustable parameters for FFmpeg command
