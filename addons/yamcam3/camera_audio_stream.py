@@ -131,10 +131,10 @@ class CameraAudioStream:
                 raw_audio += chunk
                 logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
 
-        except Exception as e:
-            logger.error(f"Error reading from FFmpeg stdout for {self.camera_name}: {e}")
-            self.stop()
-            return
+            except Exception as e:
+                logger.error(f"Error reading from FFmpeg stdout for {self.camera_name}: {e}")
+                self.stop()
+                return
 
         # Stop reading if the stderr thread detects an error
         stderr_thread.join(timeout=5)  # Wait for the stderr thread to finish or timeout
