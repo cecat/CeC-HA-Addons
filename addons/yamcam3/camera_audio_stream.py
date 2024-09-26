@@ -108,17 +108,32 @@ class CameraAudioStream:
         logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
 
         # Proceed with further processing of raw_audio as needed
+        # Proceed with further processing of raw_audio as needed
         if len(raw_audio) == self.buffer_size:
             try:
+                # Convert raw audio bytes to waveform
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                waveform = np.squeeze(waveform)
+                waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
                 logger.debug(f"Waveform length: {len(waveform)}")
+
+                # Check and log the shape of the waveform before feeding it to the interpreter
+                logger.debug(f"Segment shape: {waveform.shape}")
+
+                # Ensure waveform is in the correct shape (15600,) for the interpreter
                 if len(waveform) == 15600:
-                    self.analyze_callback(self.camera_name, waveform)
+                    # Set the interpreter tensor with the correct 1D shape
+                    interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
+                    interpreter.invoke()
+                    scores = interpreter.get_tensor(output_details[0]['index'])
+                    
+                    if len(scores) == 0:
+                        logger.error("No scores available for analysis.")
+                        return None
                 else:
                     logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
+
             except Exception as e:
-                logger.error(f"Error processing raw audio for {self.camera_name}: {e}")
+                logger.error(f"Error during interpreter invocation: {e}")
         else:
             logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
