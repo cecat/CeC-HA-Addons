@@ -142,7 +142,7 @@ class CameraAudioStream:
                     interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
 
                     # Use the timeout mechanism to invoke the interpreter
-                    if not invoke_with_timeout(interpreter):
+                    if not self.invoke_with_timeout(interpreter):
                         logger.error("Failed to analyze audio due to interpreter timeout.")
                         return None
 
