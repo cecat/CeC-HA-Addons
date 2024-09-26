@@ -71,17 +71,17 @@ class CameraAudioStream:
                 logger.debug(f"Read completed for {self.camera_name}, read size: {len(raw_audio)}")
 
                 # Capture and log FFmpeg stderr to diagnose issues
-            try:
-                # Check if there's data available on stderr before reading
-                rlist, _, _ = select.select([self.process.stderr], [], [], 0.1)  # 0.1 second timeout
-                if rlist:
-                    stderr_output = self.process.stderr.read(1024).decode()  # Read only 1024 bytes at a time
-                    if stderr_output:
-                        logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
-                else:
-                    logger.debug(f"No stderr output available for {self.camera_name}.")
-            except Exception as e:
-                logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
+                try:
+                    # Check if there's data available on stderr before reading
+                    rlist, _, _ = select.select([self.process.stderr], [], [], 0.1)  # 0.1 second timeout
+                    if rlist:
+                        stderr_output = self.process.stderr.read(1024).decode()  # Read only 1024 bytes at a time
+                        if stderr_output:
+                            logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+                    else:
+                        logger.debug(f"No stderr output available for {self.camera_name}.")
+                except Exception as e:
+                    logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
 
                 # Log the actual size read to track how much data is being received
                 logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
