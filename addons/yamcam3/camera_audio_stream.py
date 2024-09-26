@@ -24,7 +24,7 @@ class CameraAudioStream:
         self.process = None
         self.thread = None
         self.running = False
-        self.buffer_size = int(16000 * sample_duration * 2)  # 16kHz, 16-bit audio
+        self.buffer_size = 31200  # Yamnet needs 15,600 samples, 2B per sample
         self.lock = threading.Lock()
 
     def start(self):
@@ -74,6 +74,9 @@ class CameraAudioStream:
 
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
+
+        # Set the buffer size to match the expected size for YAMNet
+        self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
 
         # Initialize raw_audio as an empty byte string to accumulate audio data
         raw_audio = b""
