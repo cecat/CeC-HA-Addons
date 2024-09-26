@@ -22,20 +22,39 @@ class CameraAudioStream:
         self.lock = threading.Lock()
 
     def start(self):
+        # Adjustable parameters for FFmpeg command
+        self.ffmpeg_probesize = '50M'            # Amount of data to probe
+        self.ffmpeg_analyzeduration = '10M'      # Duration to analyze input stream
+        self.ffmpeg_max_delay = '500000'         # Max delay in microseconds
+        self.ffmpeg_use_low_delay = True         # Toggle low delay mode
+        self.ffmpeg_use_nobuffer = True          # Toggle nobuffer mode
+
+        # Construct the command with adjustable parameters
         command = [
             'ffmpeg',
-            '-rtsp_transport', 'tcp',
-            '-i', self.rtsp_url,
-            '-f', 's16le',
-            '-acodec', 'pcm_s16le',
-            '-ac', '1',
-            '-ar', '16000',
-            '-probesize', '50M',
-            '-analyzeduration', '10M',
-            '-flags', 'low_delay',
-            '-fflags', 'nobuffer',
-            '-',
+            '-rtsp_transport', 'tcp',  # Transport mode
+            '-i', self.rtsp_url,        # Input RTSP URL
+            '-f', 's16le',              # Output format (raw audio)
+            '-acodec', 'pcm_s16le',     # Audio codec (PCM 16-bit little-endian)
+            '-ac', '1',                 # Mono audio
+            '-ar', '16000',             # Sample rate: 16 kHz
+            '-reorder_queue_size', '0', # Disable reordering to reduce latency
+            '-use_wallclock_as_timestamps', '1',  # Use real-time timestamps
+            '-probesize', self.ffmpeg_probesize,  # Adjustable probesize
+            '-analyzeduration', self.ffmpeg_analyzeduration,  # Adjustable analyzeduration
+            '-max_delay', self.ffmpeg_max_delay,  # Adjustable max delay
         ]
+
+        # Conditionally add flags based on toggles
+        if self.ffmpeg_use_low_delay:
+            command.extend(['-flags', 'low_delay'])
+        if self.ffmpeg_use_nobuffer:
+            command.extend(['-fflags', 'nobuffer'])
+
+        # Redirect to standard output for processing
+        command.append('-')
+
+        # Start the FFmpeg process with the constructed command
         self.process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
