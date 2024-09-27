@@ -155,6 +155,12 @@ def analyze_audio_waveform(waveform):
     #     -  don't apply bonus if max score in group >=0.7
 
 def rank_sounds(scores, group_classes, camera_name):
+
+    # temporary bypass
+    time.sleep(2)
+    logger.debug(f"Bypassing rank_sounds for camera: {camera_name}")
+    return None
+
     ## get config settings
     reporting_threshold = yamcam_config.reporting_threshold
     top_k = yamcam_config.top_k
