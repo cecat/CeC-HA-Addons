@@ -33,12 +33,17 @@ mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 #----------- for streaming -------------------------------#
 
 def analyze_callback(camera_name, waveform):
+    
     scores = analyze_audio_waveform(waveform)
+    logger.debug("Received scores")
+
     if scores is not None:
+        logger.debug("rank them")
         results = rank_sounds(scores, group_classes, camera_name)
+        logger.debug("report them")
         report(results, mqtt_client, camera_name)
         #DEBUG
-        time.sleep (2)   # just for now while debugging
+        time.sleep (5)   # just for now while debugging
     else:
         logger.error(f"Failed to analyze audio for {camera_name}")
 
