@@ -140,7 +140,9 @@ def analyze_audio_waveform(waveform):
             return None
 
         # Assuming you want to return some aggregated or last scores
-        return scores
+        # debug
+        #return scores
+        return none 
 
     except Exception as e:
         logger.error(f"Error during waveform analysis: {e}")
