@@ -113,7 +113,7 @@ def analyze_audio_waveform(waveform):
         if waveform.ndim != 1:
             logger.error("Waveform must be a 1D array.")
             return None
-        
+
         logger.debug(f"Waveform length: {len(waveform)}")
 
         # Split waveform into overlapping segments
@@ -139,7 +139,12 @@ def analyze_audio_waveform(waveform):
             logger.error("No scores available for analysis.")
             return None
 
-    return scores
+        # Assuming you want to return some aggregated or last scores
+        return scores
+
+    except Exception as e:
+        logger.error(f"Error during waveform analysis: {e}")
+        return None
 
 
 ############# COMPUTE SCORES ##############
