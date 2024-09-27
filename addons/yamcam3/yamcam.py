@@ -25,7 +25,7 @@ mqtt_client = start_mqtt()
              ## cameras = sound sources
 camera_settings = yamcam_config.camera_settings
              ## general settings
-group_classes = yamcam_config.group_classes
+use_groups = yamcam_config.use_groups
 sample_duration = yamcam_config.sample_duration
              ## MQTT settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
@@ -40,8 +40,8 @@ def analyze_callback(camera_name, waveform):
 
     if scores is not None:
         logger.debug("rank them")
-        rank_sounds(scores, group_classes, camera_name)
-        results = rank_sounds(scores, group_classes, camera_name)
+        rank_sounds(scores, use_groups, camera_name)
+        results = rank_sounds(scores, use_groups, camera_name)
         logger.debug("report them")
         report(results, mqtt_client, camera_name)
         #DEBUG
