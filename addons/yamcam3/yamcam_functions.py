@@ -108,9 +108,9 @@ def report(results, mqtt_client, camera_name):
 
 # Segment settings for analyze_audio_waveform function
 
-segment_length = input_details[0]['shape'][0]  # YAMNet requirements
-overlap        = 0.5  # 50% overlap between segments
-step_size      = int(segment_length * overlap)  # Step size for sliding window
+#segment_length = input_details[0]['shape'][0]  # YAMNet requirements
+#overlap        = 0.5  # 50% overlap between segments
+#step_size      = int(segment_length * overlap)  # Step size for sliding window
 
 def analyze_audio_waveform(waveform):
     try:
@@ -122,11 +122,11 @@ def analyze_audio_waveform(waveform):
 
         logger.debug(f"Waveform length: {len(waveform)}")
 
-        # Split waveform into overlapping segments
+        # Invoke the model
         all_scores = []
         try:
             # Set input tensor and invoke interpreter
-            interpreter.set_tensor(input_details[0]['index'], segment)
+            interpreter.set_tensor(input_details[0]['index'], waveform)
             interpreter.invoke()
 
             # Get and store the output scores
