@@ -131,9 +131,7 @@ def analyze_audio_waveform(waveform):
 
             # Get and store the output scores
             scores = interpreter.get_tensor(output_details[0]['index'])
-            #debug temporary
-            #logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
-            logger.debug("scores came back, let's not print them")
+            logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
 
             if scores.size == 0:
                 logger.error("Scores tensor is empty.")
@@ -147,10 +145,7 @@ def analyze_audio_waveform(waveform):
             logger.error("No scores available for analysis.")
             return None
 
-        # Assuming you want to return some aggregated or last scores
-        # debug
-        #return scores
-        return none 
+        return scores
 
     except Exception as e:
         logger.error(f"Error during waveform analysis: {e}")
