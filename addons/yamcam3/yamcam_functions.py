@@ -100,6 +100,7 @@ def report(results, mqtt_client, camera_name):
 
     # debug
     logger.debug("just return, don't publish")
+    time.sleep(5) # wait 5s so we can look at the log before it scrolls away
 
 
 ############# SOUND FUNCTIONS ##############

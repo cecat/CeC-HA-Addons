@@ -95,50 +95,48 @@ class CameraAudioStream:
         # Set the buffer size to match the expected size for YAMNet
         self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
 
-        # Initialize raw_audio as an empty byte string to accumulate audio data
-        raw_audio = b""
-        logger.debug(f"Attempting to read from stream for {self.camera_name}")
+        while self.running:
+            # Initialize raw_audio as an empty byte string to accumulate audio data
+            raw_audio = b""
+            logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
-        # Loop to accumulate audio data until the full buffer size is reached
-        while len(raw_audio) < self.buffer_size:
-            chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
-            if not chunk:
-                logger.error(f"Failed to read additional data from {self.camera_name}")
-                break
-            raw_audio += chunk
-            logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
+            # Loop to accumulate audio data until the full buffer size is reached
+            while len(raw_audio) < self.buffer_size:
+                chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+                if not chunk:
+                    logger.error(f"Failed to read additional data from {self.camera_name}")
+                    break
+                raw_audio += chunk
+                logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
 
-        # Check if the total read audio is incomplete
-        if len(raw_audio) < self.buffer_size:
-            logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
-        else:
+            # Check if the total read audio is incomplete
+            if len(raw_audio) < self.buffer_size:
+                logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
+                continue  # Skip this iteration and go back to reading more data
+
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
 
-        # Handle FFmpeg stderr output
-        try:
-            stderr_output = self.process.stderr.read(1024).decode()
-            if stderr_output:
-                logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
-        except Exception as e:
-            logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
+            # Handle FFmpeg stderr output
+            try:
+                stderr_output = self.process.stderr.read(1024).decode()
+                if stderr_output:
+                    logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+            except Exception as e:
+                logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
 
-        logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
+            logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
 
-        # Process the raw audio data if the buffer is complete
-        if len(raw_audio) == self.buffer_size:
-            # Convert raw audio bytes to waveform
+            # Convert raw audio bytes to waveform and analyze it
             waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
             waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
             logger.debug(f"Waveform length: {len(waveform)}")
             logger.debug(f"Segment shape: {waveform.shape}")
-            # pass waveform back to analyze_callback in yamcam.py (our activity hub)
-            self.analyze_callback(self.camera_name, waveform)
-        else:
-            logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
-        # Handle any cleanup or stopping logic if the stream is no longer viable
-        if not self.running:
-            self.stop()
+            # Call analyze_callback with the waveform
+            self.analyze_callback(self.camera_name, waveform)
+
+        # Optional: Add cleanup logic if needed
+        self.stop()
 
 # no longer used:
     def score_segment(self, raw_audio):
