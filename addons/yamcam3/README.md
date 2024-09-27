@@ -96,7 +96,7 @@ general:
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
   report_k: 3                   # Number of top scoring groups or classes to report (default 3)
   reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
-  group_classes: true           # Default true, report by group rather than the original YAMNet classes
+  use_groups: true              # Default true, report by group rather than the original YAMNet classes
   aggregation_method: max       # Use max (default) or mean to pool scores across segments of a collected sample
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
@@ -143,7 +143,7 @@ classes (generally a subset of top_k).
 - **reporting_threshold**: Default 0.4 - When reporting to scores we ignore any classes with
 scores below this value (from 0.0 to 1.0).
 
-- **group_classes**: See note below re modifying the sound class maps to group them.  Setting this
+- **use_groups**: See note below re modifying the sound class maps to group them.  Setting this
 option to *false* will ignore these groupings and just report the native classes, however, they
 will still be prepended with groupnames (which are not part of the original YAMNet mappings).
 
@@ -213,7 +213,7 @@ the group score combines them as follows:
 group_score = max_score
 - Else group_score = max_score + 0.05(group_count), where group_count is the number of classes from that group are in the top_k scores. (group_score is capped at 0.95).
 
-Flipping the config variable *group_classes* to *false* will result in reporting
+Flipping the config variable *use_groups* to *false* will result in reporting
 all *top_k* classes without grouping them or calculating group scores.  They will
 still be prepended with *group.*.  To go fully native YAMNet in terms of class
 names, the original yamnet class map is included in */files* so one can replace

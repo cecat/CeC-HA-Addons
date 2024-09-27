@@ -49,7 +49,7 @@ except KeyError as e:
 
 log_level            = general_settings.get('log_level', 'INFO').upper()
 sample_interval      = general_settings.get('sample_interval', 15)
-group_classes        = general_settings.get('group_classes', True)
+use_groups           = general_settings.get('use_groups', True)
 sample_duration      = general_settings.get('sample_duration', 3)
 reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
 top_k                = general_settings.get('top_k', 10)

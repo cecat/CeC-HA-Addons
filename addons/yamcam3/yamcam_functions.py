@@ -159,7 +159,7 @@ def analyze_audio_waveform(waveform):
     #     -  cap scores at 0.95 
     #     -  don't apply bonus if max score in group >=0.7
 
-def rank_sounds(scores, group_classes, camera_name):
+def rank_sounds(scores, use_groups, camera_name):
 
     ## get config settings
     reporting_threshold = yamcam_config.reporting_threshold
@@ -172,10 +172,8 @@ def rank_sounds(scores, group_classes, camera_name):
     top_class_indices = np.argsort(scores)[::-1]
     top_class_indices = [
         i for i in top_class_indices[:top_k]
-        if np.squeeze(scores[0][i]) >= noise_threshold  # Ensures single scalar value
+        if scores[0][i].flatten()[0] >= noise_threshold  # Flatten ensures a 1D array, and [0] accesses the scalar
     ]
-
-
 
     for i in top_class_indices[:top_k]:  # Log only top_k scores
         logger.debug(f"{camera_name}:{class_names[i]} {scores[i]:.2f}")
@@ -190,7 +188,7 @@ def rank_sounds(scores, group_classes, camera_name):
 
     # Filter and format the top class names with their scores
     results = []
-    if group_classes:
+    if use_groups:
         for group, score in composite_scores_sorted:
             if score >= reporting_threshold:
                 score_python_float = float(score)
