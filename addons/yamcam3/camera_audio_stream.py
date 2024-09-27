@@ -1,26 +1,31 @@
 # yamcam3 - CeC September 2024
 # (add streaming and threads)
-# camera_audio_stream.py - Audio streaming class for YamCam
-
+#
+# audio streaming class
+#
 import subprocess
 import threading
 import numpy as np
-import select
 import logging
+import select
 import yamcam_config
+from yamcam_config import interpreter, input_details, output_details
 
 logger = yamcam_config.logger
 
+###################################
+
 class CameraAudioStream:
-    def __init__(self, camera_name, rtsp_url, analyze_callback):
+
+    def __init__(self, camera_name, rtsp_url):
         self.camera_name = camera_name
         self.rtsp_url = rtsp_url
-        self.analyze_callback = analyze_callback
         self.process = None
         self.thread = None
         self.running = False
-        self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
+        self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
         self.lock = threading.Lock()
+
 
     def start(self):
         # Adjustable parameters for FFmpeg command
@@ -67,21 +72,7 @@ class CameraAudioStream:
         self.thread.start()
         logger.info(f"Started audio stream for {self.camera_name}")
 
-
-
-    def read_stderr(self):
-        """Thread function to continuously read FFmpeg stderr."""
-        while self.running:
-            try:
-                stderr_output = self.process.stderr.readline().decode()
-                if stderr_output:
-                    logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
-            except Exception as e:
-                logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
-                break
-
     def invoke_with_timeout(self, interpreter, timeout=5):
-        """Invoke the interpreter with a timeout to prevent hanging."""
         def target():
             try:
                 interpreter.invoke()
@@ -96,17 +87,6 @@ class CameraAudioStream:
             return False
         return True
 
-
-    def read_stderr(self):
-        """Continuously read stderr to prevent blocking."""
-        try:
-            while self.running:
-                stderr_output = self.process.stderr.read(1024).decode()
-                if stderr_output:
-                    logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
-        except Exception as e:
-            logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
-
     def read_stream(self):
         logger.debug(f"Started reading stream for {self.camera_name}")
 
@@ -117,37 +97,30 @@ class CameraAudioStream:
         raw_audio = b""
         logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
-        # Set up a thread to read FFmpeg stderr concurrently
-        stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
-        stderr_thread.start()
-
         # Loop to accumulate audio data until the full buffer size is reached
         while len(raw_audio) < self.buffer_size:
-            try:
-                chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
-                if not chunk:
-                    logger.error(f"Failed to read additional data from {self.camera_name}")
-                    break
-                raw_audio += chunk
-                logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
-
-            except Exception as e:
-                logger.error(f"Error reading from FFmpeg stdout for {self.camera_name}: {e}")
-                self.stop()
-                return
-
-        # Stop reading if the stderr thread detects an error
-        stderr_thread.join(timeout=5)  # Wait for the stderr thread to finish or timeout
-        if stderr_thread.is_alive():
-            logger.error(f"FFmpeg stderr reading thread timed out for {self.camera_name}.")
-            self.stop()
-            return
+            chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+            if not chunk:
+                logger.error(f"Failed to read additional data from {self.camera_name}")
+                break
+            raw_audio += chunk
+            logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
 
         # Check if the total read audio is incomplete
         if len(raw_audio) < self.buffer_size:
             logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
         else:
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
+
+        # Handle FFmpeg stderr output
+        try:
+            stderr_output = self.process.stderr.read(1024).decode()
+            if stderr_output:
+                logger.error(f"FFmpeg stderr for {self.camera_name}: {stderr_output}")
+        except Exception as e:
+            logger.error(f"Error reading FFmpeg stderr for {self.camera_name}: {e}")
+
+        logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
 
         # Process the raw audio data if the buffer is complete
         if len(raw_audio) == self.buffer_size:
@@ -159,6 +132,34 @@ class CameraAudioStream:
         if not self.running:
             self.stop()
 
+    def score_segment(self, raw_audio):
+        try:
+            # Convert raw audio bytes to waveform
+            waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+            waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
+            logger.debug(f"Waveform length: {len(waveform)}")
+            logger.debug(f"Segment shape: {waveform.shape}")
+
+            # Ensure waveform is in the correct shape (15600,) for the interpreter
+            if len(waveform) == 15600:
+                interpreter.set_tensor(input_details[0]['index'], waveform.astype(np.float32))
+
+                # Use the timeout mechanism to invoke the interpreter
+                if not self.invoke_with_timeout(interpreter):
+                    logger.error("Failed to analyze audio due to interpreter timeout.")
+                    return None
+
+                scores = interpreter.get_tensor(output_details[0]['index'])
+                logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
+
+                if len(scores) == 0:
+                    logger.error("No scores available for analysis.")
+                    return None
+            else:
+                logger.error(f"Waveform size mismatch for analysis: {len(waveform)} != 15600")
+
+        except Exception as e:
+            logger.error(f"Error during interpreter invocation: {e}")
 
     def stop(self):
         with self.lock:

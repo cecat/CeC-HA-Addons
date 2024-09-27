@@ -2,49 +2,63 @@
 # yamcam3 - CeC September 2024
 # (add streaming and threads)
 #
-# yamcam.py - Main script to run YamCam with multiple cameras
 
-import yamcam_config
-from camera_audio_stream import CameraAudioStream
-from yamcam_functions import analyze_audio_waveform, start_mqtt, report, rank_sounds, group_scores
+#
+# yamcam3 (streaming) - CeC September 2024
+#
 
-# Initialize MQTT
-start_mqtt()
+import time
+import logging
+from yamcam_functions import (
+        start_mqtt, analyze_audio_waveform,
+        report, rank_sounds
+)
+import yamcam_config  # all setup and config happens here
+from yamcam_config import logger
+from camera_audio_stream import CameraAudioStream  # Ensure this import is added
 
-# Define analyze_callback to handle classification and reporting
+#---- Start MQTT session ----#
+mqtt_client = start_mqtt()
+
+#----------- PULL things we need from CONFIG -------------#
+#            (see config for definitions)
+             ## cameras = sound sources
+camera_settings = yamcam_config.camera_settings
+             ## general settings
+group_classes = yamcam_config.group_classes
+sample_duration = yamcam_config.sample_duration
+             ## MQTT settings
+mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
+
+#----------- for streaming -------------------------------#
+
 def analyze_callback(camera_name, waveform):
-    # Analyze the audio waveform and get scores
     scores = analyze_audio_waveform(waveform)
-
     if scores is not None:
-        # Rank the scores based on top_k setting
-        ranked_scores = rank_sounds(scores, yamcam_config.top_k)
-
-        # Group the scores if group_classes is set to True
-        grouped_scores = group_scores(ranked_scores, yamcam_config.group_classes)
-
-        # Report the results using MQTT
-        report(camera_name, grouped_scores)
+        results = rank_sounds(scores, group_classes, camera_name)
+        report(results, mqtt_client, camera_name)
+        #DEBUG
+        time.sleep (2)   # just for now while debugging
     else:
-        yamcam_config.logger.error(f"No valid scores found for {camera_name}.")
+        logger.error(f"Failed to analyze audio for {camera_name}")
 
-# Set up cameras based on the configuration
-cameras = yamcam_config.camera_settings
+############# Main #############
 
-# Start audio streams for each camera
+# Create and start streams for each camera
 streams = []
-for camera_name, settings in cameras.items():
-    rtsp_url = settings['ffmpeg']['inputs'][0]['path']
-    stream = CameraAudioStream(
-        camera_name,
-        rtsp_url,
-        analyze_callback  # Pass the callback function here
-    )
+for camera_name, camera_config in camera_settings.items():
+    rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
+    stream = CameraAudioStream( camera_name, rtsp_url)
     stream.start()
     streams.append(stream)
 
-# Stop streams when needed
-def stop_all_streams():
+# Keep the main thread alive
+try:
+    while True:
+        time.sleep(1)  # Sleep to keep the main thread running
+except KeyboardInterrupt:
+    logger.info("Stopping all audio streams...")
     for stream in streams:
         stream.stop()
+    logger.info("All audio streams stopped. Exiting.")
 
