@@ -139,7 +139,7 @@ def analyze_audio_waveform(waveform):
             logger.error("No scores available for analysis.")
             return None
 
-        return scores
+    return scores
 
 
 ############# COMPUTE SCORES ##############
