@@ -195,7 +195,7 @@ def rank_sounds (scores, group_classes, camera_name):
 
         if not results:
             results = [{'class': '(none)', 'score': 0.0}]
-        return results
+    return results
 
 
 ##### GROUP Composite Scores #####
