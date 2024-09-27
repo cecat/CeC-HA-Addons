@@ -124,7 +124,13 @@ class CameraAudioStream:
 
         # Process the raw audio data if the buffer is complete
         if len(raw_audio) == self.buffer_size:
-            self.score_segment(raw_audio)
+            # Convert raw audio bytes to waveform
+            waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+            waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
+            logger.debug(f"Waveform length: {len(waveform)}")
+            logger.debug(f"Segment shape: {waveform.shape}")
+            # pass waveform back to analyze_callback in yamcam.py (our activity hub)
+            self.analyze_callback(self.camera_name, waveform)
         else:
             logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
@@ -132,13 +138,9 @@ class CameraAudioStream:
         if not self.running:
             self.stop()
 
+# no longer used:
     def score_segment(self, raw_audio):
         try:
-            # Convert raw audio bytes to waveform
-            waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-            waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
-            logger.debug(f"Waveform length: {len(waveform)}")
-            logger.debug(f"Segment shape: {waveform.shape}")
 
             # Ensure waveform is in the correct shape (15600,) for the interpreter
             if len(waveform) == 15600:

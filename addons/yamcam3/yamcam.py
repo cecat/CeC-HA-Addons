@@ -42,13 +42,13 @@ def analyze_callback(camera_name, waveform):
 
     if scores is not None:
         logger.debug("rank them")
-        time.sleep(2)
+        time.sleep(1)
         results = rank_sounds(scores, group_classes, camera_name)
-        time.sleep(2)
+        time.sleep(1)
         logger.debug("report them")
         report(results, mqtt_client, camera_name)
         #DEBUG
-        time.sleep (5)   # just for now while debugging
+        time.sleep (1)   # just for now while debugging
     else:
         logger.error(f"Failed to analyze audio for {camera_name}")
 
