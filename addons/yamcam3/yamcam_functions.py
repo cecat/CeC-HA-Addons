@@ -70,11 +70,6 @@ def start_mqtt():
 
 def report(results, mqtt_client, camera_name):
 
-    # debug bypass
-    time.sleep(1)
-    logger.debug("bypassing mqtt in case this is where we hang")
-    return none
-
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
     if mqtt_client.is_connected():
@@ -91,16 +86,19 @@ def report(results, mqtt_client, camera_name):
                 f"{mqtt_topic_prefix}",
                 payload_json
             )
-            result.wait_for_publish()
-                                                                               
-            if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.info(f"\n{payload_json}")
-            else:      
-                logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
-        except Exception as e:
-            logger.error(f"Failed to publish MQTT message: {e}")
-    else:                
-        logger.error("MQTT client is not connected. Skipping publish.")
+    # Comment out for debugging
+    #        result.wait_for_publish()
+    #                                                                           
+    #        if result.rc == mqtt.MQTT_ERR_SUCCESS:
+    #            logger.info(f"\n{payload_json}")
+    #        else:      
+    #            logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
+    #    except Exception as e:
+    #        logger.error(f"Failed to publish MQTT message: {e}")
+    #else:                
+    #    logger.error("MQTT client is not connected. Skipping publish.")
+    # debug
+    logger.debug("just return, don't publish")
 
 
 ############# SOUND FUNCTIONS ##############
@@ -161,11 +159,6 @@ def analyze_audio_waveform(waveform):
     #     -  don't apply bonus if max score in group >=0.7
 
 def rank_sounds(scores, group_classes, camera_name):
-
-    # temporary bypass
-    time.sleep(2)
-    logger.debug(f"Bypassing rank_sounds for camera: {camera_name}")
-    return None
 
     ## get config settings
     reporting_threshold = yamcam_config.reporting_threshold
