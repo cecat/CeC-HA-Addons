@@ -68,6 +68,12 @@ def start_mqtt():
     #----- REPORT via MQTT -----#
 
 def report(results, mqtt_client, camera_name):
+
+    # debug bypass
+    time.sleep(1)
+    logger.debug("bypassing mqtt in case this is where we hang")
+    return none
+
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
     if mqtt_client.is_connected():
