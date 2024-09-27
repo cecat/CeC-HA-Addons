@@ -2,7 +2,7 @@
 # yamcam3 - CeC September 2024
 # (add streaming and threads)
 #
-# yamcam_functions - Functions for yamcam2
+# yamcam_functions - Functions for yamcam3
 # 
 
 import subprocess
@@ -131,7 +131,7 @@ def analyze_audio_waveform(waveform):
 
             # Get and store the output scores
             scores = interpreter.get_tensor(output_details[0]['index'])
-            #debug
+            #debug temporary
             #logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
             logger.debug("scores came back, let's not print them")
 

@@ -1,6 +1,6 @@
 # Camera-sounds add-on for Home Assistant
 
-# THIS IS UNDER CONSTRUCTION
+# THIS ADD-ON IS UNDER CONSTRUCTION
 
 Yamcam2 (below) seems to work well, but I am doing two things here,
 and under active development (so don't try to use it, as it likely
