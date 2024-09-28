@@ -121,7 +121,7 @@ def analyze_audio_waveform(waveform):
             logger.error("Waveform must be a 1D array.")
             return None
 
-        logger.debug(f"{camera_name}: Waveform length: {len(waveform)}.")
+        logger.debug(f"Waveform length: {len(waveform)}.")
 
         # Invoke the model
         all_scores = []
