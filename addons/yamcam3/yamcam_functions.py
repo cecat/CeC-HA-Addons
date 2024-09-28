@@ -132,7 +132,7 @@ def analyze_audio_waveform(waveform):
 
             # Get and store the output scores
             scores = interpreter.get_tensor(output_details[0]['index'])
-            logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
+            #logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
 
             if scores.size == 0:
                 logger.error("Scores tensor is empty.")
