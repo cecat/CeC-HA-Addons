@@ -80,7 +80,7 @@ def report(results, mqtt_client, camera_name):
             }
             payload_json = json.dumps(payload)
 
-            logger.debug(f"MQTT: {mqtt_topic_prefix}, {payload_json}")
+            logger.debug(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
 
             result = mqtt_client.publish(
                 f"{mqtt_topic_prefix}",
@@ -94,12 +94,12 @@ def report(results, mqtt_client, camera_name):
             # else:
             #     logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
         except Exception as e:
-            logger.error(f"Failed to publish MQTT message: {e}")
+            logger.error(f"{camera_name}: Failed to publish MQTT message: {e}")
     else:
         logger.error("MQTT client is not connected. Skipping publish.")
 
     # debug
-    logger.debug("just return, don't publish")
+    logger.debug("{camera_name}: debugging; just return, don't publish")
     time.sleep(5) # wait 5s so we can look at the log before it scrolls away
 
 
@@ -121,7 +121,7 @@ def analyze_audio_waveform(waveform):
             logger.error("Waveform must be a 1D array.")
             return None
 
-        logger.debug(f"Waveform length: {len(waveform)}")
+        logger.debug(f"{camera_name}: Waveform length: {len(waveform)}.")
 
         # Invoke the model
         all_scores = []
@@ -177,12 +177,12 @@ def rank_sounds(scores, use_groups, camera_name):
     ]
 
     for i in top_class_indices[:top_k]:  # Log only top_k scores
-        logger.debug(f"{camera_name}:{class_names[i]} {scores[i]:.2f}")
+        logger.debug(f"{camera_name}: {class_names[i]} {scores[i]:.2f}.")
 
     # Calculate composite group scores
     composite_scores = group_scores(top_class_indices, class_names, [scores])
     for group, score in composite_scores:
-        logger.debug(f"{camera_name}:{group} {score:.2f}")
+        logger.debug(f"{camera_name}: {group} {score:.2f}.")
 
     # Sort in descending order
     composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
