@@ -4,6 +4,7 @@
 # audio streaming class
 #
 import subprocess
+import time
 import threading
 import numpy as np
 import logging
@@ -94,9 +95,9 @@ class CameraAudioStream:
 
         # Set the buffer size to match the expected size for YAMNet
         self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
+        retry_count = 0  # Initialize retry counter
 
-        while self.running:
-            # Initialize raw_audio as an empty byte string to accumulate audio data
+        while self.running:  # Continuous loop for reading the stream
             raw_audio = b""
             logger.debug(f"Attempting to read from stream for {self.camera_name}")
 
@@ -105,14 +106,21 @@ class CameraAudioStream:
                 chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                 if not chunk:
                     logger.error(f"Failed to read additional data from {self.camera_name}")
-                    break
+                    retry_count += 1
+                    if retry_count >= 3:  # After 3 failed attempts, mark stream as unusable
+                        logger.error(f"Stream {self.camera_name} marked as unusable after 3 failed attempts.")
+                        self.stop()  # Stop the stream gracefully
+                        return
+                    time.sleep(2)  # Wait before retrying
+                    continue
                 raw_audio += chunk
+                retry_count = 0  # Reset retry counter on successful read
                 logger.debug(f"Accumulated {len(raw_audio)} bytes for {self.camera_name}")
 
             # Check if the total read audio is incomplete
             if len(raw_audio) < self.buffer_size:
                 logger.error(f"Incomplete audio capture for {self.camera_name}. Total buffer size: {len(raw_audio)}")
-                continue  # Skip this iteration and go back to reading more data
+                continue  # Skip analysis and retry reading
 
             logger.debug(f"Successfully accumulated full buffer for {self.camera_name}")
 
@@ -126,17 +134,17 @@ class CameraAudioStream:
 
             logger.debug(f"Read {len(raw_audio)} bytes from {self.camera_name}")
 
-            # Convert raw audio bytes to waveform and analyze it
-            waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-            waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
-            logger.debug(f"Waveform length: {len(waveform)}")
-            logger.debug(f"Segment shape: {waveform.shape}")
+            # Process the raw audio data if the buffer is complete
+            if len(raw_audio) == self.buffer_size:
+                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
+                logger.debug(f"Waveform length: {len(waveform)}")
+                logger.debug(f"Segment shape: {waveform.shape}")
+                self.analyze_callback(self.camera_name, waveform)  # Invoke callback with waveform
+            else:
+                logger.error(f"Incomplete audio capture prevented analysis for {self.camera_name}")
 
-            # Call analyze_callback with the waveform
-            self.analyze_callback(self.camera_name, waveform)
 
-        # Optional: Add cleanup logic if needed
-        self.stop()
 
 # no longer used:
     def score_segment(self, raw_audio):
