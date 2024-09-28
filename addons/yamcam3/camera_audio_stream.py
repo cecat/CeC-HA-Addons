@@ -115,7 +115,7 @@ class CameraAudioStream:
                     continue
                 raw_audio += chunk
                 retry_count = 0  # Reset retry counter on successful read
-                logger.debug(f"{self.camera_name}: Accumulated {len(raw_audio)} bytes.")
+                #logger.debug(f"{self.camera_name}: Accumulated {len(raw_audio)} bytes.")
 
             # Check if the total read audio is incomplete
             if len(raw_audio) < self.buffer_size:
