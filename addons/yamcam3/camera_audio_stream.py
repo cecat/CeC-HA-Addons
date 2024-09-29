@@ -14,97 +14,100 @@ from yamcam_config import interpreter, input_details, output_details
 
 logger = yamcam_config.logger
 
-###################################
-
 class CameraAudioStream:
-    def __init__(self, camera_name, rtsp_url, analyze_callback, max_retries=5, retry_delay=5):
+    def __init__(self, camera_name, rtsp_url, analyze_callback):
         self.camera_name = camera_name
         self.rtsp_url = rtsp_url
-        self.analyze_callback = analyze_callback
         self.process = None
         self.thread = None
         self.running = False
         self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
         self.lock = threading.Lock()
-        self.retry_count = 0
-        self.max_retries = max_retries
-        self.retry_delay = retry_delay  # Seconds to wait before retrying
+        self.analyze_callback = analyze_callback
+
+    def _is_non_critical_ffmpeg_log(self, log_message):
+        non_critical_keywords = ['bitrate', 'speed', 'size', 'tbn', 'fps']
+        return any(keyword in log_message for keyword in non_critical_keywords)
 
     def start(self):
-        self._run_ffmpeg()
-
-    def _run_ffmpeg(self):
+        # Adjustable parameters for FFmpeg command
         command = [
             'ffmpeg',
-            '-rtsp_transport', 'tcp',
-            '-i', self.rtsp_url,
-            '-f', 's16le',
-            '-acodec', 'pcm_s16le',
-            '-ac', '1',
-            '-ar', '16000',
-            '-reorder_queue_size', '0',
-            '-use_wallclock_as_timestamps', '1',
-            '-probesize', '50M',
-            '-analyzeduration', '10M',
-            '-max_delay', '500000',
-            '-fflags', 'nobuffer',
-            '-flags', 'low_delay',
+            '-rtsp_transport', 'tcp',  # Transport mode
+            '-i', self.rtsp_url,        # Input RTSP URL
+            '-f', 's16le',              # Output format (raw audio)
+            '-acodec', 'pcm_s16le',     # Audio codec (PCM 16-bit little-endian)
+            '-ac', '1',                 # Mono audio
+            '-ar', '16000',             # Sample rate: 16 kHz
+            '-reorder_queue_size', '0', # Disable reordering to reduce latency
+            '-use_wallclock_as_timestamps', '1',  # Use real-time timestamps
+            '-probesize', '50M',        # Adjustable probesize
+            '-analyzeduration', '10M',  # Adjustable analyzeduration
+            '-max_delay', '500000',     # Adjustable max delay
+            '-fflags', 'nobuffer',      # No buffering for low latency
             '-'
         ]
 
-        logger.info(f"{self.camera_name}: Starting ffmpeg process with command: {' '.join(command)}")
-
+        # Start the FFmpeg process with the constructed command
         self.process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             bufsize=0
         )
-
         self.running = True
+
+        # Start the stream reading thread
         self.thread = threading.Thread(target=self.read_stream, daemon=True)
         self.thread.start()
 
-    def read_stream(self):
-        logger.debug(f"{self.camera_name}: Started reading stream")
+        # Start a separate thread for reading stderr
+        stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
+        stderr_thread.start()
+
+        logger.info(f"{self.camera_name}: Started audio stream")
+
+    def read_stderr(self):
+        """ Read FFmpeg stderr in a separate thread """
         while self.running:
             try:
-                raw_audio = b""
+                stderr_output = self.process.stderr.read(1024).decode()
+                if stderr_output and not self._is_non_critical_ffmpeg_log(stderr_output):
+                    logger.error(f"{self.camera_name} - FFmpeg sderr: {stderr_output}")
+            except Exception as e:
+                logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
+
+    def read_stream(self):
+        logger.debug(f"{self.camera_name}: Started reading stream")
+
+        raw_audio = b""
+        logger.debug(f"{self.camera_name}: Attempting to read from stream")
+
+        while self.running:
+            try:
                 while len(raw_audio) < self.buffer_size:
                     chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                     if not chunk:
                         logger.error(f"{self.camera_name}: Failed to read additional data")
                         break
                     raw_audio += chunk
+                    logger.debug(f"{self.camera_name}: Accumulated {len(raw_audio)} bytes")
 
-                if len(raw_audio) < self.buffer_size:
-                    logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
-                    self._retry_or_stop()
-                    continue
+                if len(raw_audio) == self.buffer_size:
+                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                    waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
+                    logger.debug(f"{self.camera_name}: Waveform length: {len(waveform)}")
+                    logger.debug(f"{self.camera_name}: Segment shape: {waveform.shape}")
 
-                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                waveform = np.squeeze(waveform)
-
-                if len(waveform) == 15600:
                     self.analyze_callback(self.camera_name, waveform)
+
                 else:
-                    logger.error(f"{self.camera_name}: Waveform size mismatch: {len(waveform)} != 15600")
-                    self._retry_or_stop()
+                    logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading stream: {e}")
-                self._retry_or_stop()
 
-    def _retry_or_stop(self):
-        """ Retry the stream if it fails. Stop after max retries. """
-        self.retry_count += 1
-        if self.retry_count > self.max_retries:
-            logger.error(f"{self.camera_name}: Max retries exceeded. Stopping stream.")
-            self.stop()
-        else:
-            logger.info(f"{self.camera_name}: Retrying stream in {self.retry_delay} seconds (attempt {self.retry_count}/{self.max_retries})")
-            time.sleep(self.retry_delay)
-            self._run_ffmpeg()
+            raw_audio = b""  # Reset for the next capture
 
     def stop(self):
         with self.lock:

@@ -117,37 +117,32 @@ def analyze_audio_waveform(waveform):
         # Ensure waveform is a 1D array of float32 values between -1 and 1
         waveform = np.squeeze(waveform).astype(np.float32)
         if waveform.ndim != 1:
-            logger.error("Waveform must be a 1D array.")
+            logger.error(f"{self.camera_name}: Waveform must be a 1D array.")
             return None
 
         # Invoke the model
-        all_scores = []
         try:
             # Set input tensor and invoke interpreter
             interpreter.set_tensor(input_details[0]['index'], waveform)
             interpreter.invoke()
 
-            # Get and store the output scores, using .copy() to avoid retaining references
-            scores = interpreter.get_tensor(output_details[0]['index']).copy()
-            #logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
+            # Get output scores; convert to a copy to avoid holding internal references
+            scores = np.copy(interpreter.get_tensor(output_details[0]['index']))  
 
             if scores.size == 0:
-                logger.error("Scores tensor is empty.")
-            else:
-                all_scores.append(scores)
+                logger.error(f"{self.camera_name}: No scores available to analyze.")
+                return None
 
         except Exception as e:
-            logger.error(f"Error during interpreter invocation: {e}")
-
-        if len(all_scores) == 0:
-            logger.error("No scores available for analysis.")
+            logger.error(f"{self.camera_name}: Error during interpreter invocation: {e}")
             return None
 
         return scores
 
     except Exception as e:
-        logger.error(f"Error during waveform analysis: {e}")
+        logger.error(f"{self.camera_name}: Error during waveform analysis: {e}")
         return None
+
 
 
 ############# COMPUTE SCORES ##############
