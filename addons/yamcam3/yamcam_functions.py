@@ -179,33 +179,33 @@ def rank_sounds(scores, use_groups, camera_name):
     for i in top_class_indices[:top_k]:  # Log only top_k scores
         #logger.debug(f"{camera_name}: {class_names[i]} {scores[i]:.2f}.")
 
-    # Calculate composite group scores
-    composite_scores = group_scores(top_class_indices, class_names, [scores])
-    for group, score in composite_scores:
-        #logger.debug(f"{camera_name}: {group} {score:.2f}.")
+        # Calculate composite group scores
+        composite_scores = group_scores(top_class_indices, class_names, [scores])
+        for group, score in composite_scores:
+            #logger.debug(f"{camera_name}: {group} {score:.2f}.")
 
-    # Sort in descending order
-    composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
+        # Sort in descending order
+        composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
 
-    # Filter and format the top class names with their scores
-    results = []
-    if use_groups:
-        for group, score in composite_scores_sorted:
-            if score >= reporting_threshold:
-                score_python_float = float(score)
-                rounded_score = round(score_python_float, 2)
-                results.append({'class': group, 'score': rounded_score})
-            if len(results) >= report_k:
-                break
-    else:
-        for i in top_class_indices:
-            score = scores[i]
-            if score >= reporting_threshold:
-                score_python_float = float(score)
-                rounded_score = round(score_python_float, 2)
-                results.append({'class': class_names[i], 'score': rounded_score})
-            if len(results) >= report_k:
-                break
+        # Filter and format the top class names with their scores
+        results = []
+        if use_groups:
+            for group, score in composite_scores_sorted:
+                if score >= reporting_threshold:
+                    score_python_float = float(score)
+                    rounded_score = round(score_python_float, 2)
+                    results.append({'class': group, 'score': rounded_score})
+                if len(results) >= report_k:
+                    break
+        else:
+            for i in top_class_indices:
+                score = scores[i]
+                if score >= reporting_threshold:
+                    score_python_float = float(score)
+                    rounded_score = round(score_python_float, 2)
+                    results.append({'class': class_names[i], 'score': rounded_score})
+                if len(results) >= report_k:
+                    break
 
     if not results:
         results = [{'class': '(none)', 'score': 0.0}]
