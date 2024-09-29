@@ -121,7 +121,7 @@ def analyze_audio_waveform(waveform):
             logger.error("Waveform must be a 1D array.")
             return None
 
-        logger.debug(f"Waveform length: {len(waveform)}.")
+        #logger.debug(f"Waveform length: {len(waveform)}.")
 
         # Invoke the model
         all_scores = []
@@ -177,12 +177,12 @@ def rank_sounds(scores, use_groups, camera_name):
     ]
 
     for i in top_class_indices[:top_k]:  # Log only top_k scores
-        logger.debug(f"{camera_name}: {class_names[i]} {scores[i]:.2f}.")
+        #logger.debug(f"{camera_name}: {class_names[i]} {scores[i]:.2f}.")
 
     # Calculate composite group scores
     composite_scores = group_scores(top_class_indices, class_names, [scores])
     for group, score in composite_scores:
-        logger.debug(f"{camera_name}: {group} {score:.2f}.")
+        #logger.debug(f"{camera_name}: {group} {score:.2f}.")
 
     # Sort in descending order
     composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)

@@ -91,7 +91,7 @@ class CameraAudioStream:
         return True
 
     def read_stream(self):
-        logger.debug(f"{self.camera_name}: Started reading stream.")
+        #logger.debug(f"{self.camera_name}: Started reading stream.")
 
         # Set the buffer size to match the expected size for YAMNet
         self.buffer_size = 31200  # 15,600 samples * 2 bytes per sample
@@ -99,7 +99,7 @@ class CameraAudioStream:
 
         while self.running:  # Continuous loop for reading the stream
             raw_audio = b""
-            logger.debug(f"{self.camera_name}: Attempting to read from stream.")
+            #logger.debug(f"{self.camera_name}: Attempting to read from stream.")
 
             # Loop to accumulate audio data until the full buffer size is reached
             while len(raw_audio) < self.buffer_size:
@@ -122,7 +122,7 @@ class CameraAudioStream:
                 logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
                 continue  # Skip analysis and retry reading
 
-            logger.debug(f"{self.camera_name}: Successfully accumulated full buffer.")
+            #logger.debug(f"{self.camera_name}: Successfully accumulated full buffer.")
 
             # Handle FFmpeg stderr output
             try:
@@ -132,14 +132,14 @@ class CameraAudioStream:
             except Exception as e:
                 logger.error(f"{self.camera_name} - Error reading FFmpeg stderr: {e}")
 
-            logger.debug(f"{self.camera_name}: Read {len(raw_audio)} bytes.")
+            #logger.debug(f"{self.camera_name}: Read {len(raw_audio)} bytes.")
 
             # Process the raw audio data if the buffer is complete
             if len(raw_audio) == self.buffer_size:
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                 waveform = np.squeeze(waveform)  # Ensure waveform is a 1D array
-                logger.debug(f"{self.camera_name}: Waveform length: {len(waveform)}")
-                logger.debug(f"{self.camera_name}: Segment shape: {waveform.shape}")
+                #logger.debug(f"{self.camera_name}: Waveform length: {len(waveform)}")
+                #logger.debug(f"{self.camera_name}: Segment shape: {waveform.shape}")
                 self.analyze_callback(self.camera_name, waveform)  # Invoke callback with waveform
             else:
                 logger.error(f"{self.camera_name}: Incomplete audio capture prevented analysis.")
@@ -161,7 +161,7 @@ class CameraAudioStream:
 
                 scores = interpreter.get_tensor(output_details[0]['index'])
                 #logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
-                logger.debug(f"{self.camera_name}: got scores")
+                #logger.debug(f"{self.camera_name}: got scores")
 
                 if len(scores) == 0:
                     logger.error(f"{self.camera_name}: No scores available for analysis.")
