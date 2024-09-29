@@ -15,16 +15,20 @@ logger = yamcam_config.logger
 
 class CameraAudioStream:
     def __init__(self, camera_name, rtsp_url, analyze_callback):
-        self.camera_name = camera_name
-        self.rtsp_url = rtsp_url
-        self.process = None
-        self.thread = None
-        self.running = False
-        self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
-        self.lock = threading.Lock()
-        self.stderr_thread = None
-        # Log the callback assignment
-        logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
+        try:
+            print(f"Initializing CameraAudioStream for {camera_name}")
+            self.camera_name = camera_name
+            self.rtsp_url = rtsp_url
+            self.process = None
+            self.thread = None
+            self.running = False
+            self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
+            self.lock = threading.Lock()
+            self.stderr_thread = None
+            # Log the callback assignment
+            logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
+        except Exception as e:
+            logger.error(f"Exception in CameraAudioStream __init__: {e}")
 
     def start(self):
         command = [
