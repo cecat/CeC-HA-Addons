@@ -14,7 +14,7 @@ from yamcam_config import interpreter, input_details, output_details
 logger = yamcam_config.logger
 
 class CameraAudioStream:
-    def __init__(self, camera_name, rtsp_url):
+    def __init__(self, camera_name, rtsp_url, analyze_callback):
         self.camera_name = camera_name
         self.rtsp_url = rtsp_url
         self.process = None
