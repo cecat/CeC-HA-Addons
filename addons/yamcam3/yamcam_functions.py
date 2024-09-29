@@ -30,7 +30,7 @@ saveWave_dir = os.path.dirname(saveWave_path)
 
 def on_connect(client, userdata, flags, rc, properties=None):
     if rc == 0:
-        logger.debug("Connected to MQTT broker")
+        #logger.debug("Connected to MQTT broker")
     else:
         logger.error("Failed to connect to MQTT broker. Check MQTT settings.")
 
