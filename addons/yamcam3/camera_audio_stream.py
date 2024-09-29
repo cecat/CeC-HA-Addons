@@ -23,6 +23,8 @@ class CameraAudioStream:
         self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
         self.lock = threading.Lock()
         self.stderr_thread = None
+        # Log the callback assignment
+        logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
 
     def start(self):
         command = [
@@ -100,9 +102,9 @@ class CameraAudioStream:
                 stderr_output = self.process.stderr.read(1024).decode()
                 if stderr_output:
                     if not self._is_non_critical_ffmpeg_log(stderr_output):
-                        logger.error(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
+                        logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
                     else:
-                        logger.debug(f"{self.camera_name}: FFmpeg info: {stderr_output}")
+                        logger.error(f"{self.camera_name}: FFmpeg info: {stderr_output}")
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
