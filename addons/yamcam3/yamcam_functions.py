@@ -99,8 +99,7 @@ def report(results, mqtt_client, camera_name):
         logger.error("MQTT client is not connected. Skipping publish.")
 
     # debug
-    logger.debug("{camera_name}: debugging; just return, don't publish")
-    time.sleep(5) # wait 5s so we can look at the log before it scrolls away
+    logger.debug(f"{camera_name}: debugging; just return, don't publish")
 
 
 ############# SOUND FUNCTIONS ##############
