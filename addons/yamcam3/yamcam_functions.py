@@ -121,8 +121,6 @@ def analyze_audio_waveform(waveform):
             logger.error("Waveform must be a 1D array.")
             return None
 
-        #logger.debug(f"Waveform length: {len(waveform)}.")
-
         # Invoke the model
         all_scores = []
         try:
@@ -130,8 +128,8 @@ def analyze_audio_waveform(waveform):
             interpreter.set_tensor(input_details[0]['index'], waveform)
             interpreter.invoke()
 
-            # Get and store the output scores
-            scores = interpreter.get_tensor(output_details[0]['index'])
+            # Get and store the output scores, using .copy() to avoid retaining references
+            scores = interpreter.get_tensor(output_details[0]['index']).copy()
             #logger.debug(f"Scores shape: {scores.shape}, Scores: {scores}")
 
             if scores.size == 0:
