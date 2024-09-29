@@ -46,10 +46,8 @@ def start_mqtt():
         
     logger.debug(
         f"MQTT Settings:\n"
-        f"   Host: {mqtt_host} ;  Port: {mqtt_port}\n"
-        f"   Topic Prefix: {mqtt_topic_prefix}\n"
-        f"   Client ID: {mqtt_client_id}\n"
-        f"   User: {mqtt_username}\n"
+        f"   Host: {mqtt_host} ; Port: {mqtt_port}\n"
+        f"   Topic Prefix: {mqtt_topic_prefix} ; Client ID: {mqtt_client_id} ; User: {mqtt_username}."
     )
 
     mqtt_client = mqtt.Client(client_id=mqtt_client_id, protocol=mqtt.MQTTv5)
@@ -59,7 +57,7 @@ def start_mqtt():
     try:
         mqtt_client.connect(mqtt_host, mqtt_port, 60)
         mqtt_client.loop_start()
-        logger.debug(f"MQTT client connected successfully to {mqtt_host}:{mqtt_port}.")
+        logger.info(f"MQTT client connected to {mqtt_host}:{mqtt_port}.")
     except Exception as e:
         logger.error(f"Failed to connect to MQTT broker: {e}")
 
