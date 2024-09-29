@@ -81,7 +81,11 @@ class CameraAudioStream:
                     logger.debug(f"{self.camera_name}: Successfully accumulated full buffer.")
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                     waveform = np.squeeze(waveform)
-                    self.analyze_callback(self.camera_name, waveform)
+                    if hasattr(self, 'analyze_callback') and self.analyze_callback:
+                        self.analyze_callback(self.camera_name, waveform)
+                    else:
+                        logger.error(f"{self.camera_name}: analyze_callback is not set.")
+
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading stream: {e}")
