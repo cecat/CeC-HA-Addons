@@ -105,34 +105,43 @@ class CameraAudioStream:
             finally:
                 raw_audio = b""
 
-
-    def read_stderr(self):
-        while self.running:
-            try:
-                stderr_output = self.process.stderr.read(1024).decode()
-                if stderr_output:
-                    if not self._is_non_critical_ffmpeg_log(stderr_output):
-                        logger.error(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
+def read_stderr(self):
+    log_buffer = []
+    while self.running:
+        try:
+            # Read stderr in chunks
+            stderr_output = self.process.stderr.read(1024).decode()
+            
+            if stderr_output:
+                log_buffer.append(stderr_output)  # Buffer the output
+                
+                # If we get a complete message block (newline signals end of message)
+                if '\n' in stderr_output or len(log_buffer) > 0:
+                    full_log_message = ''.join(log_buffer).strip()
+                    log_buffer = []  # Clear the buffer after processing
+                    
+                    # Check if the full log message is critical or non-critical
+                    if not self._is_non_critical_ffmpeg_log(full_log_message):
+                        logger.error(f"{self.camera_name}: FFmpeg stderr: {full_log_message}")
                     else:
-                        logger.debug(f"{self.camera_name}: FFmpeg info: {stderr_output}")
-            except Exception as e:
-                logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
-
+                        logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
+        except Exception as e:
+            logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
     def _is_non_critical_ffmpeg_log(self, log_message):
-        # Keywords that signify non-critical logs
-        logger.debug("Checking for non-critical keywords")
         non_critical_keywords = [
             'Stream #', 'Output #', 'size=', 'bitrate=', 'frame=', 'time=', 'speed=',
             'Audio:', 'Video:', 'configuration:', 'built with', 'Opening', 'metadata:',
             'Press [q] to stop', 'encoder', 'libavformat', 'ffmpeg version', 'Copyright'
         ]
 
-        # Check if any keyword appears at the start of the log block
+        # Log a debug message when checking for non-critical logs
+        logger.debug(f"Checking if log is non-critical: {log_message[:100]}")  # Log first 100 chars for visibility
+
+        # Check if any keyword appears in the log message
         for keyword in non_critical_keywords:
             if keyword in log_message:
                 return True
-
         return False
 
 
