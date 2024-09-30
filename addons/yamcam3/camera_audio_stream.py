@@ -25,6 +25,7 @@ class CameraAudioStream:
             self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
             self.lock = threading.Lock()
             self.stderr_thread = None
+            self.analyze_callback = analyze_callback  
             # Log the callback assignment
             logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
         except Exception as e:
