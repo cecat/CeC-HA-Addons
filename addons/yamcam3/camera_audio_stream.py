@@ -132,7 +132,7 @@ class CameraAudioStream:
 
     def _is_non_critical_ffmpeg_log(self, log_message):
         non_critical_keywords = [ 'info:', 'copyright', 'press', 'speed',
-                                 'livav', '--enable','copyright' ]
+                                 'libav', '--enable','copyright' ]
 
         # Log a debug message when checking for non-critical logs
 
