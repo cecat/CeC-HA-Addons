@@ -130,12 +130,13 @@ class CameraAudioStream:
 
 
     def _is_non_critical_ffmpeg_log(self, log_message):
-        non_critical_keywords = [ 'info:', 'Copyright', 'Press',
-                                 'livav', '--enable','Copyright' ]
+        non_critical_keywords = [ 'info:', 'copyright', 'press',
+                                 'livav', '--enable','copyright' ]
 
         # Log a debug message when checking for non-critical logs
         logger.debug(f"Checking if log is non-critical: {log_message[:100]}")  # Log first 100 chars for visibility
 
+        log_message_lower = log_message.lower() #make lower case so we can be case insensitive
         # Check if any keyword appears in the log message
         for keyword in non_critical_keywords:
             if keyword in log_message:
