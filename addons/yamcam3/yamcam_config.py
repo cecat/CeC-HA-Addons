@@ -48,14 +48,11 @@ except KeyError as e:
     raise
 
 log_level            = general_settings.get('log_level', 'INFO').upper()
-sample_interval      = general_settings.get('sample_interval', 15)
 use_groups           = general_settings.get('use_groups', True)
-sample_duration      = general_settings.get('sample_duration', 3)
 reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
 top_k                = general_settings.get('top_k', 10)
 report_k             = general_settings.get('report_k', 3)
-aggregation_method   = general_settings.get('aggregation_method', 'max')
-noise_threshold      = general_settings.get('noise_threshold', 0.1)   # undocumented for now
+noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 
              ######## cameras = sound sources ######## 
 try:
