@@ -80,7 +80,7 @@ class CameraAudioStream:
                         logger.error(f"{self.camera_name}: Failed to read additional data.")
                         break
                     raw_audio += chunk
-                    logger.debug(f"{self.camera_name}: Accumulated {len(raw_audio)} bytes.")
+                    #logger.debug(f"{self.camera_name}: Accumulated {len(raw_audio)} bytes.")
 
                 if len(raw_audio) < self.buffer_size:
                     logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
