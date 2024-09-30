@@ -55,6 +55,7 @@ def analyze_callback(camera_name, waveform):
 streams = []
 for camera_name, camera_config in camera_settings.items():
     rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
+    logger.debug(f"Creating CameraAudioStream for {camera_name} with RTSP URL: {rtsp_url}")
     stream = CameraAudioStream( camera_name, rtsp_url, analyze_callback)
     stream.start()
     streams.append(stream)

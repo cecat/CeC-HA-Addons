@@ -16,7 +16,7 @@ logger = yamcam_config.logger
 class CameraAudioStream:
     def __init__(self, camera_name, rtsp_url, analyze_callback):
         try:
-            print(f"Initializing CameraAudioStream for {camera_name}")
+            logger.debug(f"Initializing CameraAudioStream for {camera_name}")
             self.camera_name = camera_name
             self.rtsp_url = rtsp_url
             self.process = None
