@@ -133,5 +133,6 @@ class CameraAudioStream:
                 self.process.terminate()
                 self.process.wait()
                 self.process = None
+            logger.debug("**********-------------**************------------**********")
             logger.info(f"{self.camera_name}: Stopped audio stream.")
 
