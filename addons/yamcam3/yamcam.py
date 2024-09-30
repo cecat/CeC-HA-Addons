@@ -26,7 +26,6 @@ mqtt_client = start_mqtt()
 camera_settings = yamcam_config.camera_settings
              ## general settings
 use_groups = yamcam_config.use_groups
-sample_duration = yamcam_config.sample_duration
              ## MQTT settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
