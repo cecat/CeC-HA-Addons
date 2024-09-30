@@ -171,7 +171,7 @@ def rank_sounds(scores, use_groups, camera_name):
         if scores[0][i].flatten()[0] >= noise_threshold  # Flatten ensures a 1D array, and [0] accesses the scalar
     ]
 
-    logger.debug(f"{camera_name}: {len(top_class_indices_above_noise)} classes > {noise_threshold}.")
+    logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}.")
 
     # Log the scores for the top_k classes
     for i in top_class_indices[:top_k]:
