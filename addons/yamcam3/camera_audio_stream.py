@@ -107,14 +107,19 @@ class CameraAudioStream:
                 stderr_output = self.process.stderr.read(1024).decode()
                 if stderr_output:
                     if not self._is_non_critical_ffmpeg_log(stderr_output):
-                        logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
+                        logger.error(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
                     else:
-                        logger.error(f"{self.camera_name}: FFmpeg info: {stderr_output}")
+                        logger.debug(f"{self.camera_name}: FFmpeg info: {stderr_output}")
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
     def _is_non_critical_ffmpeg_log(self, log_message):
         non_critical_keywords = ['Stream #', 'Output #', 'size=', 'bitrate=']
+            non_critical_keywords = [
+                'Stream #', 'Output #', 'size=', 'bitrate=', 'frame=', 'time=', 'speed=',
+                'Audio:', 'Video:', 'metadata:', 'Press [q] to stop', 'Opening',
+                'configuration:', 'built with'
+            ]
         return any(keyword in log_message for keyword in non_critical_keywords)
 
     def stop(self):
