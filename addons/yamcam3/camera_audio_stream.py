@@ -137,7 +137,9 @@ class CameraAudioStream:
         # Check if any keyword appears in the log message
         for keyword in non_critical_keywords:
             if keyword in log_message:
+                logger.debug(f"found keyword {keyword}.")
                 return True
+        logger.debug(f"NO keywords found.")
         return False
 
 
