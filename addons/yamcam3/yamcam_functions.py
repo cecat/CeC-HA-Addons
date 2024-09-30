@@ -159,12 +159,19 @@ def rank_sounds(scores, use_groups, camera_name):
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
 
+    # Count the number of classes with non-zero scores
+    non_zero_scores_count = np.count_nonzero(scores[0] > 0)
+    logger.debug(f"{camera_name}: Number of classes w scores !0: {non_zero_scores_count}")
+
+  
     # Log the scores for the top class names
     top_class_indices = np.argsort(scores)[::-1]
     top_class_indices = [
         i for i in top_class_indices[:top_k]
         if scores[0][i].flatten()[0] >= noise_threshold  # Flatten ensures a 1D array, and [0] accesses the scalar
     ]
+
+    logger.debug(f"{camera_name}: {len(top_class_indices_above_noise)} classes > {noise_threshold}.")
 
     # Log the scores for the top_k classes
     for i in top_class_indices[:top_k]:
