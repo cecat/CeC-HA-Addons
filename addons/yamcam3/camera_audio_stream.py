@@ -123,8 +123,9 @@ class CameraAudioStream:
                         # Check if the full log message is critical or non-critical
                         if not self._is_non_critical_ffmpeg_log(full_log_message):
                             logger.error(f"{self.camera_name}: FFmpeg stderr: {full_log_message}")
-                        else:
-                            logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
+                        # unless we are debugging ffmpeg, no need to print informational messages
+                        #else:
+                        #    logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
@@ -139,7 +140,7 @@ class CameraAudioStream:
         log_message_lower = log_message.lower() #make lower case so we can be case insensitive
         # Check if any keyword appears in the log message
         for keyword in non_critical_keywords:
-            if keyword in log_message:
+            if keyword in log_message_lower:
                 logger.debug(f"found keyword {keyword}.")
                 return True
         logger.debug(f"NO keywords found.")
