@@ -14,6 +14,7 @@ from yamcam_config import interpreter, input_details, output_details
 logger = yamcam_config.logger
 
 class CameraAudioStream:
+
     def __init__(self, camera_name, rtsp_url, analyze_callback):
         try:
             logger.debug(f"Initializing CameraAudioStream for {camera_name}")
@@ -30,6 +31,7 @@ class CameraAudioStream:
             logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
         except Exception as e:
             logger.error(f"Exception in CameraAudioStream __init__: {e}")
+
 
     def start(self):
         command = [
@@ -66,6 +68,7 @@ class CameraAudioStream:
 
         logger.info(f"{self.camera_name}: Started audio stream.")
 
+
     def read_stream(self):
         logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
 
@@ -101,6 +104,7 @@ class CameraAudioStream:
             finally:
                 raw_audio = b""
 
+
     def read_stderr(self):
         while self.running:
             try:
@@ -113,15 +117,19 @@ class CameraAudioStream:
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
+
     def _is_non_critical_ffmpeg_log(self, log_message):
         non_critical_keywords = [
             'Stream #', 'Output #', 'size=', 'bitrate=', 'frame=', 'time=', 'speed=',
-            'Audio:', 'Video:', 'configuration:', 'built with', 'Opening', 'metadata:', 
+            'Audio:', 'Video:', 'configuration:', 'built with', 'Opening', 'metadata:',
             'Press [q] to stop', 'encoder', 'libavformat', 'ffmpeg version', 'Copyright'
         ]
-        return any(keyword in log_message for keyword in non_critical_keywords)
 
-
+        # Check if any line in a multi-line log matches the non-critical keywords
+        for line in log_message.splitlines():
+            if any(keyword in line for keyword in non_critical_keywords):
+                return True
+        return False
 
 
     def stop(self):
