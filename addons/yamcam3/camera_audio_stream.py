@@ -129,11 +129,7 @@ class CameraAudioStream:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
     def _is_non_critical_ffmpeg_log(self, log_message):
-        non_critical_keywords = [
-            'Stream #', 'Output #', 'size=', 'bitrate=', 'frame=', 'time=', 'speed=',
-            'Audio:', 'Video:', 'configuration:', 'built with', 'Opening', 'metadata:',
-            'Press [q] to stop', 'encoder', 'libavformat', 'ffmpeg version', 'Copyright'
-        ]
+        non_critical_keywords = [ 'info:', 'Copyright', 'Press', 'Copyright' ]
 
         # Log a debug message when checking for non-critical logs
         logger.debug(f"Checking if log is non-critical: {log_message[:100]}")  # Log first 100 chars for visibility
