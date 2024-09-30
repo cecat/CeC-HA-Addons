@@ -116,10 +116,13 @@ class CameraAudioStream:
     def _is_non_critical_ffmpeg_log(self, log_message):
         non_critical_keywords = [
             'Stream #', 'Output #', 'size=', 'bitrate=', 'frame=', 'time=', 'speed=',
-            'Audio:', 'Video:', 'metadata:', 'Press [q] to stop', 'Opening',
-            'configuration:', 'built with'
+            'Audio:', 'Video:', 'configuration:', 'built with', 'Opening', 'metadata:', 
+            'Press [q] to stop', 'encoder', 'libavformat', 'ffmpeg version', 'Copyright'
         ]
         return any(keyword in log_message for keyword in non_critical_keywords)
+
+
+
 
     def stop(self):
         with self.lock:

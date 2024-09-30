@@ -60,11 +60,9 @@ MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), some of which may have embedded credentials
 (so treat this as a secrets file). 
 
-The config file also includes many knobs you can use to customize how the addon
-functions.  These are explained below.
-
-For each sound source, at each reporting interval,
-we send a MQTT  message to HA of the form *topic_prefix* {json payload} where the 
+The add-on groups the 521 native YAMNet classes into groups.  When sounds are detected from
+a sound group configured in the watch list, a MQTT message is sent to Home Assistant (or
+other MQTT destination) of the form *topic_prefix* {json payload} where the 
 json payload includes *camera_name* followed by *class*, *score* pairs, with up to *report_k*
 classes/scores reported.  Example:
 '''
@@ -91,13 +89,11 @@ classes/scores reported.  Example:
 
 ```
 general:
-  sample_interval: 15           # Sampling interval (seconds) (default 15)
-  sample_duration: 3            # Sound sample length (seconds) (default 3) 
+  noise_threshold: 0.1          # Filter out very very low scores
+  reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
   report_k: 3                   # Number of top scoring groups or classes to report (default 3)
-  reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
   use_groups: true              # Default true, report by group rather than the original YAMNet classes
-  aggregation_method: max       # Use max (default) or mean to pool scores across segments of a collected sample
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
 mqtt:
@@ -122,17 +118,11 @@ cameras:
 
 **General configuration variables**
 
-- **sample_interval**: Wait time (seconds) between cycling through the sound
-sources (ffmpeg, analyze, calculate scores, report via MQTT) so sample_interval
-for n cameras (on a low-end Celeron CPU it takes about 2s to process audio and report) is actually
-(sample_duration+2) * n + sample_interval.  So three with 3s *sample_duration* will take about
-15s to process, and if *sample_interval* is 15 then it each camera will get sampled about once
-every (3+2)*3 + 15 = 30s.
+- **noise**: Default 0.1 - Many sound classes will have very low scores, so we filter these 
+out before processing the composite score for a sound group.
 
-- **sample_duration**: Sound sample length (seconds) (default 3). YAMNet operates on 16 KHz 
-frames, maximum 15,360 samples -- so it operates on 0.96s duration frames.  To analyze across
-longer durations we segment the waveform into 0.96s frames with 50% overlap, then combine the
-scores across the segments by taking the max of scores for each class.
+- **reporting_threshold**: Default 0.4 - When reporting to scores we ignore any classes with
+scores below this value.
 
 - **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes. However,
 we ignore classes with confidence levels below 0.1.
@@ -140,17 +130,9 @@ we ignore classes with confidence levels below 0.1.
 - **report_k**: After analyzing top scores, we report the report_k highest scoring
 classes (generally a subset of top_k).
 
-- **reporting_threshold**: Default 0.4 - When reporting to scores we ignore any classes with
-scores below this value (from 0.0 to 1.0).
-
 - **use_groups**: See note below re modifying the sound class maps to group them.  Setting this
 option to *false* will ignore these groupings and just report the native classes, however, they
 will still be prepended with groupnames (which are not part of the original YAMNet mappings).
-
-- **aggregation_method**: YAMNet analyzes 0.96s samples. For longer *sample_duration*
-we divide the waveform into multiple segments, each 0.96s, overlapped by 50%.  The method
-specified here is used to create a score for the collection of segments. The choices are 
-*mean* or *max*. 
 
 - **log_level**: Level of detail to be logged. Levels are
 DEBUG->INFO->WARNING->ERROR->CRITICAL
