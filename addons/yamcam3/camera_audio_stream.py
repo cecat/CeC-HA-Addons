@@ -119,16 +119,18 @@ class CameraAudioStream:
 
 
     def _is_non_critical_ffmpeg_log(self, log_message):
+        # Keywords that signify non-critical logs
         non_critical_keywords = [
             'Stream #', 'Output #', 'size=', 'bitrate=', 'frame=', 'time=', 'speed=',
             'Audio:', 'Video:', 'configuration:', 'built with', 'Opening', 'metadata:',
             'Press [q] to stop', 'encoder', 'libavformat', 'ffmpeg version', 'Copyright'
         ]
 
-        # Check if any line in a multi-line log matches the non-critical keywords
-        for line in log_message.splitlines():
-            if any(keyword in line for keyword in non_critical_keywords):
+        # Check if any keyword appears at the start of the log block
+        for keyword in non_critical_keywords:
+            if keyword in log_message:
                 return True
+
         return False
 
 
