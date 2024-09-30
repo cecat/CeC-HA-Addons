@@ -67,7 +67,7 @@ class CameraAudioStream:
         logger.info(f"{self.camera_name}: Started audio stream.")
 
     def read_stream(self):
-        logger.debug(f"{self.camera_name}: Started reading stream.")
+        logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
 
         self.buffer_size = 31200
         raw_audio = b""
