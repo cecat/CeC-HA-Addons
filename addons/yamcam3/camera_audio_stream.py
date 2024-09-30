@@ -116,10 +116,10 @@ class CameraAudioStream:
                     log_buffer.append(stderr_output)  # Buffer the output
                     
                     # If we get a complete message block (newline signals end of message)
-                    if '\n' in stderr_output or len(log_buffer) > 0:
+                    if '\n' in stderr_output:
                         full_log_message = ''.join(log_buffer).strip()
                         log_buffer = []  # Clear the buffer after processing
-                        
+
                         # Check if the full log message is critical or non-critical
                         if not self._is_non_critical_ffmpeg_log(full_log_message):
                             logger.error(f"{self.camera_name}: FFmpeg stderr: {full_log_message}")
@@ -128,8 +128,10 @@ class CameraAudioStream:
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
+
     def _is_non_critical_ffmpeg_log(self, log_message):
-        non_critical_keywords = [ 'info:', 'Copyright', 'Press', 'Copyright' ]
+        non_critical_keywords = [ 'info:', 'Copyright', 'Press',
+                                 'livav', '--enable','Copyright' ]
 
         # Log a debug message when checking for non-critical logs
         logger.debug(f"Checking if log is non-critical: {log_message[:100]}")  # Log first 100 chars for visibility
