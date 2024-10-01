@@ -237,10 +237,14 @@ def rank_sounds(scores, use_groups, camera_name):
 def group_scores(top_class_indices, class_names, scores):
     group_scores_dict = {}
 
-    for i in top_class_indices[:10]:
+    for i in top_class_indices[:10]:  # Limit to top 10 classes
+        if i >= len(scores[0]):  # Adding bounds check here
+            logger.error(f"Skipping index {i} because it is out of bounds for scores array of size {len(scores[0])}")
+            continue
+
         class_name = class_names[i]
         score = scores[0][i]
-        group = class_name.split('.')[0]
+        group = class_name.split('.')[0]  # Get the group name
 
         if group not in group_scores_dict:
             group_scores_dict[group] = []
@@ -250,13 +254,13 @@ def group_scores(top_class_indices, class_names, scores):
 
     composite_scores = []
     for group, group_scores in group_scores_dict.items():
-        max_score = max(group_scores)
+        max_score = max(group_scores)  # Calculate the max score for the group
         if max_score < 0.7:
-            composite_score = max_score + 0.05 * len(group_scores)
+            composite_score = max_score + 0.05 * len(group_scores)  # Add bonus for multiple classes
         else:
             composite_score = max_score
 
-        composite_score = min(composite_score, 0.95)
+        composite_score = min(composite_score, 0.95)  # Cap composite score
         logger.debug(f"Group: {group}, Max score: {max_score:.2f}, Composite score: {composite_score:.2f}")
 
         composite_scores.append((group, composite_score))
