@@ -151,70 +151,74 @@ def analyze_audio_waveform(waveform):
     #     -  cap scores at 0.95 
     #     -  don't apply bonus if max score in group >=0.7
 
-def rank_sounds(scores, use_groups, camera_name):
-    ## get config settings
-    reporting_threshold = yamcam_config.reporting_threshold
-    top_k = yamcam_config.top_k
-    report_k = yamcam_config.report_k
-    noise_threshold = yamcam_config.noise_threshold
-    class_names = yamcam_config.class_names
+    def rank_sounds(scores, use_groups, camera_name):
+        ## get config settings
+        reporting_threshold = yamcam_config.reporting_threshold
+        top_k = yamcam_config.top_k
+        report_k = yamcam_config.report_k
+        noise_threshold = yamcam_config.noise_threshold
+        class_names = yamcam_config.class_names
 
-    # Count the number of classes with non-zero scores
-    non_zero_scores_count = np.count_nonzero(scores[0] > 0)
-    logger.debug(f"{camera_name}: Number of classes w scores !0: {non_zero_scores_count}")
+        # *** Added this array size check ***
+        if len(scores[0]) != 521:
+            logger.error(f"{camera_name}: Unexpected number of classes in scores array. Expected 521, got {len(scores[0])}.")
+            return [{'class': '(error)', 'score': 0.0}]
 
-  
-    # Log the scores for the top class names
-    # Pair each score with its corresponding class index
-    class_score_pairs = [(i, scores[0][i].flatten()[0]) for i in range(len(scores[0]))]
+        # Count the number of classes with non-zero scores
+        non_zero_scores_count = np.count_nonzero(scores[0] > 0)
+        logger.debug(f"{camera_name}: Number of classes w scores !0: {non_zero_scores_count}")
 
-    # Sort the pairs by score in descending order
-    sorted_class_score_pairs = sorted(class_score_pairs, key=lambda x: x[1], reverse=True)
+        # Pair each score with its corresponding class index
+        class_score_pairs = [(i, scores[0][i].flatten()[0]) for i in range(len(scores[0]))]
 
-    # Now, filter the top_k class indices that have scores above noise_threshold
-    top_class_indices = [
-        i for i, score in sorted_class_score_pairs[:top_k] 
-        if score >= noise_threshold
-    ]
+        # Sort the pairs by score in descending order
+        sorted_class_score_pairs = sorted(class_score_pairs, key=lambda x: x[1], reverse=True)
 
-    logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}.")
+        # Now, filter the top_k class indices that have scores above noise_threshold
+        top_class_indices = [
+            i for i, score in sorted_class_score_pairs[:top_k]
+            if score >= noise_threshold
+        ]
 
-    # Log the scores for the top_k classes
-    for i in top_class_indices[:top_k]:
-        logger.debug(f"{camera_name}: {class_names[i]} {scores[0][i]:.2f}")
+        logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}.")
 
-    # Calculate composite group scores
-    composite_scores = group_scores(top_class_indices, class_names, [scores])
-    for group, score in composite_scores:
-        logger.debug(f"{camera_name}: {group} {score:.2f}")
+        # Log the scores for the top_k classes
+        for i in top_class_indices[:top_k]:
+            logger.debug(f"{camera_name}: {class_names[i]} {scores[0][i]:.2f}")
+                    
+            # Calculate composite group scores
+            composite_scores = group_scores(top_class_indices, class_names, [scores])
+            for group, score in composite_scores:
+                logger.debug(f"{camera_name}: {group} {score:.2f}")
+                    
+            # Sort in descending order
+            composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
+                        
+            # Filter and format the top class names with their scores
+            results = []
+            if use_groups:
+                for group, score in composite_scores_sorted:
+                    if score >= reporting_threshold:
+                        score_python_float = float(score)
+                        rounded_score = round(score_python_float, 2)
+                        results.append({'class': group, 'score': rounded_score})
+                    if len(results) >= report_k:
+                        break
+            else:
+                for i in top_class_indices:
+                    score = scores[0][i]
+                    if score >= reporting_threshold:
+                        score_python_float = float(score)
+                        rounded_score = round(score_python_float, 2)
+                        results.append({'class': class_names[i], 'score': rounded_score})
+                    if len(results) >= report_k:
+                        break
 
-    # Sort in descending order
-    composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
+        if not results:
+            results = [{'class': '(none)', 'score': 0.0}]
 
-    # Filter and format the top class names with their scores
-    results = []
-    if use_groups:
-        for group, score in composite_scores_sorted:
-            if score >= reporting_threshold:
-                score_python_float = float(score)
-                rounded_score = round(score_python_float, 2)
-                results.append({'class': group, 'score': rounded_score})
-            if len(results) >= report_k:
-                break
-    else:
-        for i in top_class_indices:
-            score = scores[0][i]
-            if score >= reporting_threshold:
-                score_python_float = float(score)
-                rounded_score = round(score_python_float, 2)
-                results.append({'class': class_names[i], 'score': rounded_score})
-            if len(results) >= report_k:
-                break
+        return results
 
-    if not results:
-        results = [{'class': '(none)', 'score': 0.0}]
-
-    return results
 
 
 
