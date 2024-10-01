@@ -152,12 +152,15 @@ def analyze_audio_waveform(waveform):
     #     -  don't apply bonus if max score in group >=0.7
 
 def rank_sounds(scores, use_groups, camera_name):
-    ## get config settings
+    ## Get config settings
     reporting_threshold = yamcam_config.reporting_threshold
     top_k = yamcam_config.top_k
     report_k = yamcam_config.report_k
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
+
+    # Log the shape of the scores array to debug
+    logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
 
     # *** Added this array size check ***
     if len(scores[0]) != 521:
@@ -166,7 +169,7 @@ def rank_sounds(scores, use_groups, camera_name):
 
     # Count the number of classes with non-zero scores
     non_zero_scores_count = np.count_nonzero(scores[0] > 0)
-    logger.debug(f"{camera_name}: Number of classes w scores !0: {non_zero_scores_count}")
+    logger.debug(f"{camera_name}: Number of classes w scores > 0: {non_zero_scores_count}")
 
     # Pair each score with its corresponding class index
     class_score_pairs = [(i, scores[0][i].flatten()[0]) for i in range(len(scores[0]))]
@@ -184,16 +187,19 @@ def rank_sounds(scores, use_groups, camera_name):
 
     # Log the scores for the top_k classes
     for i in top_class_indices[:top_k]:
+        if i >= len(scores[0]):
+            logger.error(f"{camera_name}: Skipping index {i} because it is out of bounds.")
+            continue
         logger.debug(f"{camera_name}: {class_names[i]} {scores[0][i]:.2f}")
-                
+
     # Calculate composite group scores
     composite_scores = group_scores(top_class_indices, class_names, [scores])
     for group, score in composite_scores:
         logger.debug(f"{camera_name}: {group} {score:.2f}")
-            
+
     # Sort in descending order
     composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
-                
+
     # Filter and format the top class names with their scores
     results = []
     if use_groups:
@@ -206,6 +212,9 @@ def rank_sounds(scores, use_groups, camera_name):
                 break
     else:
         for i in top_class_indices:
+            if i >= len(scores[0]):
+                logger.error(f"{camera_name}: Skipping index {i} because it is out of bounds.")
+                continue
             score = scores[0][i]
             if score >= reporting_threshold:
                 score_python_float = float(score)
@@ -218,7 +227,6 @@ def rank_sounds(scores, use_groups, camera_name):
         results = [{'class': '(none)', 'score': 0.0}]
 
     return results
-
 
 
 
