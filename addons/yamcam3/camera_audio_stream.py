@@ -18,7 +18,7 @@ class CameraAudioStream:
 
     def __init__(self, camera_name, rtsp_url, analyze_callback):
         try:
-            logger.debug(f"Initializing CameraAudioStream for {camera_name}")
+            logger.info(f"Initializing CameraAudioStream for {camera_name}")
             self.camera_name = camera_name
             self.rtsp_url = rtsp_url
             self.process = None
@@ -29,7 +29,7 @@ class CameraAudioStream:
             self.stderr_thread = None
             self.analyze_callback = analyze_callback  
             # Log the callback assignment
-            logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
+            #logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
         except Exception as e:
             logger.error(f"Exception in CameraAudioStream __init__: {e}")
 
@@ -71,7 +71,7 @@ class CameraAudioStream:
 
 
     def read_stream(self):
-        logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
+        #logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
 
         self.buffer_size = 31200
         raw_audio = b""
@@ -89,7 +89,7 @@ class CameraAudioStream:
                 if len(raw_audio) < self.buffer_size:
                     logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
                 else:
-                    logger.debug(f"{self.camera_name}: Successfully accumulated full buffer.")
+                    #logger.debug(f"{self.camera_name}: Successfully accumulated full buffer.")
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                     waveform = np.squeeze(waveform)
                     if hasattr(self, 'analyze_callback') and self.analyze_callback:
@@ -123,16 +123,16 @@ class CameraAudioStream:
                         # Check if the full log message is critical or non-critical
                         if not self._is_non_critical_ffmpeg_log(full_log_message):
                             logger.error(f"{self.camera_name}: FFmpeg stderr: {full_log_message}")
-                        # unless we are debugging ffmpeg, no need to print informational messages
-                        #else:
-                        #    logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
+                         unless we are debugging ffmpeg, no need to print informational messages
+                        else:
+                            logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
 
     def _is_non_critical_ffmpeg_log(self, log_message):
         non_critical_keywords = [ 'info:', 'copyright', 'press', 'speed', 'input',
-                                 'libav', '--enable','copyright', 'metadata' ]
+                                 'libav', '--enable','copyright' ]
 
         # Log a debug message when checking for non-critical logs
 
@@ -140,9 +140,7 @@ class CameraAudioStream:
         # Check if any keyword appears in the log message
         for keyword in non_critical_keywords:
             if keyword in log_message_lower:
-                logger.debug(f"found keyword {keyword}.")
                 return True
-        logger.debug(f"NO keywords found.")
         return False
 
 

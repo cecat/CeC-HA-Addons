@@ -29,7 +29,7 @@ saveWave_dir = os.path.dirname(saveWave_path)
 ############# COMMUNICATIONS ##############
 
 def on_connect(client, userdata, flags, rc, properties=None):
-    #if rc == 0:
+    if rc == 0:
     #    logger.debug("Connected to MQTT broker")
     #else:
     if rc != 0:
@@ -160,7 +160,7 @@ def rank_sounds(scores, use_groups, camera_name):
     class_names = yamcam_config.class_names
 
     # Log the shape of the scores array to debug
-    logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
+    #logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
 
     # *** Added this array size check ***
     if len(scores[0]) != 521:
