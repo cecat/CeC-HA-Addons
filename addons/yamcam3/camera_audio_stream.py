@@ -123,7 +123,6 @@ class CameraAudioStream:
                         # Check if the full log message is critical or non-critical
                         if not self._is_non_critical_ffmpeg_log(full_log_message):
                             logger.error(f"{self.camera_name}: FFmpeg stderr: {full_log_message}")
-                         unless we are debugging ffmpeg, no need to print informational messages
                         else:
                             logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
             except Exception as e:
