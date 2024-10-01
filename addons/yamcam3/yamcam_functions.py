@@ -246,6 +246,8 @@ def group_scores(top_class_indices, class_names, scores):
             group_scores_dict[group] = []
         group_scores_dict[group].append(score)
 
+        logger.debug(f"Added score {score:.2f} to group {group}")
+
     composite_scores = []
     for group, group_scores in group_scores_dict.items():
         max_score = max(group_scores)
@@ -255,6 +257,8 @@ def group_scores(top_class_indices, class_names, scores):
             composite_score = max_score
 
         composite_score = min(composite_score, 0.95)
+        logger.debug(f"Group: {group}, Max score: {max_score:.2f}, Composite score: {composite_score:.2f}")
+
         composite_scores.append((group, composite_score))
 
     return composite_scores
