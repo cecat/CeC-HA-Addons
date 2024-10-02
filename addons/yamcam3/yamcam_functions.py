@@ -79,7 +79,7 @@ def report(results, mqtt_client, camera_name):
             }
             payload_json = json.dumps(payload)
 
-            logger.debug(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
+            logger.info(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
 
             result = mqtt_client.publish(
                 f"{mqtt_topic_prefix}",
@@ -98,7 +98,7 @@ def report(results, mqtt_client, camera_name):
         logger.error("MQTT client is not connected. Skipping publish.")
 
     # debug
-    logger.debug(f"{camera_name}: debugging; just return, don't publish")
+    logger.info(f"{camera_name}: debugging; just return, don't publish")
 
 
 ############# SOUND FUNCTIONS ##############

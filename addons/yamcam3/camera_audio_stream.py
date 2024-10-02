@@ -139,7 +139,7 @@ class CameraAudioStream:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
 
 
-    def _is_non_critical_ffmpeg_log(self, log_message):
+    def _is_non_critical_ffmpeg_log(self, log_message): # only used w/ OLD_read_stderr
         non_critical_keywords = [ 'info:', 'copyright', 'press', 'speed', 'input',
                                  'libav', '--enable','copyright' ]
 
