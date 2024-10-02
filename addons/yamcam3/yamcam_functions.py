@@ -155,13 +155,13 @@ def rank_sounds(scores, use_groups, camera_name):
     class_names = yamcam_config.class_names
 
     # Log shape of scores array for debugging
-    logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
+    #logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
 
     # Step 1: Filter out scores below noise_threshold, keeping index for name mapping
     filtered_scores = [
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
-    logger.debug(f"{camera_name}: {len(filtered_scores)} classes above noise_threshold.")
+    #logger.debug(f"{camera_name}: {len(filtered_scores)} classes above noise_threshold.")
 
     # If no scores are above noise threshold, return early
     if not filtered_scores:
