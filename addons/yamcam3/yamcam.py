@@ -54,7 +54,6 @@ for camera_name, camera_config in camera_settings.items():
     stream = CameraAudioStream( camera_name, rtsp_url, analyze_callback)
     stream.start()
     streams.append(stream)
-    #time.sleep(5) # on startup, stagger to avoid race conditions (didn't help)
 
 # Keep the main thread alive
 try:
