@@ -106,6 +106,16 @@ class CameraAudioStream:
                 raw_audio = b""
 
     def read_stderr(self):
+        while self.running:
+            try:
+                stderr_output = self.process.stderr.read(1024).decode()
+                if stderr_output:
+                    logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
+            except Exception as e:
+                logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
+
+
+    def OLD_read_stderr(self):
         log_buffer = []
         while self.running:
             try:
