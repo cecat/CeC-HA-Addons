@@ -160,7 +160,7 @@ def rank_sounds(scores, use_groups, camera_name):
     class_names = yamcam_config.class_names
 
     # Log the shape of the scores array to debug
-    #logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
+    logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
 
     # *** Added this array size check ***
     if len(scores[0]) != 521:
@@ -180,7 +180,7 @@ def rank_sounds(scores, use_groups, camera_name):
     # Now, filter the top_k class indices that have scores above noise_threshold
     top_class_indices = [
         i for i, score in sorted_class_score_pairs[:top_k]
-        if score >= noise_threshold
+        if score >= noise_threshold and i < len(scores[0])  # Ensure index is within bounds
     ]
 
     logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}.")
@@ -228,12 +228,7 @@ def rank_sounds(scores, use_groups, camera_name):
 
     return results
 
-
-
 ##### GROUP Composite Scores #####
-    # -  cap scores at 0.95 
-    # -  don't apply bonus if max score in group >=0.7
-
 def group_scores(top_class_indices, class_names, scores):
     group_scores_dict = {}
 
