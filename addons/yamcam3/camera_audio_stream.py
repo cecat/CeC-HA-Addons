@@ -83,6 +83,30 @@ class CameraAudioStream:
             except Exception as e:
                 logger.error(f"{self.camera_name}: Failed to start FFmpeg process: {e}")
 
+    def read_stderr(self):
+        with self.lock:
+            while self.running:
+                try:
+                    stderr_output = self.process.stderr.read(1024).decode()
+                    if stderr_output:
+                        logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
+                except Exception as e:
+                    logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
+                    logger.debug(f"{self.camera_name}: Running state: {self.running}")
+                    logger.debug(f"{self.camera_name}: Process details: {self.process}")
+
+    def stop(self):
+        with self.lock:
+            if not self.running:
+                return
+            self.running = False
+            if self.process:
+                self.process.terminate()
+                self.process.wait()
+                self.process = None
+            logger.debug("**********-------------**************------------**********")
+            logger.info(f"{self.camera_name}: Stopped audio stream.")
+
 
     def read_stream(self):
         with self.lock:
@@ -119,18 +143,6 @@ class CameraAudioStream:
 
                 finally:
                     raw_audio = b""
-
-    def read_stderr(self):
-        with self.lock:
-            while self.running:
-                try:
-                    stderr_output = self.process.stderr.read(1024).decode()
-                    if stderr_output:
-                        logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
-                except Exception as e:
-                    logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
-                    logger.debug(f"{self.camera_name}: Running state: {self.running}")
-                    logger.debug(f"{self.camera_name}: Process details: {self.process}")
 
 
     def OLD_read_stderr(self):
@@ -170,16 +182,4 @@ class CameraAudioStream:
                 return True
         return False
 
-
-    def stop(self):
-        with self.lock:
-            if not self.running:
-                return
-            self.running = False
-            if self.process:
-                self.process.terminate()
-                self.process.wait()
-                self.process = None
-            logger.debug("**********-------------**************------------**********")
-            logger.info(f"{self.camera_name}: Stopped audio stream.")
 
