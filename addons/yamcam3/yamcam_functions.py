@@ -180,7 +180,7 @@ def rank_sounds(scores, use_groups, camera_name):
     results = []
     for group, score in sorted_composite_scores[:top_k]:
         if score >= reporting_threshold:
-            results.append({'class': group, 'score': round(score, 2)})
+            results.append({'class': group, 'score': float(round(score, 2))})
 
     # If no results meet the reporting threshold, return (none)
     if not results:
