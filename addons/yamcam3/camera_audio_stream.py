@@ -33,57 +33,56 @@ class CameraAudioStream:
         except Exception as e:
             logger.error(f"Exception in CameraAudioStream __init__: {e}")
 
-
     def start(self):
-        # prevent double-starting
         with self.lock:
             if self.running:
-                return  
+                return  # Prevent double-starting
 
-        command = [
-            'ffmpeg',
-            '-rtsp_transport', 'tcp',
-            '-i', self.rtsp_url,
-            '-f', 's16le',
-            '-acodec', 'pcm_s16le',
-            '-ac', '1',
-            '-ar', '16000',
-            '-reorder_queue_size', '0',
-            '-use_wallclock_as_timestamps', '1',
-            '-probesize', '50M',
-            '-analyzeduration', '10M',
-            '-max_delay', '500000',
-            '-flags', 'low_delay',
-            '-fflags', 'nobuffer',
-            '-'
-        ]
+            command = [
+                'ffmpeg',
+                '-rtsp_transport', 'tcp',
+                '-i', self.rtsp_url,
+                '-f', 's16le',
+                '-acodec', 'pcm_s16le',
+                '-ac', '1',
+                '-ar', '16000',
+                '-reorder_queue_size', '0',
+                '-use_wallclock_as_timestamps', '1',
+                '-probesize', '50M',
+                '-analyzeduration', '10M',
+                '-max_delay', '500000',
+                '-flags', 'low_delay',
+                '-fflags', 'nobuffer',
+                '-'
+            ]
 
-        # Start the subprocess with FFmpeg
-        logger.debug(f"{self.camera_name}: About to start FFmpeg process with command: {' '.join(command)}")
-        try:
-            self.process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                bufsize=0
-            )
-            self.running = True
-            logger.debug(f"{self.camera_name}: FFmpeg process started successfully. Process ID: {self.process.pid}")
+            # Start the subprocess with FFmpeg
+            logger.debug(f"{self.camera_name}: About to start FFmpeg process with command: {' '.join(command)}")
+            try:
+                self.process = subprocess.Popen(
+                    command,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    bufsize=0
+                )
+                self.running = True
+                logger.debug(f"{self.camera_name}: FFmpeg process started successfully. Process ID: {self.process.pid}")
 
-            # Start stream reading thread
-            self.thread = threading.Thread(target=self.read_stream, daemon=True)
-            self.thread.start()
-            logger.debug(f"{self.camera_name}: Stream reading thread started.")
+                # Start stream reading thread
+                self.thread = threading.Thread(target=self.read_stream, daemon=True)
+                self.thread.start()
+                logger.debug(f"{self.camera_name}: Stream reading thread started.")
 
-            # Start stderr reading thread
-            self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
-            self.stderr_thread.start()
-            logger.debug(f"{self.camera_name}: STDERR reading thread started.")
+                # Start stderr reading thread
+                self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
+                self.stderr_thread.start()
+                logger.debug(f"{self.camera_name}: STDERR reading thread started.")
 
-            logger.info(f"{self.camera_name}: Started audio stream.")
+                logger.info(f"{self.camera_name}: Started audio stream.")
 
-        except Exception as e:
-            logger.error(f"{self.camera_name}: Failed to start FFmpeg process: {e}")
+            except Exception as e:
+                logger.error(f"{self.camera_name}: Failed to start FFmpeg process: {e}")
+
 
     def read_stream(self):
         with self.lock:
