@@ -27,9 +27,7 @@ class CameraAudioStream:
             self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
             self.lock = threading.Lock()
             self.stderr_thread = None
-            self.analyze_callback = analyze_callback  
-            # Log the callback assignment
-            #logger.debug(f"{self.camera_name}: analyze_callback assigned: {analyze_callback}")
+            self.analyze_callback = analyze_callback
         except Exception as e:
             logger.error(f"Exception in CameraAudioStream __init__: {e}")
 
@@ -56,8 +54,6 @@ class CameraAudioStream:
                 '-'
             ]
 
-            # Start the subprocess with FFmpeg
-            logger.debug(f"{self.camera_name}: About to start FFmpeg process with command: {' '.join(command)}")
             try:
                 self.process = subprocess.Popen(
                     command,
@@ -66,34 +62,28 @@ class CameraAudioStream:
                     bufsize=0
                 )
                 self.running = True
-                logger.debug(f"{self.camera_name}: FFmpeg process started successfully. Process ID: {self.process.pid}")
 
-                # Start stream reading thread
+                # Start the reading threads
                 self.thread = threading.Thread(target=self.read_stream, daemon=True)
                 self.thread.start()
-                logger.debug(f"{self.camera_name}: Stream reading thread started.")
-
-                # Start stderr reading thread
                 self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
                 self.stderr_thread.start()
-                logger.debug(f"{self.camera_name}: STDERR reading thread started.")
 
                 logger.info(f"{self.camera_name}: Started audio stream.")
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Failed to start FFmpeg process: {e}")
+                self.running = False
 
     def read_stderr(self):
-        with self.lock:
-            while self.running:
-                try:
-                    stderr_output = self.process.stderr.read(1024).decode()
-                    if stderr_output:
-                        logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
-                except Exception as e:
-                    logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
-                    logger.debug(f"{self.camera_name}: Running state: {self.running}")
-                    logger.debug(f"{self.camera_name}: Process details: {self.process}")
+        while self.running:
+            try:
+                stderr_output = self.process.stderr.read(1024).decode()
+                if stderr_output:
+                    logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
+            except Exception as e:
+                logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
+            # No lock needed here as this is an independent read operation
 
     def stop(self):
         with self.lock:
@@ -104,82 +94,34 @@ class CameraAudioStream:
                 self.process.terminate()
                 self.process.wait()
                 self.process = None
-            logger.debug("**********-------------**************------------**********")
             logger.info(f"{self.camera_name}: Stopped audio stream.")
 
-
     def read_stream(self):
-        with self.lock:
-            logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
+        # Only lock where necessary for shared resources like self.running or self.process
+        raw_audio = b""
+        buffer_size = self.buffer_size  # No need to lock this
 
-            self.buffer_size = 31200
-            raw_audio = b""
-
-            while self.running:
-                try:
-                    while len(raw_audio) < self.buffer_size:
-                        chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
-                        if not chunk:
-                            logger.error(f"{self.camera_name}: Failed to read additional data.")
-                            break
-                        raw_audio += chunk
-                        #logger.debug(f"{self.camera_name}: Accumulated {len(raw_audio)} bytes.")
-
-                    if len(raw_audio) < self.buffer_size:
-                        logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
-                    else:
-                        #logger.debug(f"{self.camera_name}: Successfully accumulated full buffer.")
-                        waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                        waveform = np.squeeze(waveform)
-                        if hasattr(self, 'analyze_callback') and self.analyze_callback:
-                            self.analyze_callback(self.camera_name, waveform)
-                        else:
-                            logger.error(f"{self.camera_name}: analyze_callback is not set.")
-
-
-                except Exception as e:
-                    logger.error(f"{self.camera_name}: Error reading stream: {e}")
-                    self.stop()
-
-                finally:
-                    raw_audio = b""
-
-
-    def OLD_read_stderr(self):
-        log_buffer = []
         while self.running:
             try:
-                # Read stderr in chunks
-                stderr_output = self.process.stderr.read(1024).decode()
-                
-                if stderr_output:
-                    log_buffer.append(stderr_output)  # Buffer the output
-                    
-                    # If we get a complete message block (newline signals end of message)
-                    if '\n' in stderr_output:
-                        full_log_message = ''.join(log_buffer).strip()
-                        log_buffer = []  # Clear the buffer after processing
+                while len(raw_audio) < buffer_size:
+                    chunk = self.process.stdout.read(buffer_size - len(raw_audio))
+                    if not chunk:
+                        logger.error(f"{self.camera_name}: Failed to read additional data.")
+                        break
+                    raw_audio += chunk
 
-                        # Check if the full log message is critical or non-critical
-                        if not self._is_non_critical_ffmpeg_log(full_log_message):
-                            logger.error(f"{self.camera_name}: FFmpeg stderr: {full_log_message}")
-                        else:
-                            logger.debug(f"{self.camera_name}: FFmpeg info: {full_log_message}")
+                if len(raw_audio) < buffer_size:
+                    logger.error(f"{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
+                else:
+                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                    waveform = np.squeeze(waveform)
+                    if self.analyze_callback:
+                        self.analyze_callback(self.camera_name, waveform)
+
             except Exception as e:
-                logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
+                logger.error(f"{self.camera_name}: Error reading stream: {e}")
+                self.stop()
 
-
-    def _is_non_critical_ffmpeg_log(self, log_message): # only used w/ OLD_read_stderr
-        non_critical_keywords = [ 'info:', 'copyright', 'press', 'speed', 'input',
-                                 'libav', '--enable','copyright' ]
-
-        # Log a debug message when checking for non-critical logs
-
-        log_message_lower = log_message.lower() #make lower case so we can be case insensitive
-        # Check if any keyword appears in the log message
-        for keyword in non_critical_keywords:
-            if keyword in log_message_lower:
-                return True
-        return False
-
+            finally:
+                raw_audio = b""
 
