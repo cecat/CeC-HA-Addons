@@ -7,11 +7,10 @@
 #
 
 import subprocess
-import time
+#import time
 import threading
 import numpy as np
 import logging
-import yamcam_config
 import tflite_runtime.interpreter as tflite
 from yamcam_config import logger, model_path
 
@@ -34,7 +33,7 @@ class CameraAudioStream:
             self.running = False
             self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
             self.lock = threading.Lock()
-            self.stderr_thread = None
+            #self.stderr_thread = None
             self.analyze_callback = analyze_callback
         except Exception as e:
             logger.error(f"{self.camera_name}: Exception in CameraAudioStream __init__: {e}")
@@ -107,18 +106,18 @@ class CameraAudioStream:
     def read_stream(self):
         # Only lock where necessary for shared resources like self.running or self.process
         raw_audio = b""
-        buffer_size = self.buffer_size  # No need to lock this
+        #buffer_size = self.buffer_size  # No need to lock this
 
         while self.running:
             try:
-                while len(raw_audio) < buffer_size:
-                    chunk = self.process.stdout.read(buffer_size - len(raw_audio))
+                while len(raw_audio) < self.buffer_size:
+                    chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                     if not chunk:
                         logger.error(f"{self.camera_name}: Exception in CameraAudioStream read_strea(1)m: {e}")
                         break
                     raw_audio += chunk
 
-                if len(raw_audio) < buffer_size:
+                if len(raw_audio) < self.buffer_size:
                     logger.error(f"{self.camera_name}: Exception in CameraAudioStream read_stream(2): {e}")
                     logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
                 else:
