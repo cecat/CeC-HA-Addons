@@ -180,16 +180,15 @@ def rank_sounds(scores, use_groups, camera_name):
     # Now, filter the top_k class indices that have scores above noise_threshold
     top_class_indices = [
         i for i, score in sorted_class_score_pairs[:top_k]
-        if score >= noise_threshold and i < len(scores[0])  # Ensure index is within bounds
+        if score >= noise_threshold
     ]
 
+    # Ensure all indices are valid
+    top_class_indices = [i for i in top_class_indices if i < len(scores[0])]
     logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}.")
 
     # Log the scores for the top_k classes
     for i in top_class_indices[:top_k]:
-        if i >= len(scores[0]):
-            logger.error(f"{camera_name}: Skipping index {i} because it is out of bounds.")
-            continue
         logger.debug(f"{camera_name}: {class_names[i]} {scores[0][i]:.2f}")
 
     # Calculate composite group scores
@@ -229,6 +228,9 @@ def rank_sounds(scores, use_groups, camera_name):
     return results
 
 ##### GROUP Composite Scores #####
+    # -  cap scores at 0.95
+    # -  don't apply bonus if max score in group >=0.7
+
 def group_scores(top_class_indices, class_names, scores):
     group_scores_dict = {}
 

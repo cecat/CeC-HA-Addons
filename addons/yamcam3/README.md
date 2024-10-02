@@ -2,8 +2,9 @@
 
 # THIS ADD-ON IS UNDER CONSTRUCTION
 
-Yamcam2 (below) seems to work well, but I am doing two things here,
-and under active development (so don't try to use it, as it likely
+[Yamcam2](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam2)
+seems to work reasonably well, and this is
+still under active development (so don't try to use it, as it likely
 won't build, or if it builds it will throw whatever error I am trying
 to address at the moment). I am doing the following:
 1. Moving from periodic short-burst FFMPEG sampling to continuous streams. Among other reasons, the CPU load for FFMPEG is primarily start/stop, not stead state (so we get the benefit of streaming while also solving a resource issue).
