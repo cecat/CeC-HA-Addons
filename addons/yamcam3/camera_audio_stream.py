@@ -1,9 +1,6 @@
 # yamcam3 - CeC September 2024
-# (add streaming and threads)
 #
-# camera_audio_stream.py
-#
-# audio streaming class
+# camera_audio_stream.py --> audio streaming class
 #
 
 import subprocess
@@ -13,9 +10,6 @@ import numpy as np
 import logging
 import tflite_runtime.interpreter as tflite
 from yamcam_config import logger, model_path
-
-
-logger = yamcam_config.logger
 
 class CameraAudioStream:
 
