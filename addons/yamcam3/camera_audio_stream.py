@@ -12,7 +12,9 @@ import threading
 import numpy as np
 import logging
 import yamcam_config
-from yamcam_config import interpreter, input_details, output_details, tflite
+import tflite_runtime.interpreter as tflite
+from yamcam_config import logger, model_path
+
 
 logger = yamcam_config.logger
 
