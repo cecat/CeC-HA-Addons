@@ -37,7 +37,7 @@ class CameraAudioStream:
             self.stderr_thread = None
             self.analyze_callback = analyze_callback
         except Exception as e:
-            logger.error(f"{self.camera_name: Exception in CameraAudioStream __init__: {e}")
+            logger.error(f"{self.camera_name}: Exception in CameraAudioStream __init__: {e}")
 
     def start(self):
         with self.lock:
@@ -80,7 +80,7 @@ class CameraAudioStream:
                 logger.info(f"{self.camera_name}: Started audio stream.")
 
             except Exception as e:
-                logger.error(f"{self.camera_name: Exception in CameraAudioStream start: {e}")
+                logger.error(f"{self.camera_name}: Exception in CameraAudioStream start: {e}")
                 self.running = False
 
     def read_stderr(self):
@@ -90,7 +90,7 @@ class CameraAudioStream:
                 if stderr_output:
                     logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
             except Exception as e:
-                logger.error(f"{self.camera_name: Exception in CameraAudioStream read_stderr: {e}")
+                logger.error(f"{self.camera_name}: Exception in CameraAudioStream read_stderr: {e}")
             # No lock needed here as this is an independent read operation
 
     def stop(self):
@@ -114,12 +114,12 @@ class CameraAudioStream:
                 while len(raw_audio) < buffer_size:
                     chunk = self.process.stdout.read(buffer_size - len(raw_audio))
                     if not chunk:
-                        logger.error(f"{self.camera_name: Exception in CameraAudioStream read_strea(1)m: {e}")
+                        logger.error(f"{self.camera_name}: Exception in CameraAudioStream read_strea(1)m: {e}")
                         break
                     raw_audio += chunk
 
                 if len(raw_audio) < buffer_size:
-                    logger.error(f"{self.camera_name: Exception in CameraAudioStream read_stream(2): {e}")
+                    logger.error(f"{self.camera_name}: Exception in CameraAudioStream read_stream(2): {e}")
                     logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
                 else:
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
@@ -130,7 +130,7 @@ class CameraAudioStream:
 
 
             except Exception as e:
-                logger.error(f"{self.camera_name: Exception in CameraAudioStream read_stream(3): {e}")
+                logger.error(f"{self.camera_name}: Exception in CameraAudioStream read_stream(3): {e}")
                 logger.error(f"--->{self.camera_name}: Error reading stream: {e}")
                 self.stop()
 
