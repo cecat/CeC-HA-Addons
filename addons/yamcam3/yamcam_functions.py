@@ -160,7 +160,7 @@ def rank_sounds(scores, use_groups, camera_name):
     class_names = yamcam_config.class_names
 
     # Log the shape of the scores array to debug
-    logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
+    logger.debug(f"{camera_name}: Initial shape of scores array: {scores.shape}")
 
     # *** Added this array size check ***
     if len(scores[0]) != 521:
@@ -173,25 +173,36 @@ def rank_sounds(scores, use_groups, camera_name):
 
     # Pair each score with its corresponding class index
     class_score_pairs = [(i, scores[0][i].flatten()[0]) for i in range(len(scores[0]))]
+    logger.debug(f"{camera_name}: Length of class_score_pairs: {len(class_score_pairs)}")
 
     # Sort the pairs by score in descending order
     sorted_class_score_pairs = sorted(class_score_pairs, key=lambda x: x[1], reverse=True)
+    logger.debug(f"{camera_name}: Length of sorted_class_score_pairs: {len(sorted_class_score_pairs)}")
 
     # Now, filter the top_k class indices that have scores above noise_threshold
     top_class_indices = [
         i for i, score in sorted_class_score_pairs[:top_k]
         if score >= noise_threshold
     ]
+    logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}. Length of top_class_indices: {len(top_class_indices)}")
+
+    # Log if index 494 is included in top_class_indices
+    if 494 in top_class_indices:
+        logger.debug(f"{camera_name}: Index 494 is in top_class_indices")
 
     # Ensure all indices are valid
     top_class_indices = [i for i in top_class_indices if i < len(scores[0])]
-    logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}.")
+    logger.debug(f"{camera_name}: After bounds check, length of top_class_indices: {len(top_class_indices)}")
 
     # Log the scores for the top_k classes
     for i in top_class_indices[:top_k]:
+        if i >= len(scores[0]):
+            logger.error(f"{camera_name}: Skipping index {i} because it is out of bounds.")
+            continue
         logger.debug(f"{camera_name}: {class_names[i]} {scores[0][i]:.2f}")
 
     # Calculate composite group scores
+    logger.debug(f"{camera_name}: Calling group_scores with top_class_indices of length: {len(top_class_indices)}")
     composite_scores = group_scores(top_class_indices, class_names, [scores])
     for group, score in composite_scores:
         logger.debug(f"{camera_name}: {group} {score:.2f}")
@@ -227,11 +238,13 @@ def rank_sounds(scores, use_groups, camera_name):
 
     return results
 
+
 ##### GROUP Composite Scores #####
     # -  cap scores at 0.95
     # -  don't apply bonus if max score in group >=0.7
 
 def group_scores(top_class_indices, class_names, scores):
+    logger.debug(f"Received top_class_indices of length: {len(top_class_indices)}")
     group_scores_dict = {}
 
     for i in top_class_indices[:10]:  # Limit to top 10 classes
