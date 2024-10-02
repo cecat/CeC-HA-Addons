@@ -1,5 +1,5 @@
 #
-# yamcam3 - CeC September 2024
+# yamcam.py - CeC September 2024
 # (add streaming and threads)
 #
 
@@ -31,9 +31,14 @@ mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
 #----------- for streaming -------------------------------#
 
-def analyze_callback(camera_name, waveform):
+#def analyze_callback(camera_name, waveform):
+
+def analyze_callback(camera_name, waveform, interpreter, input_details, output_details):
+#    scores = analyze_audio_waveform(waveform, camera_name)
+
+    scores = analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
+
     
-    scores = analyze_audio_waveform(waveform)
 
     #logger.debug("Received scores")
 

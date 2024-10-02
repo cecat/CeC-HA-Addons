@@ -2,7 +2,7 @@
 # yamcam3 - CeC September 2024
 # (add streaming and threads)
 #
-# yamcam_functions - Functions for yamcam3
+# yamcam_functions.py - Functions for yamcam3
 # 
 
 import time
@@ -111,12 +111,14 @@ def report(results, mqtt_client, camera_name):
 #overlap        = 0.5  # 50% overlap between segments
 #step_size      = int(segment_length * overlap)  # Step size for sliding window
 
-def analyze_audio_waveform(waveform):
+#def analyze_audio_waveform(waveform, camera_name):
+def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details):
+
     try:
         # Ensure waveform is a 1D array of float32 values between -1 and 1
         waveform = np.squeeze(waveform).astype(np.float32)
         if waveform.ndim != 1:
-            logger.error(f"{self.camera_name}: Waveform must be a 1D array.")
+            logger.error(f"{camera_name}: Waveform must be a 1D array.")
             return None
 
         # Invoke the model
@@ -129,17 +131,17 @@ def analyze_audio_waveform(waveform):
             scores = np.copy(interpreter.get_tensor(output_details[0]['index']))  
 
             if scores.size == 0:
-                logger.error(f"{self.camera_name}: No scores available to analyze.")
+                logger.error(f"{camera_name}: No scores available to analyze.")
                 return None
 
         except Exception as e:
-            logger.error(f"{self.camera_name}: Error during interpreter invocation: {e}")
+            logger.error(f"{camera_name}: Error during interpreter invocation: {e}")
             return None
 
         return scores
 
     except Exception as e:
-        logger.error(f"{self.camera_name}: Error during waveform analysis: {e}")
+        logger.error(f"{camera_name}: Error during waveform analysis: {e}")
         return None
 
 

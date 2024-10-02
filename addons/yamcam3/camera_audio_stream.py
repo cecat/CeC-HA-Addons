@@ -1,6 +1,8 @@
 # yamcam3 - CeC September 2024
 # (add streaming and threads)
 #
+# camera_audio_stream.py
+#
 # audio streaming class
 #
 
@@ -19,6 +21,10 @@ class CameraAudioStream:
     def __init__(self, camera_name, rtsp_url, analyze_callback):
         try:
             logger.info(f"Initializing CameraAudioStream for {camera_name}")
+            self.interpreter = tflite.Interpreter(model_path=model_path)
+            self.interpreter.allocate_tensors()
+            self.input_details = self.interpreter.get_input_details()
+            self.output_details = self.interpreter.get_output_details()
             self.camera_name = camera_name
             self.rtsp_url = rtsp_url
             self.process = None
@@ -116,7 +122,9 @@ class CameraAudioStream:
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                     waveform = np.squeeze(waveform)
                     if self.analyze_callback:
-                        self.analyze_callback(self.camera_name, waveform)
+                        #self.analyze_callback(self.camera_name, waveform)
+                        self.analyze_callback(self.camera_name, waveform, self.interpreter, self.input_details, self.output_details)
+
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading stream: {e}")
