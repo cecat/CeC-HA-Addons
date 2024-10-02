@@ -53,25 +53,35 @@ class CameraAudioStream:
             '-'
         ]
 
-        self.process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=0
-        )
-        self.running = True
-        self.thread = threading.Thread(target=self.read_stream, daemon=True)
-        self.thread.start()
+        # Start the subprocess with FFmpeg
+        logger.debug(f"{self.camera_name}: About to start FFmpeg process with command: {' '.join(command)}")
+        try:
+            self.process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                bufsize=0
+            )
+            self.running = True
+            logger.debug(f"{self.camera_name}: FFmpeg process started successfully. Process ID: {self.process.pid}")
 
-        # Start stderr reading thread
-        self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
-        self.stderr_thread.start()
+            # Start stream reading thread
+            self.thread = threading.Thread(target=self.read_stream, daemon=True)
+            self.thread.start()
+            logger.debug(f"{self.camera_name}: Stream reading thread started.")
 
-        logger.info(f"{self.camera_name}: Started audio stream.")
+            # Start stderr reading thread
+            self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
+            self.stderr_thread.start()
+            logger.debug(f"{self.camera_name}: STDERR reading thread started.")
 
+            logger.info(f"{self.camera_name}: Started audio stream.")
+
+        except Exception as e:
+            logger.error(f"{self.camera_name}: Failed to start FFmpeg process: {e}")
 
     def read_stream(self):
-        #logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
+        logger.debug(f"{self.camera_name}: Started reading stream. 'self' : {self}")
 
         self.buffer_size = 31200
         raw_audio = b""
@@ -113,6 +123,8 @@ class CameraAudioStream:
                     logger.debug(f"{self.camera_name}: FFmpeg stderr: {stderr_output}")
             except Exception as e:
                 logger.error(f"{self.camera_name}: Error reading FFmpeg stderr: {e}")
+                logger.debug(f"{self.camera_name}: Running state: {self.running}")
+                logger.debug(f"{self.camera_name}: Process details: {self.process}")
 
 
     def OLD_read_stderr(self):
