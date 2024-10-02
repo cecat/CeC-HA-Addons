@@ -1,8 +1,6 @@
 #
 # yamcam.py - CeC September 2024
-# (add streaming and threads)
 #
-
 #
 # yamcam3 (streaming) - CeC September 2024
 #
@@ -34,13 +32,8 @@ mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 #def analyze_callback(camera_name, waveform):
 
 def analyze_callback(camera_name, waveform, interpreter, input_details, output_details):
-#    scores = analyze_audio_waveform(waveform, camera_name)
 
     scores = analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
-
-    
-
-    #logger.debug("Received scores")
 
     if scores is not None:
         #logger.debug(f"{camera_name}: rank_sounds")
@@ -48,15 +41,16 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
         #logger.debug(f"{camera_name}: report")
         report(results, mqtt_client, camera_name)
     else:
-        logger.error(f"Failed to analyze audio for {camera_name}")
+        logger.error(f"FAILED to analyze audio: {camera_name}")
 
 ############# Main #############
 
 # Create and start streams for each camera
+
 streams = []
 for camera_name, camera_config in camera_settings.items():
     rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
-    logger.debug(f"Creating CameraAudioStream for {camera_name} with RTSP URL: {rtsp_url}")
+    logger.debug(f"Creating CameraAudioStream: {camera_name}: {rtsp_url}")
     stream = CameraAudioStream( camera_name, rtsp_url, analyze_callback)
     stream.start()
     streams.append(stream)
@@ -67,7 +61,7 @@ try:
     while True:
         time.sleep(1)  # Sleep to keep the main thread running
 except KeyboardInterrupt:
-    logger.info("Stopping all audio streams...")
+    logger.info("******------> STOPPING ALL audio streams...")
     for stream in streams:
         stream.stop()
     logger.info("All audio streams stopped. Exiting.")

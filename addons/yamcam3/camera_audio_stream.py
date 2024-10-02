@@ -41,7 +41,7 @@ class CameraAudioStream:
 
     def __init__(self, camera_name, rtsp_url, analyze_callback):
         try:
-            logger.info(f"Initializing CameraAudioStream for {camera_name}")
+            logger.info(f"Initializing CameraAudioStream: {camera_name}")
             self.interpreter = tflite.Interpreter(model_path=model_path)
             self.interpreter.allocate_tensors()
             self.input_details = self.interpreter.get_input_details()
@@ -55,7 +55,7 @@ class CameraAudioStream:
             self.lock = threading.Lock()
             self.analyze_callback = analyze_callback
         except Exception as e:
-            logger.error(f"{self.camera_name}: Exception in CameraAudioStream __init__: {e}")
+            logger.error(f"Exception in __init__.CameraAudioStream {self.camera_name}: {e}")
 
     def start(self):
         with self.lock:
@@ -96,7 +96,7 @@ class CameraAudioStream:
                 self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
                 self.stderr_thread.start()
 
-                logger.info(f"START audio stream: {self.camera_name}:.")
+                logger.info(f"START audio stream: {self.camera_name}.")
 
             except Exception as e:
                 logger.error(f"Exception in start.CameraAudioStream: {self.camera_name}: {e}")
