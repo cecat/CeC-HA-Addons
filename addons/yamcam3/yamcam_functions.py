@@ -147,131 +147,80 @@ def analyze_audio_waveform(waveform):
 ############# COMPUTE SCORES ##############
 
 ##### Tease out the Sounds #####
-
-    #     -  cap scores at 0.95 
-    #     -  don't apply bonus if max score in group >=0.7
-
 def rank_sounds(scores, use_groups, camera_name):
-    ## Get config settings
+    # Get config settings
     reporting_threshold = yamcam_config.reporting_threshold
     top_k = yamcam_config.top_k
-    report_k = yamcam_config.report_k
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
 
-    # Log the shape of the scores array to debug
-    logger.debug(f"{camera_name}: Initial shape of scores array: {scores.shape}")
+    # Log shape of scores array for debugging
+    logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
 
-    # *** Added this array size check ***
-    if len(scores[0]) != 521:
-        logger.error(f"{camera_name}: Unexpected number of classes in scores array. Expected 521, got {len(scores[0])}.")
-        return [{'class': '(error)', 'score': 0.0}]
-
-    # Count the number of classes with non-zero scores
-    non_zero_scores_count = np.count_nonzero(scores[0] > 0)
-    logger.debug(f"{camera_name}: Number of classes w scores > 0: {non_zero_scores_count}")
-
-    # Pair each score with its corresponding class index
-    class_score_pairs = [(i, scores[0][i].flatten()[0]) for i in range(len(scores[0]))]
-    logger.debug(f"{camera_name}: Length of class_score_pairs: {len(class_score_pairs)}")
-
-    # Sort the pairs by score in descending order
-    sorted_class_score_pairs = sorted(class_score_pairs, key=lambda x: x[1], reverse=True)
-    logger.debug(f"{camera_name}: Length of sorted_class_score_pairs: {len(sorted_class_score_pairs)}")
-
-    # Now, filter the top_k class indices that have scores above noise_threshold
-    top_class_indices = [
-        i for i, score in sorted_class_score_pairs[:top_k]
-        if score >= noise_threshold
+    # Step 1: Filter out scores below noise_threshold, keeping index for name mapping
+    filtered_scores = [
+        (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
-    logger.debug(f"{camera_name}: {len(top_class_indices)} classes > {noise_threshold}. Length of top_class_indices: {len(top_class_indices)}")
+    logger.debug(f"{camera_name}: {len(filtered_scores)} classes above noise_threshold.")
 
-    # Log if index 494 is included in top_class_indices
-    if 494 in top_class_indices:
-        logger.debug(f"{camera_name}: Index 494 is in top_class_indices")
+    # If no scores are above noise threshold, return early
+    if not filtered_scores:
+        return [{'class': '(none)', 'score': 0.0}]
 
-    # Ensure all indices are valid
-    top_class_indices = [i for i in top_class_indices if i < len(scores[0])]
-    logger.debug(f"{camera_name}: After bounds check, length of top_class_indices: {len(top_class_indices)}")
+    # Step 2: Group classes based on their grouping (before the first period '.')
+    group_scores_dict = group_scores_by_prefix(filtered_scores, class_names)
 
-    # Log the scores for the top_k classes
-    for i in top_class_indices[:top_k]:
-        if i >= len(scores[0]):
-            logger.error(f"{camera_name}: Skipping index {i} because it is out of bounds.")
-            continue
-        logger.debug(f"{camera_name}: {class_names[i]} {scores[0][i]:.2f}")
+    # Step 3: Calculate composite scores for each group
+    composite_scores = calculate_composite_scores(group_scores_dict)
 
-    # Calculate composite group scores
-    logger.debug(f"{camera_name}: Calling group_scores with top_class_indices of length: {len(top_class_indices)}")
-    composite_scores = group_scores(top_class_indices, class_names, [scores])
-    for group, score in composite_scores:
-        logger.debug(f"{camera_name}: {group} {score:.2f}")
+    # Step 4: Sort composite scores in descending order
+    sorted_composite_scores = sorted(composite_scores, key=lambda x: x[1], reverse=True)
 
-    # Sort in descending order
-    composite_scores_sorted = sorted(composite_scores, key=lambda x: x[1], reverse=True)
-
-    # Filter and format the top class names with their scores
+    # Step 5: Filter top_k groups and prepare results
     results = []
-    if use_groups:
-        for group, score in composite_scores_sorted:
-            if score >= reporting_threshold:
-                score_python_float = float(score)
-                rounded_score = round(score_python_float, 2)
-                results.append({'class': group, 'score': rounded_score})
-            if len(results) >= report_k:
-                break
-    else:
-        for i in top_class_indices:
-            if i >= len(scores[0]):
-                logger.error(f"{camera_name}: Skipping index {i} because it is out of bounds.")
-                continue
-            score = scores[0][i]
-            if score >= reporting_threshold:
-                score_python_float = float(score)
-                rounded_score = round(score_python_float, 2)
-                results.append({'class': class_names[i], 'score': rounded_score})
-            if len(results) >= report_k:
-                break
+    for group, score in sorted_composite_scores[:top_k]:
+        if score >= reporting_threshold:
+            results.append({'class': group, 'score': round(score, 2)})
 
+    # If no results meet the reporting threshold, return (none)
     if not results:
         results = [{'class': '(none)', 'score': 0.0}]
 
     return results
 
 
-##### GROUP Composite Scores #####
-    # -  cap scores at 0.95
-    # -  don't apply bonus if max score in group >=0.7
-
-def group_scores(top_class_indices, class_names, scores):
-    logger.debug(f"Received top_class_indices of length: {len(top_class_indices)}")
+def group_scores_by_prefix(filtered_scores, class_names):
+    """
+    Group scores by their prefix (e.g., 'music.*'), and keep track of the individual class scores.
+    """
     group_scores_dict = {}
 
-    for i in top_class_indices[:10]:  # Limit to top 10 classes
-        if i >= len(scores[0]):  # Adding bounds check here
-            logger.error(f"Skipping index {i} because it is out of bounds for scores array of size {len(scores[0])}")
-            continue
-
+    for i, score in filtered_scores:
         class_name = class_names[i]
-        score = scores[0][i]
-        group = class_name.split('.')[0]  # Get the group name
+        group = class_name.split('.')[0]  # Get the group prefix before the first period '.'
 
         if group not in group_scores_dict:
             group_scores_dict[group] = []
+
         group_scores_dict[group].append(score)
 
-        logger.debug(f"Added score {score:.2f} to group {group}")
+    return group_scores_dict
 
+
+def calculate_composite_scores(group_scores_dict):
+    """
+    Calculate composite scores for each group based on the specified rules:
+    - If max score in group is > 0.7, use it.
+    - Otherwise, max score + 0.05 * number of classes in the group (up to a max of 0.95).
+    """
     composite_scores = []
-    for group, group_scores in group_scores_dict.items():
-        max_score = max(group_scores)  # Calculate the max score for the group
-        if max_score < 0.7:
-            composite_score = max_score + 0.05 * len(group_scores)  # Add bonus for multiple classes
-        else:
-            composite_score = max_score
 
-        composite_score = min(composite_score, 0.95)  # Cap composite score
-        logger.debug(f"Group: {group}, Max score: {max_score:.2f}, Composite score: {composite_score:.2f}")
+    for group, scores in group_scores_dict.items():
+        max_score = max(scores)
+        if max_score > 0.7:
+            composite_score = max_score
+        else:
+            composite_score = min(max_score + 0.05 * len(scores), 0.95)
 
         composite_scores.append((group, composite_score))
 
