@@ -5,13 +5,13 @@
 # yamcam_functions.py - Functions for yamcam3
 # 
 
-import time
-import subprocess
+#import time
+#import subprocess
 import paho.mqtt.client as mqtt
-import yaml
+#import yaml
 import os
 import numpy as np
-import io
+#import io
 import logging
 import json
 import yamcam_config
@@ -28,14 +28,15 @@ saveWave_dir = os.path.dirname(saveWave_path)
 
 ############# COMMUNICATIONS ##############
 
-def on_connect(client, userdata, flags, rc, properties=None):
-    #if rc == 0:
-    #    logger.debug("Connected to MQTT broker")
-    #else:
-    if rc != 0:
-        logger.error("Failed to connect to MQTT broker. Check MQTT settings.")
+    #----- Make sure we are Connected before Sending -----#
 
-    #----- START ME UP -----#
+def on_connect(client, userdata, flags, rc, properties=None):
+    
+    if rc != 0:
+        logger.error("FAILED to connect to MQTT broker. Check MQTT settings.")
+
+
+    #----- CONNECT to Broker (host) -----#
 
 def start_mqtt():
     mqtt_host = yamcam_config.mqtt_host
@@ -58,9 +59,9 @@ def start_mqtt():
     try:
         mqtt_client.connect(mqtt_host, mqtt_port, 60)
         mqtt_client.loop_start()
-        logger.info(f"MQTT client connected to {mqtt_host}:{mqtt_port}.")
+        logger.info(f"MQTT client CONNECTED to {mqtt_host}:{mqtt_port}.")
     except Exception as e:
-        logger.error(f"Failed to connect to MQTT broker: {e}")
+        logger.error(f"FAILED to connect to MQTT broker: {e}")
 
     return mqtt_client  
 
@@ -82,39 +83,27 @@ def report(results, mqtt_client, camera_name):
 
             payload_json = json.dumps(payload)
 
-            logger.info(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
+            #logger.info(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
 
-            result = mqtt_client.publish(
-                f"{mqtt_topic_prefix}",
-                payload_json
-            )
+            result = mqtt_client.publish( f"{mqtt_topic_prefix}", payload_json)
+
             # Comment out for debugging
             result.wait_for_publish()
 
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
                 logger.info(f"\n{payload_json}")
             else:
-                logger.error(f"Failed to publish MQTT message for sound types, return code: {result.rc}")
+                logger.error(f"FAILED to publish MQTT message: {result.rc}")
         except Exception as e:
-            logger.error(f"{camera_name}: Failed to publish MQTT message: {e}")
+            logger.error(f"Exception: Failed to form/publish MQTT message: {e}")
     else:
-        logger.error("MQTT client is not connected. Skipping publish.")
-
-    # debug
-    #logger.info(f"{camera_name}: debugging; just return, don't publish")
+        logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
 
 
 ############# SOUND FUNCTIONS ##############
 
-############# ANALYZE AUDIO STREAM ##############
+    #----- Analyze Waveform using YAMNet  -----#
 
-# Segment settings for analyze_audio_waveform function
-
-#segment_length = input_details[0]['shape'][0]  # YAMNet requirements
-#overlap        = 0.5  # 50% overlap between segments
-#step_size      = int(segment_length * overlap)  # Step size for sliding window
-
-#def analyze_audio_waveform(waveform, camera_name):
 def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details):
 
     try:
@@ -124,7 +113,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
             logger.error(f"{camera_name}: Waveform must be a 1D array.")
             return None
 
-        # Invoke the model
+        # Invoke the YAMNET inference engine 
         try:
             # Set input tensor and invoke interpreter
             interpreter.set_tensor(input_details[0]['index'], waveform)
@@ -148,10 +137,10 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
         return None
 
 
+    #----- Calculate, Group, and Filter Scores  -----#
 
-############# COMPUTE SCORES ##############
+# - use_groups switch not yet implemented
 
-##### Tease out the Sounds #####
 def rank_sounds(scores, use_groups, camera_name):
     # Get config settings
     reporting_threshold = yamcam_config.reporting_threshold
@@ -159,14 +148,10 @@ def rank_sounds(scores, use_groups, camera_name):
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
 
-    # Log shape of scores array for debugging
-    #logger.debug(f"{camera_name}: Shape of scores array: {scores.shape}")
-
     # Step 1: Filter out scores below noise_threshold, keeping index for name mapping
     filtered_scores = [
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
-    #logger.debug(f"{camera_name}: {len(filtered_scores)} classes above noise_threshold.")
 
     # If no scores are above noise threshold, return early
     if not filtered_scores:
@@ -194,10 +179,11 @@ def rank_sounds(scores, use_groups, camera_name):
     return results
 
 
+    #----- Combine filtered class/score Pairs into Groups  -----#
+
+    # Group scores by prefix (e.g., 'music.*'), and keep track of the individual class scores.
+
 def group_scores_by_prefix(filtered_scores, class_names):
-    """
-    Group scores by their prefix (e.g., 'music.*'), and keep track of the individual class scores.
-    """
     group_scores_dict = {}
 
     for i, score in filtered_scores:
@@ -212,12 +198,16 @@ def group_scores_by_prefix(filtered_scores, class_names):
     return group_scores_dict
 
 
+    #----- Calculate Composite Scores for Groups -----#
+
+    # Group scores by prefix (e.g., 'music.*'), and keep track of the individual class scores.
+    # Algorithm to create a group score using the scores of the component classes from that group
+    # - If max score in group is > 0.7, use this as the group composite score.
+    # - Otherwise, boost score with credit based on number of group classes that were found:
+    #   Max score + 0.05 * number of classes in the group (Cap Max score at 0.95).
+
 def calculate_composite_scores(group_scores_dict):
-    """
-    Calculate composite scores for each group based on the specified rules:
-    - If max score in group is > 0.7, use it.
-    - Otherwise, max score + 0.05 * number of classes in the group (up to a max of 0.95).
-    """
+
     composite_scores = []
 
     for group, scores in group_scores_dict.items():
