@@ -73,10 +73,13 @@ def report(results, mqtt_client, camera_name):
 
     if mqtt_client.is_connected():
         try:
+            formatted_results = [{'class': r['class'], 'score': float(f"{r['score']:.2f}")} for r in results]
+
             payload = {
                 'camera_name': camera_name,
-                'sound_classes': results
+                'sound_classes': formatted_results
             }
+
             payload_json = json.dumps(payload)
 
             logger.info(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
