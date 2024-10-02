@@ -4,6 +4,48 @@
 #
 # yamcam_functions.py - Functions for yamcam3
 # 
+#
+#
+#  Functions used by Yamnet
+#
+#
+#         on_connect(client, userdata, flags, rc, properties=None)
+#             Set up thread
+#
+#         start_mqtt()
+#             Connect to the MQTT broker (host) with settings from configuration yaml file
+#
+#         report(results, mqtt_client, camera_name)
+#             Report via MQTT using topic prefix from configuration yaml file and
+#             with a JSON payload.
+#
+#         analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
+#             Check waveform for compatibility with YAMNet interpreter, invoke the
+#             intepreter, and return scores (a [1,521] array of scores, ordered per the
+#             YAMNet class map CSV (files/yamnet_class_map.csv)
+#
+#         rank_sounds(scores, use_groups, camera_name)
+#             Use noise_threshold to toss out very low scores; take the top_k highest
+#             scores, return a [2,521] array with pairs of class names (from class map CSV)
+#             and scores.  Calls group_scores to group these class name/score pairs by
+#             group, in turn calling calculate_composite_scores to create scores for these
+#             groups. A modified yamnet_class_map.csv prepends each Yamnet display name
+#             with a group name (people, music, birds, etc.) for this purpose.
+#
+#         group_scores_by_prefix(filtered_scores, class_names)
+#             Organize filtered scores into groups according to the prefix of each class
+#             name in (modified) files/yamnet_class_map.csv
+#
+#         calculate_composite_scores(group_scores_dict)
+#             To report by group (vs. individual classes), take the individual scores from
+#             each group (within the filtered scores) and use a simple algorithm to
+#             score the group.  If any individual class score within the group is above 0.7,
+#             that score will be used for the entire group.  Otherwise, take the highest
+#             score within the group and add a confidence credit (0.05) for each individual
+#             class within that group that made it through the filtering process.  Max 
+#             composite score is 0.95 (unless the highest scoring class within the group 
+#             is higher).
+#
 
 #import time
 #import subprocess
@@ -220,4 +262,6 @@ def calculate_composite_scores(group_scores_dict):
         composite_scores.append((group, composite_score))
 
     return composite_scores
+
+
 
