@@ -51,7 +51,7 @@
 #          update_sound_window(camera_name, detected_sounds)
 #             Set up sliding window for detecting start/end sound events
 #             
-#          report_event(camera_name, sound_class, event_type):
+#          report_event(camera_name, sound_class, event_type, timestamp)
 #
 #          set_mqtt_client(client)
 #
@@ -371,7 +371,7 @@ def update_sound_window(camera_name, detected_sounds ):
 
     #----- Report Sound Event -----#
 
-def report_event(camera_name, sound_class, event_type):
+def report_event(camera_name, sound_class, event_type, timestamp):
 
     global mqtt_client
 
