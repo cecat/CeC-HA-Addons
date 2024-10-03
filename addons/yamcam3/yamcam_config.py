@@ -39,7 +39,6 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
-
              ######### general settings ######## 
 try:
     general_settings = config['general']
@@ -53,6 +52,18 @@ reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
 top_k                = general_settings.get('top_k', 10)
 report_k             = general_settings.get('report_k', 3)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
+
+             ######## Window Sound Event Detection Settings ######## 
+
+window_detect = config.get('window_detect', 5)
+persistence = config.get('persistence', 3)
+decay = config.get('decay', 15)
+
+             ######## Sounds to Track and Filters/thresholds######## 
+
+sounds_settings = config.get('sounds', {})
+sounds_to_track = sounds_settings.get('track', [])
+sounds_filters = sounds_settings.get('filters', {})
 
              ######## cameras = sound sources ######## 
 try:
