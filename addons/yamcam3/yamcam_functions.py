@@ -268,9 +268,15 @@ def rank_sounds(scores, use_groups, camera_name):
     # Step 3: Calculate composite scores
     composite_scores = calculate_composite_scores(group_scores_dict)
 
+    # Step 3.5: Sort composite scores in descending order
+    sorted_composite_scores = sorted(composite_scores, key=lambda x: x[1], reverse=True)
+
+    # Step 3.6: Limit to top_k composite scores
+    limited_composite_scores = sorted_composite_scores[:top_k]
+
     # Step 4: Apply min_score filters and prepare results
     results = []
-    for group, score in composite_scores:
+    for group, score in limited_composite_scores:
         if group in yamcam_config.sounds_to_track:
             min_score = sounds_filters.get(group, {}).get('min_score', reporting_threshold)
             if score >= min_score:
