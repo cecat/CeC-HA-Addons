@@ -10,7 +10,20 @@ takes brief (see settings) samples using FFMPEG and scores sound types
 detected, based on a YAMnet's 520 sound classes.
 
 The project relies on MQTT for communicating with Home Assistant.
+There is a 
+[new version](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam3)
+that functions more like Frigate - letting you choose what
+types of sounds you are looking for and set parameters for how you want to 
+define the start and end of a sound type detection.
 
+This one reports all of the sounds detected from each source (camera mic)
+at regular intervals.  Though not as useful as the new version, this one
+is helpful as a way to get a feel for what sounds are being heard by each
+source.
+
+The most significant limitation to this version is that it fires up and tears
+down FFMPEG for each source, each time it polls.  This is quite costly
+computationally.  The new version does not have this limitation.
 
 ## How to Use
 
@@ -33,7 +46,8 @@ Select the **YAMNet Camera Sounds** add-on.
 
 2. Manual Installation:
 
-- Download this repository (*https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam*)
+- Download 
+[this repository] (*https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam*)
 - Place it in your */addons/local* directory of your Home Assistant Server.
 - On your Home Assistant, go to **Settings** --> **Add-ons** and click the reload 
 (arrow circling a clock) icon in the upper right of that page.  The add-on should appear.
@@ -80,17 +94,22 @@ general:
   sample_interval: 15           # Sampling interval (seconds) (default 15)
   sample_duration: 3            # Sound sample length (seconds) (default 3) 
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
-  report_k: 3                   # Number of top scoring groups or classes to report (default 3)
+  report_k: 3                   # Number of top scoring groups or classes to
+                                # report (default 3)
   reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
-  group_classes: true           # Default true, report by group rather than the original YAMNet classes
-  aggregation_method: max       # Use max (default) or mean to pool scores across segments of a collected sample
+  group_classes: true           # Default true, report by group rather than the
+                                # original YAMNet classes
+  aggregation_method: max       # Use max (default) or mean to pool scores across
+                                # segments of a collected sample
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
-  port: 1883                    # Default unless you specifically changed it in your broker
+  port: 1883                    # Default unless you changed it in your broker
   topic_prefix: "yamcam/sounds" # adjust to your taste
-  client_id: "yamcam"           # adjust to your taste
+  client_id: "yamcam"           # adjust to your taste (will be yamcam<n> with <n>
+                                # set to the version of Yamcam you are using (to avoid
+                                # confusing MQTT, and you)
   user: "mymqttusername"        # your mqtt username on your broker (e.g., Home Asst server) 
   password: "mymqttpassword"    #         & password
 
