@@ -1,7 +1,7 @@
 {
   "name": "YAMNet Camera Sounds (streaming)",
   "description": "Analyze audio from camera mics via continous monitoring ofRTSP streams to detect sound types using YAMNet",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "slug": "yamcam3",
   "init": false,
   "arch": [

@@ -1,6 +1,27 @@
 
 # Changelog
 
+## 0.3.1
+- Overhaul how we use/report yamnet scores/detections.  In this version,
+  we switch from capturing sound, analyzing, and reporting every n second intervals
+  to continously streaming, and rather than continue periodically reporting everything
+  (yamcam2 is good for that) this one supports (a) specifying which sound groups to
+  detect, with individual score thresholds, and (b) using three parameters to define
+  windows for sound "events."  This version, then, only reports when a sound event
+  starts and when a sound event ends.
+- To specify groups of interest, the same yaml syntax is used as in Frigate
+- To determine how to define sound "events" that start and stop, we use three
+  config variables (see README.md):
+  - window_detect - the window (seconds) within which we decide a sound is "present"
+  - persistence - the number of detections within window_detect for a given 
+    sound group to determine that it's an event of interst.
+  - window_detect - once we decide a sound event has begun, how many seconds 
+    we wait, where we do not detect the sound, before deciding that the event has
+    ended.
+- mqtt_client_id from microphones.yaml will have a '3' appended to avoid colliding
+  with yamcam2 (which will have '2' appended) since we use the same microphones.yaml
+  file.
+
 ## 0.3.0
 - Implement continuous streaming and threads
 
