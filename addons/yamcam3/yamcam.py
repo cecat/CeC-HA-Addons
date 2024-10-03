@@ -9,11 +9,15 @@ import time
 import logging
 from yamcam_functions import (
         start_mqtt, analyze_audio_waveform,
-        report, rank_sounds
+        report, rank_sounds, set_mqtt_client, update_sound_window
 )
 import yamcam_config  # all setup and config happens here
 from yamcam_config import logger
 from camera_audio_stream import CameraAudioStream  # Ensure this import is added
+
+#----- Initialize MQTT client ---#
+mqtt_client = start_mqtt()
+set_mqtt_client(mqtt_client)
 
 #---- Start MQTT session ----#
 mqtt_client = start_mqtt()
@@ -27,21 +31,18 @@ use_groups = yamcam_config.use_groups
              ## MQTT settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
-#----------- for streaming -------------------------------#
-
-#def analyze_callback(camera_name, waveform):
+#----------- Hub for sound stream analysis within each thread -----------#
 
 def analyze_callback(camera_name, waveform, interpreter, input_details, output_details):
-
     scores = analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
 
     if scores is not None:
-        #logger.debug(f"{camera_name}: rank_sounds")
         results = rank_sounds(scores, use_groups, camera_name)
-        #logger.debug(f"{camera_name}: report")
-        report(results, mqtt_client, camera_name)
+        detected_sounds = [result['class'] for result in results if result['class'] in yamcam_config.sounds_to_track]
+        update_sound_window(camera_name, detected_sounds)
     else:
         logger.error(f"FAILED to analyze audio: {camera_name}")
+
 
 ############# Main #############
 

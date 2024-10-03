@@ -46,14 +46,22 @@
 #             composite score is 0.95 (unless the highest scoring class within the group 
 #             is higher).
 #
+#  ### New Functions for Sound Event Detect
+#
+#          update_sound_window(camera_name, detected_sounds)
+#             Set up sliding window for detecting start/end sound events
+#             
+#          report_event(camera_name, sound_class, event_type):
+#
+#          set_mqtt_client(client)
+#
 
-#import time
-#import subprocess
+import time
+import threading
+import collections
 import paho.mqtt.client as mqtt
-#import yaml
 import os
 import numpy as np
-#import io
 import logging
 import json
 import yamcam_config
@@ -61,6 +69,14 @@ from yamcam_config import interpreter, input_details, output_details, logger
 
 logger = yamcam_config.logger
 
+mqtt_client = None # will initialize in yamcam.py and set via a function
+
+# State management for sound event detection
+
+sound_windows = {}        # {camera_name: {sound_class: deque}}
+active_sounds = {}        # {camera_name: {sound_class: bool}}
+last_detection_time = {}  # {camera_name: {sound_class: timestamp}}
+state_lock = threading.Lock()
 #
 # for heavy debug early on; relevant code commented out for the moment
 #
@@ -69,6 +85,13 @@ saveWave_dir = os.path.dirname(saveWave_path)
 
 
 ############# COMMUNICATIONS ##############
+
+    #----- Set MQTT client as global -----#
+
+def set_mqtt_client(client):
+    global mqtt_client
+    mqtt_client = client
+
 
     #----- Make sure we are Connected before Sending -----#
 
@@ -183,7 +206,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
 
 # - use_groups switch not yet implemented
 
-def rank_sounds(scores, use_groups, camera_name):
+def OLD_rank_sounds(scores, use_groups, camera_name):
     # Get config settings
     reporting_threshold = yamcam_config.reporting_threshold
     top_k = yamcam_config.top_k
@@ -217,6 +240,40 @@ def rank_sounds(scores, use_groups, camera_name):
     # If no results meet the reporting threshold, return (none)
     if not results:
         results = [{'class': '(none)', 'score': 0.0}]
+
+    return results
+
+    #----- New Calculate, Group, and Filter Scores  -----#
+
+def rank_sounds(scores, use_groups, camera_name):
+    # Get config settings
+    reporting_threshold = yamcam_config.reporting_threshold
+    top_k = yamcam_config.top_k
+    noise_threshold = yamcam_config.noise_threshold
+    class_names = yamcam_config.class_names
+    sounds_filters = yamcam_config.sounds_filters
+
+    # Step 1: Filter out scores below noise_threshold
+    filtered_scores = [
+        (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
+    ]
+
+    if not filtered_scores:
+        return []
+
+    # Step 2: Group classes
+    group_scores_dict = group_scores_by_prefix(filtered_scores, class_names)
+
+    # Step 3: Calculate composite scores
+    composite_scores = calculate_composite_scores(group_scores_dict)
+
+    # Step 4: Apply min_score filters and prepare results
+    results = []
+    for group, score in composite_scores:
+        if group in yamcam_config.sounds_to_track:
+            min_score = sounds_filters.get(group, {}).get('min_score', reporting_threshold)
+            if score >= min_score:
+                results.append({'class': group, 'score': score})
 
     return results
 
@@ -264,4 +321,79 @@ def calculate_composite_scores(group_scores_dict):
     return composite_scores
 
 
+
+    #----- Manage Sound Event Window -----#
+
+def update_sound_window(camera_name, detected_sounds ):
+
+    with state_lock:
+
+        current_time = time.time()
+
+        # Initialize if not present
+        if camera_name not in sound_windows:
+            sound_windows[camera_name] = {}
+            active_sounds[camera_name] = {}
+            last_detection_time[camera_name] = {}
+
+        window = sound_windows[camera_name]
+        active = active_sounds[camera_name]
+        last_time = last_detection_time[camera_name]
+
+        for sound_class in yamcam_config.sounds_to_track:
+            # Initialize deque for sound class
+            if sound_class not in window:
+                window[sound_class] = collections.deque(maxlen=yamcam_config.window_detect)
+
+            # Update detections
+            is_detected = sound_class in detected_sounds
+            window[sound_class].append(is_detected)
+
+            # Update last detection time
+            if is_detected:
+                last_time[sound_class] = current_time
+
+            # Check for start event
+            if window[sound_class].count(True) >= yamcam_config.persistence:
+                if not active.get(sound_class, False):
+                    active[sound_class] = True
+                    report_event(camera_name, sound_class, 'start', current_time)
+                    logger.info(f"{camera_name}: Sound '{sound_class}' started.")
+            else:
+                # Check for stop event
+                if active.get(sound_class, False):
+                    elapsed_chunks = len([d for d in window[sound_class] if not d])
+                    if elapsed_chunks >= yamcam_config.decay:
+                        active[sound_class] = False
+                        report_event(camera_name, sound_class, 'stop', current_time)
+                        logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
+
+
+    #----- Report Sound Event -----#
+
+def report_event(camera_name, sound_class, event_type):
+
+    global mqtt_client
+
+    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
+
+    payload = {
+        'camera_name': camera_name,
+        'sound_class': sound_class,
+        'event_type': event_type,
+        'timestamp': time.time()
+    }
+
+    payload_json = json.dumps(payload)
+
+    if mqtt_client.is_connected():
+        try:
+            result = mqtt_client.publish(f"{mqtt_topic_prefix}/{event_type}", payload_json)
+            result.wait_for_publish()
+            if result.rc != mqtt.MQTT_ERR_SUCCESS:
+                logger.error(f"FAILED to publish MQTT message: {result.rc}")
+        except Exception as e:
+            logger.error(f"Exception: Failed to publish MQTT message: {e}")
+    else:
+        logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
 
