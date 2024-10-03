@@ -19,8 +19,6 @@ from camera_audio_stream import CameraAudioStream  # Ensure this import is added
 mqtt_client = start_mqtt()
 set_mqtt_client(mqtt_client)
 
-#---- Start MQTT session ----#
-mqtt_client = start_mqtt()
 
 #----------- PULL things we need from CONFIG -------------#
 #            (see config for definitions)
