@@ -1,7 +1,7 @@
 {
   "name": "YAMNet Camera Sounds (v2)",
   "description": "Analyze audio from camera mics via RTSP streams to detect sound types using YAMNet",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "slug": "yamcam2",
   "init": false,
   "arch": [

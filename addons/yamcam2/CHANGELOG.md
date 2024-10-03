@@ -1,6 +1,11 @@
 
 # Changelog
 
+## 0.2.1
+- Append "2" to the mqtt client ID so that one can run both yamcam2 and
+  yamcam3 using the same /config/microphones.yaml config file without
+  having two add-ons using the same client ID (confusing MQTT).
+
 ## 0.2.0
 - Re-publish in CeC-HA-Addons store.
 - Overhauled README to be more helpful
