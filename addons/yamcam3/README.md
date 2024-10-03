@@ -70,7 +70,12 @@ in Frigate (if you use Frigate), some of which may have embedded credentials
 
 classes/scores reported.  Example:
 '''
-<soon>
+{
+    "camera_name": "pondcam",
+    "sound_class": "birds",
+    "event_type": "start",
+    "timestamp": "2024-10-03 16:46:29"
+}
 '''
 
 #### Sample Configuration File
