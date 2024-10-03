@@ -57,6 +57,7 @@
 #
 
 import time
+from datetime import datetime
 import threading
 import collections
 import paho.mqtt.client as mqtt
@@ -377,11 +378,15 @@ def report_event(camera_name, sound_class, event_type, timestamp):
 
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
+    # Format the timestamp as a human-readable date and time
+    formatted_timestamp = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+
     payload = {
         'camera_name': camera_name,
         'sound_class': sound_class,
         'event_type': event_type,
-        'timestamp': time.time()
+        'timestamp': formatted_timestamp
     }
 
     payload_json = json.dumps(payload)
