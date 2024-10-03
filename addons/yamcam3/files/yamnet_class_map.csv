@@ -279,12 +279,12 @@ index,mid,display_name
 277,/m/03m9d0z,weather.wind
 278,/m/09t49,weather.rustlingLeaves
 279,/t/dd00092,weather.windNoiseMicrophone
-280,/m/0jb2l,storm.thunderstorm
-281,/m/0ngt1,storm.thunder
+280,/m/0jb2l,weather.thunderstorm
+281,/m/0ngt1,weather.thunder
 282,/m/0838f,water.water
-283,/m/06mb1,storm.rain
-284,/m/07r10fb,storm.raindrop
-285,/t/dd00038,storm.rainOnSurface
+283,/m/06mb1,weather.rain
+284,/m/07r10fb,weather.raindrop
+285,/t/dd00038,weather.rainOnSurface
 286,/m/0j6m2,water.stream
 287,/m/0j2kx,water.waterfall
 288,/m/05kq4,water.ocean
