@@ -149,7 +149,7 @@ def report(results, mqtt_client, camera_name):
 
             payload_json = json.dumps(payload)
 
-            #logger.info(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
+            logger.debug(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
 
             result = mqtt_client.publish( f"{mqtt_topic_prefix}", payload_json)
 
