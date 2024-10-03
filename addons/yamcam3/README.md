@@ -1,21 +1,6 @@
 # Camera-sounds add-on for Home Assistant
 
-# THIS ADD-ON IS UNDER CONSTRUCTION
-
-[Yamcam2](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam2)
-seems to work reasonably well, and this is
-still under active development (so don't try to use it, as it likely
-won't build, or if it builds it will throw whatever error I am trying
-to address at the moment). I am doing the following:
-1. Moving from periodic short-burst FFMPEG sampling to continuous streams. Among other reasons, the CPU load for FFMPEG is primarily start/stop, not stead state (so we get the benefit of streaming while also solving a resource issue).
-2. Currently, we report classes/scores found at each iteration.  This
-functionality will remain as it's useful to, say, determine how often
-a space is used by people (or birds, or guitarists).  But we will add
-a Frigate-like capability to specify which groups to monitor,
-reporting *only* if the scores for those groups is greater than a
-reporting_threshold for that group.
-
----
+# THIS ADD-ON IS "Beta"
 
 This project uses TensorFlow Lite and the
 [YAMNet sound model](https://www.tensorflow.org/hub/tutorials/yamnet)
@@ -26,6 +11,28 @@ detected, based on a YAMnet's 520 sound classes.
 
 The project relies on MQTT for communicating with Home Assistant.
 
+Designed as a Home Assistant addon, this version follows
+[Yamcam2](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam2),
+which is useful to monitor sound sources (microphones on cameras, or other
+rtsp sources) to get a feel for what sounds your microphones are picking up.
+Yamcam2 and this addon do the following:
+1. Analyze sound (in ~1s chunks) using Yamnet, which produces scores for each
+   of 521 sound classes.
+2. Filter out all but the *top_k* sounds whose scores exceed *noise_threshold*.
+3. Aggregate those *top_k* scoring sound classes into groups such as "people," "music",
+   "insects," or "birds." This uses a custom yamnet_class_map.csv where each
+   of the 521 native classes has been grouped and renamed as *groupname*.*classname*.
+4. Assign a composite score to each group, based on the scores (that made the
+   *top_k* cut) of the individual yamnet classes within that group.
+
+Yamnet3 differs from Yamnet2 in the following ways:
+1. Rather than polling sources by temporarily opening FFMPEG for a sample
+   duration, we open a continous ffmpeg stream to each source, read and analyzed
+   within a separate thread.
+2. Instead of continually reporting what sound classes are being detected, we
+   move toward something more like Frigate, where we report when a sound class
+   forms a "sound event" that starts and ends.  We use three parameters
+   (also in the config file) to define events, as outlined below.
 
 ## How to Use
 
@@ -61,29 +68,9 @@ MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), some of which may have embedded credentials
 (so treat this as a secrets file). 
 
-The add-on groups the 521 native YAMNet classes into groups.  When sounds are detected from
-a sound group configured in the watch list, a MQTT message is sent to Home Assistant (or
-other MQTT destination) of the form *topic_prefix* {json payload} where the 
-json payload includes *camera_name* followed by *class*, *score* pairs, with up to *report_k*
 classes/scores reported.  Example:
 '''
-{
-    "camera_name": "pondcam",
-    "sound_classes": [
-        {
-            "class": "animals",
-            "score": 0.65
-        },
-        {
-            "class": "birds",
-            "score": 0.61
-        },
-        {
-            "class": "domestic",
-            "score": 0.38
-        }
-    ]
-}
+<soon>
 '''
 
 #### Sample Configuration File
@@ -94,18 +81,33 @@ general:
   reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
   report_k: 3                   # Number of top scoring groups or classes to report (default 3)
-  use_groups: true              # Default true, report by group rather than the original YAMNet classes
+  use_groups: true              # Default true, report by group rather than the original
+                                # YAMNet classes
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
   port: 1883                    # Default unless you specifically changed it in your broker
   topic_prefix: "yamcam/sounds" # adjust to your taste
-  client_id: "yamcam"           # adjust to your taste
+  client_id: "yamcam"           # adjust to your taste (a "3" will be appended to avoid
+                                # colliding with Yamcam2 (which also uses this file) and
+                                # confusing MQTT.
   user: "mymqttusername"        # your mqtt username on your broker (e.g., Home Asst server) 
   password: "mymqttpassword"    #         & password
 
+# sound event parameters
+
+window_detect: 5                # Number of samples (~1s each) to examine to determine 
+                                #   if a sound is persistent.
+persistence: 2                  # Number of detections within window_detect to consider
+                                #   a sound event has started.
+decay: 10                       # Number of waveforms without the sound to consider 
+                                #   the sound event has stopped.
+
+
+# Sound sources
 # examples of Amcrest and UniFi NVR camera rtsp feeds
+
 cameras:
   doorfrontcam:
     ffmpeg:
@@ -115,6 +117,24 @@ cameras:
     ffmpeg:
       inputs:
       - path: "rtsp://x.x.x.x:7447/65dd5a1900f4cb70dffa2143_1"
+
+
+# sound groups to listen for, and optional individual thresholds (will override
+# reporting_threshold above in general settings)
+
+sounds:                     
+  track:                    
+    - people
+    - birds
+    - alert
+  filters:
+    people:
+      min_score: 0.70
+    birds:
+      min_score: 0.70
+    alert:
+      min_score: 0.8
+
 ```
 
 **General configuration variables**
@@ -155,6 +175,29 @@ configuration file), with the detected sound classes as the payload to this topi
 
 - **password**: The password to the username/login you are using as *user*.
 
+**Sound Event Parameters**
+
+- **window_detect**: Number of samples (~1s each) to examine to determine if a sound is persistent.
+- **persistence**:   Number of detections within window_detect to consider a sound event has started.
+- **decay**:          Number of waveforms without the sound to consider the sound event has stopped.
+
+**Sounds and Filters**
+
+The sounds yaml group allows you to select the specific sound groups you want to track
+and (optionally) set thresholds for each.  Available sound groups are:
+- aircraft
+- alert (e.g., sirens, alarms, ringtones, loud pops...)
+- animals
+- birds
+- construction (e.g., banging, sawing...)
+- insects
+- music
+- people
+- vehicles
+- weather
+
+More on sound groups below.
+
 ## Modified YAMNet Sound Class Scheme for Convenience Integrating with Home Assistant.
 
 In the addon's directory is a *files* subdirectory, which contains the YAMNet *tflite* model
@@ -165,20 +208,17 @@ These are available at the
 The *yamnet_class_map.csv* used here is modified (without losing the original class names).
 Yamnet has a whopping 521 sound classes,
 so if we are looking for human-related sounds there are
-many distinct classes (e.g., giggle, hiccup, laughter, shout, sigh, not
-to mention speech, crowd, or sneeze...). Similarly, if we want to detect that
-music is playing there are many many related classes (reggae, rimshot, rock and roll,
-strum, tabla...).
+many distinct classes (e.g., *giggle, hiccup, laughter, shout, sigh,* not
+to mention *speech, crowd, or sneeze*...). Similarly, if we want to detect that
+music is playing there are many many related classes (*reggae, rimshot, rock and roll,
+strum, tabla*...).
 
-The purpose of this addon is to use Home Assistant automations to
-potentially act on detecting broad ranges of things (like human activity
-in general, which might trigger turning on lights). Alternatively,
-one might wish to track the use of a space over time (how often do
-we use this room, or play music).  For this purpose, I've created a
-version of *yamnet_class_map.csv* that prepends a grouping to each sound
-class.  The group name is prepended to the YAMNet class name. Thus,
-for example, the classes *music*, *snareDrum*, and *Middle Eastern Music*
-are replaced with *music.snareDrum*, *music.middleEasternMusic*,
+For this addon to be useful for Home Assistant automations it seemed useful
+to group these 521 classes.
+This is done by using a modified version of *yamnet_class_map.csv* that
+prepends a group name to each of the 521 sound class names.
+For example, the classes *fiddle*, *snareDrum*, and *Middle Eastern Music*
+are replaced with *music.fiddle, music.snareDrum* and * music.middleEasternMusic*;
 and the classes *Tire Squeel*, *Motorcycle*, and
 *Vehicle Horn Honking, Car Horn Honking* are replaced with 
 *vehicles.tireSqueel*, *vehicles.motorcycle*, and
@@ -188,19 +228,15 @@ This allows automations to check for group names rather than lists of 30 or 40
 sound classes that might be related to what we are wanting to detect (e.g., 
 human activity, traffic sounds, etc.).
 
-The code only pulls the n classes with the highest scores (n = *top_k* in the 
-*microphones.yaml* configuration file) and then calculates a group score from
-these.  For example, if there are three *music_classname* scores in the top_k,
-the group score combines them as follows:
+The code pulls the *top_k* classes with the highest scores (assuming there are 
+at leaste *top_k* classes that exceed *noise_threshold*), then calculates a
+group score from these.
+For example, if there are three classes from the *music* group with scores in the top_k,
+the composite (i.e., group) score is calculated as follows:
 - If the highest score (*max_score*) among those in the same group >= 0.7,
 group_score = max_score
 - Else group_score = max_score + 0.05(group_count), where group_count is the number of classes from that group are in the top_k scores. (group_score is capped at 0.95).
 
-Flipping the config variable *use_groups* to *false* will result in reporting
-all *top_k* classes without grouping them or calculating group scores.  They will
-still be prepended with *group.*.  To go fully native YAMNet in terms of class
-names, the original yamnet class map is included in */files* so one can replace
-*files/yamnet_class_map.csv* with the original (*files/yamnet_class_map_ORIG.csv*).
 
 ## Tech Info
 
