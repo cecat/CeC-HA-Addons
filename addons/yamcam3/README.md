@@ -83,13 +83,13 @@ classes/scores reported.  Example:
 ```
 general:
   noise_threshold: 0.1          # Filter out very very low scores
-  reporting_threshold: 0.5      # Reporting threshold for sound class scores (default 0.4)
+  default_min_score: 0.5        # Default threshold for group scores (default 0.5)
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
-  report_k: 3                   # Number of top scoring groups or classes to report (default 3)
   use_groups: true              # Default true, report by group rather than the original
                                 # YAMNet classes
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
+
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
   port: 1883                    # Default unless you specifically changed it in your broker
@@ -100,17 +100,17 @@ mqtt:
   user: "mymqttusername"        # your mqtt username on your broker (e.g., Home Asst server) 
   password: "mymqttpassword"    #         & password
 
-# sound event parameters
-
-window_detect: 5                # Number of samples (~1s each) to examine to determine 
+# EVENTS (define 'event' parameters)
+events:
+  window_detect: 5              # Number of samples (~1s each) to examine to determine 
                                 #   if a sound is persistent.
-persistence: 2                  # Number of detections within window_detect to consider
+  persistence: 2                # Number of detections within window_detect to consider
                                 #   a sound event has started.
-decay: 10                       # Number of waveforms without the sound to consider 
+  decay: 10                     # Number of waveforms without the sound to consider 
                                 #   the sound event has stopped.
 
 
-# Sound sources
+# SOURCES
 # examples of Amcrest and UniFi NVR camera rtsp feeds
 
 cameras:
@@ -125,8 +125,7 @@ cameras:
 
 
 # sound groups to listen for, and optional individual thresholds (will override
-# reporting_threshold above in general settings)
-
+# reporting_threshold above in general settings). 
 sounds:                     
   track:                    
     - people
@@ -144,17 +143,14 @@ sounds:
 
 **General configuration variables**
 
-- **noise**: Default 0.1 - Many sound classes will have very low scores, so we filter these 
+- **noise_threshold**: Default 0.1 - Many sound classes will have very low scores, so we filter these 
 out before processing the composite score for a sound group.
 
-- **reporting_threshold**: Default 0.4 - When reporting to scores we ignore any classes with
+- **default_min_score**: Default 0.4 - When reporting to scores we ignore any groups with
 scores below this value.
 
 - **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes. However,
-we ignore classes with confidence levels below 0.1.
-
-- **report_k**: After analyzing top scores, we report the report_k highest scoring
-classes (generally a subset of top_k).
+we ignore classes with confidence levels below *noise_threshold*.
 
 - **use_groups**: See note below re modifying the sound class maps to group them.  Setting this
 option to *false* will ignore these groupings and just report the native classes, however, they
@@ -184,9 +180,13 @@ configuration file), with the detected sound classes as the payload to this topi
 
 - **window_detect**: Number of samples (~1s each) to examine to determine if a sound is persistent.
 - **persistence**:   Number of detections within window_detect to consider a sound event has started.
-- **decay**:          Number of waveforms without the sound to consider the sound event has stopped.
+- **decay**:         Number of waveforms without the sound to consider the sound event has stopped.
 
 **Sounds and Filters**
+
+These are structured similarly to Frigate configuration. Nothing will be reported if no sound
+groups are listed here. If no min_score is set for a group, the general setting *default_min_score* is used.
+are not set.
 
 The sounds yaml group allows you to select the specific sound groups you want to track
 and (optionally) set thresholds for each.  Available sound groups are:
