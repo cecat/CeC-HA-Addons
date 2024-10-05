@@ -47,11 +47,22 @@ except KeyError as e:
 
 log_level            = general_settings.get('log_level', 'INFO').upper()
 use_groups           = general_settings.get('use_groups', True)
-reporting_threshold  = general_settings.get('reporting_threshold', 0.4)
-top_k                = general_settings.get('top_k', 10)
-report_k             = general_settings.get('report_k', 3)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
+default_min_score    = general_settings.get('default_min_score', 0.5)
+top_k                = general_settings.get('top_k', 10)
 
+if not (0.0 <= default_min_score <= 1.0):
+    logger.warning(f"Invalid default_min_score '{defult_min_score}'"
+                    "Should be between 0.0 and 1.0. Defaulting to 0.5."
+    )
+    default_min_score = 0.5
+
+if not (0.0 <= noise_threshold <= 1.0):
+    logger.warning(f"Invalid noise_threshold '{noise_threshold}'"
+                    "Should be between 0.0 and 1.0. Defaulting to 0.1."
+    )
+    noise_threshold = 0.1
+        
              ######## Sound Event Detection Settings ######## 
 try:
     events_settings = config['events']
@@ -75,6 +86,15 @@ except KeyError:
 
 sounds_to_track = sounds_settings.get('track', [])
 sounds_filters = sounds_settings.get('filters', {})
+# Validate min_score values
+for group, settings in sounds_filters.items():
+    min_score = settings.get('min_score')
+    if not (0.0 <= min_score <= 1.0):
+        logger.warning(f"Invalid min_score '{min_score}' for group '{group}'."
+                        "Should be between 0.0 and 1.0. Defaulting to default_min_score."
+        )
+        settings['min_score'] = default_min_score 
+
 
              ######## cameras = sound sources ######## 
 try:
