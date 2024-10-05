@@ -207,7 +207,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
 
 def rank_sounds(scores, camera_name):
     # Get config settings
-    reporting_threshold = yamcam_config.reporting_threshold
+    default_min_score = yamcam_config.default_min_score
     top_k = yamcam_config.top_k
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
@@ -237,7 +237,7 @@ def rank_sounds(scores, camera_name):
     results = []
     for group, score in limited_composite_scores:
         if group in yamcam_config.sounds_to_track:
-            min_score = sounds_filters.get(group, {}).get('min_score', reporting_threshold)
+            min_score = sounds_filters.get(group, {}).get('min_score', default_min_score)
             if score >= min_score:
                 results.append({'class': group, 'score': score})
 
