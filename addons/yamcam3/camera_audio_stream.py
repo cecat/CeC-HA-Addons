@@ -130,12 +130,12 @@ class CameraAudioStream:
                 while len(raw_audio) < self.buffer_size:
                     chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                     if not chunk:
-                        logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}")
+                        logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: Failed to read additional data.")
+
                         break
                     raw_audio += chunk
 
                 if len(raw_audio) < self.buffer_size:
-                    logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}")
                     logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
                 else:
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
