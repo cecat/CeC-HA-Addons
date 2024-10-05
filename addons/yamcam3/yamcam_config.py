@@ -83,8 +83,8 @@ try:
 except KeyError:
     logger.debug("Missing sounds settings in the configuration file. Using default values.")
 
-sounds_to_track = sounds_settings.get('track', [])
-sounds_filters = sounds_settings.get('filters', {})
+sounds_to_track = sounds.get('track', [])
+sounds_filters = sounds.get('filters', {})
 # Validate min_score values
 for group, settings in sounds_filters.items():
     min_score = settings.get('min_score')
