@@ -80,7 +80,7 @@ decay = events_settings.get('decay', 15)
 
              ######## Sounds to Track and Filters/thresholds######## 
 try:
-    events_settings = config['sounds']
+    sounds = config['sounds']
 except KeyError:
     logger.debug("Missing sounds settings in the configuration file. Using default values.")
 
