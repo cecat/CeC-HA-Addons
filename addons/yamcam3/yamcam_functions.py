@@ -207,44 +207,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
 
 # - use_groups switch not yet implemented
 
-def OLD_rank_sounds(scores, use_groups, camera_name):
-    # Get config settings
-    reporting_threshold = yamcam_config.reporting_threshold
-    top_k = yamcam_config.top_k
-    noise_threshold = yamcam_config.noise_threshold
-    class_names = yamcam_config.class_names
-
-    # Step 1: Filter out scores below noise_threshold, keeping index for name mapping
-    filtered_scores = [
-        (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
-    ]
-
-    # If no scores are above noise threshold, return early
-    if not filtered_scores:
-        return [{'class': '(none)', 'score': 0.0}]
-
-    # Step 2: Group classes based on their grouping (before the first period '.')
-    group_scores_dict = group_scores_by_prefix(filtered_scores, class_names)
-
-    # Step 3: Calculate composite scores for each group
-    composite_scores = calculate_composite_scores(group_scores_dict)
-
-    # Step 4: Sort composite scores in descending order
-    sorted_composite_scores = sorted(composite_scores, key=lambda x: x[1], reverse=True)
-
-    # Step 5: Filter top_k groups and prepare results
-    results = []
-    for group, score in sorted_composite_scores[:top_k]:
-        if score >= reporting_threshold:
-            results.append({'class': group, 'score': float(round(score, 2))})
-
-    # If no results meet the reporting threshold, return (none)
-    if not results:
-        results = [{'class': '(none)', 'score': 0.0}]
-
-    return results
-
-    #----- New Calculate, Group, and Filter Scores  -----#
+    #----- Calculate, Group, and Filter Scores  -----#
 
 def rank_sounds(scores, use_groups, camera_name):
     # Get config settings

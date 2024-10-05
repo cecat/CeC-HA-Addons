@@ -52,15 +52,27 @@ top_k                = general_settings.get('top_k', 10)
 report_k             = general_settings.get('report_k', 3)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 
-             ######## Window Sound Event Detection Settings ######## 
+             ######## Sound Event Detection Settings ######## 
+try:
+    events_settings = config['events']
+except KeyError:
+    logger.debug("Missing events settings in the configuration file. Using default values.")
+    events_settings = {
+        'window_detect': 5,  # Default value
+        'persistence': 3,    # Default value
+        'decay': 15          # Default value
+    }
 
-window_detect = config.get('window_detect', 5)
-persistence = config.get('persistence', 3)
-decay = config.get('decay', 15)
+window_detect = events_settings.get('window_detect', 5)
+persistence = events_settings.get('persistence', 3)
+decay = events_settings.get('decay', 15)
 
              ######## Sounds to Track and Filters/thresholds######## 
+try:
+    events_settings = config['sounds']
+except KeyError:
+    logger.debug("Missing sounds settings in the configuration file. Using default values.")
 
-sounds_settings = config.get('sounds', {})
 sounds_to_track = sounds_settings.get('track', [])
 sounds_filters = sounds_settings.get('filters', {})
 
