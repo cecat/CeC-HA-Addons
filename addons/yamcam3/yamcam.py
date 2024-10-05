@@ -24,8 +24,6 @@ set_mqtt_client(mqtt_client)
 #            (see config for definitions)
              ## cameras = sound sources
 camera_settings = yamcam_config.camera_settings
-             ## general settings
-use_groups = yamcam_config.use_groups
              ## MQTT settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
@@ -35,7 +33,7 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
     scores = analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
 
     if scores is not None:
-        results = rank_sounds(scores, use_groups, camera_name)
+        results = rank_sounds(scores, camera_name)
         detected_sounds = [result['class'] for result in results if result['class'] in yamcam_config.sounds_to_track]
         update_sound_window(camera_name, detected_sounds)
     else:

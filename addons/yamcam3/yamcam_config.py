@@ -46,7 +46,6 @@ except KeyError as e:
     raise
 
 log_level            = general_settings.get('log_level', 'INFO').upper()
-use_groups           = general_settings.get('use_groups', True)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 default_min_score    = general_settings.get('default_min_score', 0.5)
 top_k                = general_settings.get('top_k', 10)

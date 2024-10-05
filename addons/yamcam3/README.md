@@ -85,8 +85,6 @@ general:
   noise_threshold: 0.1          # Filter out very very low scores
   default_min_score: 0.5        # Default threshold for group scores (default 0.5)
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
-  use_groups: true              # Default true, report by group rather than the original
-                                # YAMNet classes
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
 
@@ -151,10 +149,6 @@ scores below this value.
 
 - **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes. However,
 we ignore classes with confidence levels below *noise_threshold*.
-
-- **use_groups**: See note below re modifying the sound class maps to group them.  Setting this
-option to *false* will ignore these groupings and just report the native classes, however, they
-will still be prepended with groupnames (which are not part of the original YAMNet mappings).
 
 - **log_level**: Level of detail to be logged. Levels are
 DEBUG->INFO->WARNING->ERROR->CRITICAL

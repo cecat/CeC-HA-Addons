@@ -24,7 +24,7 @@
 #             intepreter, and return scores (a [1,521] array of scores, ordered per the
 #             YAMNet class map CSV (files/yamnet_class_map.csv)
 #
-#         rank_sounds(scores, use_groups, camera_name)
+#         rank_sounds(scores, camera_name)
 #             Use noise_threshold to toss out very low scores; take the top_k highest
 #             scores, return a [2,521] array with pairs of class names (from class map CSV)
 #             and scores.  Calls group_scores to group these class name/score pairs by
@@ -205,11 +205,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
 
     #----- Calculate, Group, and Filter Scores  -----#
 
-# - use_groups switch not yet implemented
-
-    #----- Calculate, Group, and Filter Scores  -----#
-
-def rank_sounds(scores, use_groups, camera_name):
+def rank_sounds(scores, camera_name):
     # Get config settings
     reporting_threshold = yamcam_config.reporting_threshold
     top_k = yamcam_config.top_k
