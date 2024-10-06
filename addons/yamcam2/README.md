@@ -7,7 +7,10 @@ This project uses TensorFlow Lite and the
 to characterize sounds deteced by  microphones on networked cameras.
 *It does not record or keep any sound samples after analyzing them*. It
 takes brief (see settings) samples using FFMPEG and scores sound types 
-detected, based on a YAMnet's 520 sound classes.
+detected, based on a YAMnet's 521 sound classes.  
+
+The purpose of the add-on is to examine the mix of sounds being detected
+by a given source (typically a camera with a microphone).
 
 The project relies on MQTT for communicating with Home Assistant.
 There is a 
@@ -17,13 +20,13 @@ types of sounds you are looking for and set parameters for how you want to
 define the start and end of a sound type detection.
 
 This one reports all of the sounds detected from each source (camera mic)
-at regular intervals.  Though not as useful as the new version, this one
-is helpful as a way to get a feel for what sounds are being heard by each
-source.
+at regular intervals.  It is intended to be helpful as a way to get a feel for
+what types of sounds are being heard by each source.
 
 The most significant limitation to this version is that it fires up and tears
-down FFMPEG for each source, each time it polls.  This is quite costly
-computationally.  The new version does not have this limitation.
+down FFMPEG for each source, each time it polls.  This is a bit costly
+computationally.  The new version streams each source continuously and thus
+is a bit less demanding of the CPU.
 
 ## How to Use
 
@@ -55,7 +58,7 @@ Select the **YAMNet Camera Sounds** add-on.
 ### Create the Add-on Configuration File
 
 Create a file in your Home Assistant directory */config* named
-*microphones.yaml*. Here you will configure specifics including your MQTT broker address,
+*yamcam_profiler.yaml*. Here you will configure specifics including your MQTT broker address,
 MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), some of which may have embedded credentials
 (so treat this as a secrets file). 
@@ -113,13 +116,12 @@ mqtt:
   user: "mymqttusername"        # your mqtt username on your broker (e.g., Home Asst server) 
   password: "mymqttpassword"    #         & password
 
-# examples of Amcrest and UniFi NVR camera rtsp feeds
 cameras:
-  doorfrontcam:
+  doorfrontcam: # example of an Amcrest wifi camera
     ffmpeg:
       inputs:
       - path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
-  frontyardcam:
+  frontyardcam: # example of Unifi camera via NVR
     ffmpeg:
       inputs:
       - path: "rtsp://x.x.x.x:7447/65dd5a1900f4cb70dffa2143_1"
@@ -135,12 +137,12 @@ for n cameras (on a low-end Celeron CPU it takes about 2s to process audio and r
 every (3+2)*3 + 15 = 30s.
 
 - **sample_duration**: Sound sample length (seconds) (default 3). YAMNet operates on 16 KHz 
-frames, maximum 15,360 samples -- so it operates on 0.96s duration frames.  To analyze across
-longer durations we segment the waveform into 0.96s frames with 50% overlap, then combine the
+frames, maximum 15,360 samples -- so it operates on 0.975s duration frames.  To analyze across
+longer durations we segment the waveform into 0.975s frames with 50% overlap, then combine the
 scores across the segments by taking the max of scores for each class.
 
-- **top_k**: YAMNet scores all 520 classes, we analyze the top_k highest scoring classes. However,
-we ignore classes with confidence levels below 0.1.
+- **top_k**: YAMNet scores all 521 classes, we analyze the top_k highest scoring classes. However,
+we ignore classes with scores below 0.1.
 
 - **report_k**: After analyzing top scores, we report the report_k highest scoring
 classes (generally a subset of top_k).
@@ -211,7 +213,7 @@ sound classes that might be related to what we are wanting to detect (e.g.,
 human activity, traffic sounds, etc.).
 
 The code only pulls the n classes with the highest scores (n = *top_k* in the 
-*microphones.yaml* configuration file) and then calculates a group score from
+*yamcam_profiler.yaml* configuration file) and then calculates a group score from
 these.  For example, if there are three *music_classname* scores in the top_k,
 the group score combines them as follows:
 - If the highest score (*max_score*) among those in the same group >= 0.7,

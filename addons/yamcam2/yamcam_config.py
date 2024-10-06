@@ -12,7 +12,7 @@ import tflite_runtime.interpreter as tflite
 
 # File paths
 
-config_path = '/config/microphones.yaml'
+config_path = '/config/yamcam_profiler.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 
