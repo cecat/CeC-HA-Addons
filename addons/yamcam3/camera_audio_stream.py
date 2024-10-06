@@ -109,7 +109,7 @@ class CameraAudioStream:
         while self.running:
             try:
                 stderr_output = self.process.stderr.read(1024).decode()
-                if stderr_output and not any(keyword in stderr_output for keyword in filtered_keywords):
+                if stderr_output and not any(keyword in stderr_output for keyword in noisy_keywords):
                     logger.debug(f"FFmpeg stderr: {self.camera_name}: {stderr_output}")
             except Exception as e:
                 logger.error(f"Exception in read-stderr.CameraAudioStream: {self.camera_name}: {e}")
