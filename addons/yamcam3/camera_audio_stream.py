@@ -153,11 +153,6 @@ class CameraAudioStream:
             finally:
                 raw_audio = b""
 
-import time  # Make sure to import time for sleep functionality
-
-class CameraAudioStream:
-    # ... existing methods ...
-
     def read_stream(self):
         raw_audio = b""
         restart_attempts = 0
