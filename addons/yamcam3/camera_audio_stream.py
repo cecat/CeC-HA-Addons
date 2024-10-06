@@ -34,6 +34,7 @@ import subprocess
 import threading
 import numpy as np
 import logging
+import time
 import tflite_runtime.interpreter as tflite
 from yamcam_config import logger, model_path
 
@@ -122,7 +123,7 @@ class CameraAudioStream:
                 self.process = None
             logger.info(f"******-->STOP audio stream: {self.camera_name}.")
 
-    def read_stream(self):
+    def OLD_read_stream(self):
         raw_audio = b""
 
         while self.running:
@@ -151,4 +152,86 @@ class CameraAudioStream:
 
             finally:
                 raw_audio = b""
+
+import time  # Make sure to import time for sleep functionality
+
+class CameraAudioStream:
+    # ... existing methods ...
+
+    def read_stream(self):
+        raw_audio = b""
+        restart_attempts = 0
+        max_restarts = 5
+        restart_delay = 5  # seconds
+
+        while self.running:
+            try:
+                while len(raw_audio) < self.buffer_size:
+                    chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+                    if not chunk:
+                        # Check if process is still running
+                        return_code = self.process.poll()
+                        if return_code is not None:
+                            logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}. Attempting to restart.")
+                            restart_attempts += 1
+                            if restart_attempts <= max_restarts:
+                                self.restart_process()
+                                time.sleep(restart_delay)
+                                raw_audio = b""  # Reset raw_audio before retrying
+                                break  # Break inner loop to restart reading
+                            else:
+                                logger.error(f"{self.camera_name}: Max restart attempts reached ({max_restarts}). Stopping stream.")
+                                self.stop()
+                                return
+                        else:
+                            logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
+                            # Optionally, you might want to restart here as well
+                            break
+                    else:
+                        raw_audio += chunk
+
+                if len(raw_audio) < self.buffer_size:
+                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
+                else:
+                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                    waveform = np.squeeze(waveform)
+                    if self.analyze_callback:
+                        self.analyze_callback(self.camera_name, waveform, self.interpreter, self.input_details, self.output_details)
+                    # Reset restart attempts after successful read
+                    restart_attempts = 0
+
+            except Exception as e:
+                logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}")
+                logger.error(f"--->{self.camera_name}: Error reading stream: {e}")
+                self.stop()
+                return  # Exit the method to stop the thread
+
+            finally:
+                raw_audio = b""
+
+    def restart_process(self):
+        self.stop_ffmpeg_process()
+        time.sleep(1)  # Short delay before restarting
+        self.start_ffmpeg_process()
+        logger.info(f"{self.camera_name}: FFmpeg process restarted.")
+
+    def stop_ffmpeg_process(self):
+        if self.process:
+            self.process.terminate()
+            try:
+                self.process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                logger.warning(f"{self.camera_name}: FFmpeg process did not terminate. Killing process.")
+                self.process.kill()
+                self.process.wait()
+            self.process = None
+
+    def start_ffmpeg_process(self):
+        # Reinitialize the FFmpeg process
+        self.process = subprocess.Popen(
+            self.command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=10**8
+        )
 
