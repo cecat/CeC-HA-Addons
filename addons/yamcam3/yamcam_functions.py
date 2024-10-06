@@ -218,6 +218,8 @@ def rank_sounds(scores, camera_name):
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
 
+    logger.debug(f"{camera-namc}: {len(filtered_scores)} sounds found.")
+
     if not filtered_scores:
         return []
 
