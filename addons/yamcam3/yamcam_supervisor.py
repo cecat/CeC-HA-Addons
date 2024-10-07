@@ -76,34 +76,55 @@ class CameraStreamSupervisor:
 
                             offline_duration = current_time - offline_since
                             reconnection_interval = self.calculate_reconnection_interval(offline_duration)
-                            if offline_duration == 90:
-                                logger.info(f"{camera_name}: Drop to 1m retry interval after 90s offline.")
-                            elif offline_duration == 6 * 3600:
-                                logger.info(f"{camera_name}: Drop to 10m retry interval after 6h offline.")
 
+                            # Log transition between retry intervals
+                            if not hasattr(stream, 'logged_90_seconds') and offline_duration >= 90:
+                                logger.info(f"{camera_name}: Switching to 60-second retry interval after 90 seconds offline.")
+                                stream.logged_90_seconds = True
+                            if not hasattr(stream, 'logged_6_hours') and offline_duration >= (6 * 3600):
+                                logger.info(f"{camera_name}: Switching to 10-minute retry interval after 6 hours offline.")
+                                stream.logged_6_hours = True
 
-                            last_attempt = stream.last_reconnect_attempt or 0
+                            # Add detailed logging
+                            logger.debug(f"{camera_name}: offline_since = {offline_since}")
+                            logger.debug(f"{camera_name}: current_time = {current_time}")
+                            logger.debug(f"{camera_name}: offline_duration = {offline_duration}")
+                            logger.debug(f"{camera_name}: reconnection_interval = {reconnection_interval}")
+
+                            last_attempt = stream.last_reconnect_attempt
+                            if last_attempt is None:
+                                last_attempt = offline_since
+                                logger.debug(f"{camera_name}: last_reconnect_attempt is None, setting last_attempt to offline_since")
+                            logger.debug(f"{camera_name}: last_attempt = {last_attempt}")
+
                             time_since_last_attempt = current_time - last_attempt
+                            logger.debug(f"{camera_name}: time_since_last_attempt = {time_since_last_attempt}")
 
                             if time_since_last_attempt >= reconnection_interval:
                                 logger.info(f"{camera_name}: Attempting to reconnect...")
-                                stream.last_reconnect_attempt = current_time
                                 try:
                                     stream.start()
                                     if stream.running:
                                         stream.should_reconnect = False
+                                        stream.last_reconnect_attempt = current_time  # Update on success
                                         self.offline_since.pop(camera_name, None)
                                         logger.info(f"{camera_name}: Reconnection successful.")
+                                        # Reset logged flags
+                                        if hasattr(stream, 'logged_90_seconds'):
+                                            del stream.logged_90_seconds
+                                        if hasattr(stream, 'logged_6_hours'):
+                                            del stream.logged_6_hours
                                     else:
                                         logger.error(f"{camera_name}: Reconnection failed to start the stream.")
+                                        # Do not update last_reconnect_attempt to retry sooner
                                 except Exception as e:
-                                    logger.error(f"{camera_name}: Reconnection failed: {e}")
+                                    logger.error(f"{camera_name}: Reconnection failed: {e}", exc_info=True)
                                     # Ensure should_reconnect remains True
                                     stream.should_reconnect = True
+                                    # Do not update last_reconnect_attempt to retry sooner
                             else:
                                 time_until_next_attempt = reconnection_interval - time_since_last_attempt
-                                logger.debug(f"{camera_name}: Next reconnection attempt in "
-                                             f"{time_until_next_attempt:.2f} seconds.")
+                                logger.debug(f"{camera_name}: Next reconnection attempt in {time_until_next_attempt:.2f} seconds.")
                                 if next_check is None or time_until_next_attempt < next_check:
                                     next_check = time_until_next_attempt
                         elif not stream.running:
@@ -118,6 +139,7 @@ class CameraStreamSupervisor:
                         sleep_time = max(1, int(next_check))
                     else:
                         sleep_time = 1  # Default sleep time
+                logger.debug(f"Supervisor sleeping for {sleep_time} seconds.")
                 time.sleep(sleep_time)
             except Exception as e:
                 logger.error(f"Exception in supervisor monitor_streams: {e}", exc_info=True)
