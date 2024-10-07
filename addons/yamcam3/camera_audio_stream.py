@@ -155,27 +155,24 @@ class CameraAudioStream:
                 logger.error(f"Exception in read-stderr.CameraAudioStream: {self.camera_name}: {e}")
                 break  # stop the thread if process is terminated
 
-    def stop(self, should_reconnect=False):
+    def stop(self):
         with self.lock:
             if not self.running:
                 return
             self.running = False
-            self.should_reconnect = should_reconnect  # for supervisor
             if self.process:
                 self.process.terminate()
                 self.process.wait()
                 self.process = None
             logger.info(f"******-->STOP audio stream: {self.camera_name}.")
             # Wait for threads to finish
+            current_thread = threading.current_thread()
             if self.thread and self.thread != current_thread:
                 self.thread.join()
             if self.stderr_thread and self.stderr_thread != current_thread:
                 self.stderr_thread.join()
-            # Inform supervisor that the stream has stopped
-        if should_reconnect:
-            self.last_reconnect_attempt = None  # Reset last reconnect attempt
-            logger.debug(f"{self.camera_name}: Notifying supervisor that stream has stopped.")
-            self.supervisor.stream_stopped(self.camera_name)
+        # Inform supervisor that the stream has stopped
+        self.supervisor.stream_stopped(self.camera_name)
 
     def read_stream(self):
         raw_audio = b""
