@@ -147,18 +147,21 @@ class CameraAudioStream:
                             # Handle EOF or process termination
                             return_code = self.process.poll()
                             if return_code is not None:
-                                logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}.")
+                                logger.error(f"{self.camera_name}: FFmpeg process terminated "
+                                             f"with return code {return_code}.")
                                 self.stop()
                                 return
                             else:
-                                logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
+                                logger.error(f"{self.camera_name}: No data read from FFmpeg "
+                                              "stdout, but process is still running.")
                                 time.sleep(1)
                                 continue
                         else:
                             raw_audio += chunk
                     else:
                         # Timeout occurred; handle accordingly
-                        logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg.")
+                        logger.error(f"{self.camera_name}: Timeout waiting for data from "
+                                      "FFmpeg. Stopping thread.")
                         self.stop()
                         return
 
@@ -175,7 +178,7 @@ class CameraAudioStream:
                     )
 
             except Exception as e:
-                logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}", exc_info=True)
+                logger.error(f"{self.camera_name}: Exception in read_stream: {e}", exc_info=True)
                 self.stop()
                 return  # Exit the method to stop the thread
 
@@ -193,16 +196,18 @@ class CameraAudioStream:
             try:
                 line = stderr.readline()
                 if line:
-                    logger.debug(f"FFmpeg stderr: {self.camera_name}: {line.decode('utf-8', errors='replace')}")
+                    logger.debug(f"FFmpeg stderr: {self.camera_name}: "
+                                 f"{line.decode('utf-8', errors='replace')}")
                 else:
                     with self.lock:
                         if self.process:
                             return_code = self.process.poll()
                             if return_code is not None:
-                                logger.debug(f"{self.camera_name}: FFmpeg process has terminated with return code {return_code}.")
+                                logger.debug(f"{self.camera_name}: FFmpeg process has "
+                                             f"terminated with return code {return_code}.")
                                 break  # Exit the loop as the process has terminated
                     time.sleep(0.1)
             except Exception as e:
-                logger.error(f"Exception in read_stderr.CameraAudioStream: {self.camera_name}: {e}", exc_info=True)
+                logger.error(f"{self.camera_name}: Exception in read_stderr: {e}", exc_info=True)
                 break
 
