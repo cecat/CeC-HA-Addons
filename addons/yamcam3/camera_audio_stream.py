@@ -72,7 +72,7 @@ class CameraAudioStream:
             self.command = [
                 'ffmpeg',
                 '-rtsp_transport', 'tcp',
-                '-stimeout', '5000000', #5s
+                '-timeout', '5000000', #5s
                 '-i', self.rtsp_url,
                 '-f', 's16le',
                 '-acodec', 'pcm_s16le',
@@ -112,10 +112,30 @@ class CameraAudioStream:
                 self.stderr_thread.start()
 
                 logger.info(f"START audio stream: {self.camera_name}.")
-                time.sleep(2) # give it 2 seconds to fire up
+
+                # *** Changes start here ***
+
+                # Wait briefly to check if process is still running
+                time.sleep(2)  # Wait 2 seconds
+                return_code = self.process.poll()
+                if return_code is not None:
+                    logger.error(f"{self.camera_name}: FFmpeg process exited immediately with return code {return_code}.")
+                    self.running = False
+                    self.should_reconnect = True
+                    # Notify the supervisor
+                    self.supervisor.stream_stopped(self.camera_name)
+                    # Raise an exception to indicate failure
+                    raise Exception(f"FFmpeg process exited with return code {return_code}")
+                elif not self.running:
+                    logger.error(f"{self.camera_name}: Stream stopped shortly after starting.")
+                    self.should_reconnect = True
+                    self.supervisor.stream_stopped(self.camera_name)
+                    raise Exception("Stream stopped immediately after starting.")
+
+                # *** Changes end here ***
 
             except Exception as e:
-                logger.error(f"{self.camera_name}: Exception during start: {e}")
+                logger.error(f"{self.camera_name}: Exception during start: {e}", exc_info=True)
                 self.running = False
                 self.should_reconnect = True  # Ensure the supervisor continues reconnection attempts
                 # Notify the supervisor
@@ -202,8 +222,7 @@ class CameraAudioStream:
                         )
 
             except Exception as e:
-                logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}")
-                logger.error(f"--->{self.camera_name}: Error reading stream: {e}")
+                logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}", exc_info=True)
                 self.stop(should_reconnect=True)
                 return  # Exit the method to stop the thread
 
