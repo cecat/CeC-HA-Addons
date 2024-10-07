@@ -13,10 +13,6 @@
 #         start(self)
 #             Start thread - set up FFMPEG to stream with proper settings
 #
-#         read_stderr(self)
-#             Monitor stderr for messages from FFMPEG which can be informational
-#             or errors, but FFMPEG does not provide a code to differentiate between them.
-#
 #         stop(self)
 #             Stop thread
 #
@@ -28,12 +24,9 @@
 #             results that can be sent (via the report function in yamnet_functions.py)
 #             to Home Assistant via MQTT.
 #             
-#        restart_process(self):
-#
-#        stop_ffmpeg_process(self):
-#
-#        start_ffmpeg_process(self):
-#
+#         read_stderr(self)
+#             Monitor stderr for messages from FFMPEG which can be informational
+#             or errors, but FFMPEG does not provide a code to differentiate between them.
 
 import os
 import subprocess
