@@ -113,8 +113,12 @@ class CameraAudioStream:
                 logger.info(f"START audio stream: {self.camera_name}.")
 
             except Exception as e:
-                logger.error(f"Exception in start.CameraAudioStream: {self.camera_name}: {e}")
+                logger.error(f"{self.camera_name}: Exception during start: {e}")
                 self.running = False
+                self.should_reconnect = True  # Ensure the supervisor continues reconnection attempts
+                # Optionally, notify the supervisor
+                self.supervisor.stream_stopped(self.camera_name)
+
 
     def read_stderr(self):
         noisy_keywords = {"bitrate", "speed"}
