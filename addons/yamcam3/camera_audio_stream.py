@@ -30,6 +30,8 @@
 #             
 #
 
+import os
+import fcnt1
 import subprocess
 import threading
 import numpy as np
@@ -134,18 +136,22 @@ class CameraAudioStream:
                 while len(raw_audio) < self.buffer_size:
                     chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                     if not chunk:
-                        logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: Failed to read additional data.")
+                        logger.error(f"Exception in read_stream.CameraAudioStream: "
+                                     f"{self.camera_name}: Failed to read additional data.")
 
                         break
                     raw_audio += chunk
 
                 if len(raw_audio) < self.buffer_size:
-                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
+                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. "
+                                              f"Total buffer size: {len(raw_audio)}")
                 else:
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                     waveform = np.squeeze(waveform)
                     if self.analyze_callback:
-                        self.analyze_callback(self.camera_name, waveform, self.interpreter, self.input_details, self.output_details)
+                        self.analyze_callback(self.camera_name, waveform,
+                                              self.interpreter, self.input_details,
+                                              self.output_details)
 
 
             except Exception as e:
@@ -165,36 +171,46 @@ class CameraAudioStream:
         while self.running:
             try:
                 while len(raw_audio) < self.buffer_size:
-                    chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
-                    if not chunk:
-                        # Check if process is still running
-                        return_code = self.process.poll()
-                        if return_code is not None:
-                            logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}. Attempting to restart.")
-                            restart_attempts += 1
-                            if restart_attempts <= max_restarts:
-                                self.restart_process()
-                                time.sleep(restart_delay)
-                                raw_audio = b""  # Reset raw_audio before retrying
-                                break  # Break inner loop to restart reading
+                    try:
+                        chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+                        if not chunk:
+                            # Check if process is still running
+                            return_code = self.process.poll()
+                            if return_code is not None:
+                                logger.error(f"{self.camera_name}: FFmpeg process terminated with "
+                                         f"return code {return_code}. Attempting to restart.")
+                                restart_attempts += 1
+                                if restart_attempts <= max_restarts:
+                                    self.restart_process()
+                                    time.sleep(restart_delay)
+                                    raw_audio = b""  # Reset raw_audio before retrying
+                                    break  # Break inner loop to restart reading
+                                else:
+                                    logger.error(f"{self.camera_name}: Max restart attempts reached "
+                                             f"({max_restarts}). Stopping stream.")
+                                    self.stop()
+                                    return
                             else:
-                                logger.error(f"{self.camera_name}: Max restart attempts reached ({max_restarts}). Stopping stream.")
-                                self.stop()
-                                return
+                                logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, "
+                                              "but process is still running.")
+                                # Optionally, you might want to restart here as well
+                                break
                         else:
-                            logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
-                            # Optionally, you might want to restart here as well
-                            break
-                    else:
-                        raw_audio += chunk
+                            raw_audio += chunk
+                    except BlockingIOError: # no data arriving...pause and retry
+                        time.sleep(0.1)
+                        continue
 
                 if len(raw_audio) < self.buffer_size:
-                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
+                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total "
+                                 f"buffer size: {len(raw_audio)}")
                 else:
                     waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                     waveform = np.squeeze(waveform)
                     if self.analyze_callback:
-                        self.analyze_callback(self.camera_name, waveform, self.interpreter, self.input_details, self.output_details)
+                        self.analyze_callback(self.camera_name, waveform,
+                                              self.interpreter, self.input_details,
+                                              self.output_details)
                     # Reset restart attempts after successful read
                     restart_attempts = 0
 
@@ -232,4 +248,8 @@ class CameraAudioStream:
             stderr=subprocess.PIPE,
             bufsize=10**8
         )
+            # Set stdout to non-blocking mode
+        fd = self.process.stdout.fileno()
+        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
