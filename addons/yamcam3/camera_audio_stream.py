@@ -48,7 +48,7 @@ from yamcam_config import logger, model_path
 
 class CameraAudioStream:
 
-    def __init__(self, camera_name, rtsp_url, analyze_callback):
+    def __init__(self, camera_name, rtsp_url, analyze_callback, supervisor):
         try:
             logger.info(f"Initializing CameraAudioStream: {camera_name}")
             self.camera_name = camera_name
@@ -66,6 +66,7 @@ class CameraAudioStream:
             self.output_details = self.interpreter.get_output_details()
             self.should_reconnect = False
             self.last_reconnect_attempt = None  # Timestamp of the last reconnection attempt
+            self.supervisor = supervisor
 
             # ffmpeg command
             self.command = [
@@ -145,6 +146,11 @@ class CameraAudioStream:
                 self.thread.join()
             if self.stderr_thread:
                 self.stderr_thread.join()
+            # Inform supervisor that the stream has stopped
+        if should_reconnect:
+            self.last_reconnect_attempt = None  # Reset last reconnect attempt
+            logger.debug(f"{self.camera_name}: Notifying supervisor that stream has stopped.")
+            self.supervisor.stream_stopped(self.camera_name)
 
     def read_stream(self):
         raw_audio = b""
