@@ -24,11 +24,10 @@ class CameraStreamSupervisor:
         for camera_name, camera_config in self.camera_configs.items():
             rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
             stream = CameraAudioStream(camera_name, rtsp_url, self.analyze_callback, self)
-
             stream.start()
             self.streams[camera_name] = stream
         self.supervisor_thread.start()
-        logger.info("Supervisor thread started.")
+        logger.info("*-------> Supervisor thread started.")
 
     def stop_all_streams(self):
         with self.lock:
@@ -48,15 +47,18 @@ class CameraStreamSupervisor:
                     current_time = time.time()
                     for camera_name, stream in self.streams.items():
                         if not stream.running and stream.should_reconnect:
-                            offline_since = self.offline_since.get(camera_name, current_time)
+                            offline_since = self.offline_since.get(camera_name)
+                            if offline_since is None:
+                                # This is the first time we're noting that the stream is offline
+                                offline_since = time.time()
+                                self.offline_since[camera_name] = offline_since
                             offline_duration = current_time - offline_since
                             reconnection_interval = self.calculate_reconnection_interval(offline_duration)
 
                             logger.debug(f"{camera_name}: Offline for {offline_duration:.2f} seconds.")
                             logger.debug(f"{camera_name}: Reconnection interval is {reconnection_interval} seconds.")
 
-                            # Check if it's time to attempt reconnection
-                            last_attempt = stream.last_reconnect_attempt or 0
+                            last_attempt = stream.last_reconnect_attempt or offline_since
                             time_since_last_attempt = current_time - last_attempt
                             logger.debug(f"{camera_name}: Time since last attempt {time_since_last_attempt:.2f} seconds.")
 
@@ -70,8 +72,6 @@ class CameraStreamSupervisor:
                                     logger.info(f"{camera_name}: Reconnection successful.")
                                 except Exception as e:
                                     logger.error(f"{camera_name}: Reconnection failed: {e}")
-                                    # If reconnection fails, offline_since remains the same
-                                    # so offline_duration continues to increase
                             else:
                                 # Schedule the next check based on the reconnection interval
                                 time_until_next_attempt = reconnection_interval - time_since_last_attempt
@@ -97,6 +97,7 @@ class CameraStreamSupervisor:
 
         logger.info("Supervisor monitoring stopped.")
 
+
     def calculate_reconnection_interval(self, offline_duration):
         if offline_duration < 90:
             # First 90 seconds: retry every 1 second
@@ -110,6 +111,6 @@ class CameraStreamSupervisor:
 
     def stream_stopped(self, camera_name):
         with self.lock:
-            self.offline_since.setdefault(camera_name, time.time())
+            self.offline_since[camera_name] = time.time()
             logger.debug(f"{camera_name}: Marked as offline at {self.offline_since[camera_name]}")
 
