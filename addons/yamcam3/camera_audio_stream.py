@@ -42,6 +42,7 @@ import numpy as np
 import logging
 import time
 import tflite_runtime.interpreter as tflite
+import select  # <-- Added missing import
 from yamcam_config import logger, model_path
 
 class CameraAudioStream:
@@ -113,8 +114,6 @@ class CameraAudioStream:
                 self.running = False
                 self.supervisor.stream_stopped(self.camera_name)
 
-    # Rest of the methods remain mostly the same, removing references to should_reconnect
-
     def stop(self):
         with self.lock:
             if not self.running:
@@ -133,8 +132,6 @@ class CameraAudioStream:
                 self.stderr_thread.join()
         # Inform supervisor that the stream has stopped
         self.supervisor.stream_stopped(self.camera_name)
-
-    # Ensure that read_stream calls self.stop() when appropriate
 
     def read_stream(self):
         raw_audio = b""
@@ -184,4 +181,28 @@ class CameraAudioStream:
 
             finally:
                 raw_audio = b""
+
+    def read_stderr(self):
+        # Continuously read FFmpeg's stderr to prevent buffer blockage
+        while True:
+            with self.lock:
+                if not self.running or not self.process or not self.process.stderr:
+                    break  # Exit the loop if the stream is no longer running or process is invalid
+                stderr = self.process.stderr
+
+            try:
+                line = stderr.readline()
+                if line:
+                    logger.debug(f"FFmpeg stderr: {self.camera_name}: {line.decode('utf-8', errors='replace')}")
+                else:
+                    with self.lock:
+                        if self.process:
+                            return_code = self.process.poll()
+                            if return_code is not None:
+                                logger.debug(f"{self.camera_name}: FFmpeg process has terminated with return code {return_code}.")
+                                break  # Exit the loop as the process has terminated
+                    time.sleep(0.1)
+            except Exception as e:
+                logger.error(f"Exception in read_stderr.CameraAudioStream: {self.camera_name}: {e}", exc_info=True)
+                break
 
