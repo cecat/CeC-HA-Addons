@@ -30,6 +30,8 @@
 #             
 #
 
+import os
+import fcntl
 import select
 import subprocess
 import threading
