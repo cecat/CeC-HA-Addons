@@ -8,23 +8,20 @@
 import time
 import logging
 from yamcam_functions import (
-        start_mqtt, analyze_audio_waveform,
-        report, rank_sounds, set_mqtt_client, update_sound_window
+    start_mqtt, analyze_audio_waveform,
+    report, rank_sounds, set_mqtt_client, update_sound_window
 )
 import yamcam_config  # all setup and config happens here
 from yamcam_config import logger
-from camera_audio_stream import CameraAudioStream  # Ensure this import is added
+from yamcam_supervisor import CameraStreamSupervisor  # Import the supervisor
 
 #----- Initialize MQTT client ---#
 mqtt_client = start_mqtt()
 set_mqtt_client(mqtt_client)
 
-
 #----------- PULL things we need from CONFIG -------------#
-#            (see config for definitions)
-             ## cameras = sound sources
+# (see config for definitions)
 camera_settings = yamcam_config.camera_settings
-             ## MQTT settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
 #----------- Hub for sound stream analysis within each thread -----------#
@@ -39,18 +36,11 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
     else:
         logger.error(f"FAILED to analyze audio: {camera_name}")
 
-
 ############# Main #############
 
-# Create and start streams for each camera
-
-streams = []
-for camera_name, camera_config in camera_settings.items():
-    rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
-    logger.debug(f"Creating CameraAudioStream: {camera_name}: {rtsp_url}")
-    stream = CameraAudioStream( camera_name, rtsp_url, analyze_callback)
-    stream.start()
-    streams.append(stream)
+# Create and start streams using the supervisor
+supervisor = CameraStreamSupervisor(camera_settings, analyze_callback)
+supervisor.start_all_streams()
 
 # Keep the main thread alive
 try:
@@ -58,7 +48,6 @@ try:
         time.sleep(1)  # Sleep to keep the main thread running
 except KeyboardInterrupt:
     logger.info("******------> STOPPING ALL audio streams...")
-    for stream in streams:
-        stream.stop()
+    supervisor.stop_all_streams()
     logger.info("All audio streams stopped. Exiting.")
 

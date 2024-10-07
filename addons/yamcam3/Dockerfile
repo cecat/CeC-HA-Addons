@@ -21,6 +21,7 @@ COPY yamcam.py .
 COPY yamcam_functions.py .
 COPY yamcam_config.py .
 COPY camera_audio_stream.py .
+COPY yamcam_supervisor.py .
 
 # Set entrypoint
 CMD ["python", "yamcam.py"]

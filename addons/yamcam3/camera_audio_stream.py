@@ -51,18 +51,21 @@ class CameraAudioStream:
     def __init__(self, camera_name, rtsp_url, analyze_callback):
         try:
             logger.info(f"Initializing CameraAudioStream: {camera_name}")
+            self.camera_name = camera_name
+            self.rtsp_url = rtsp_url
+            self.analyze_callback = analyze_callback
+            self.process = None
+            self.thread = None
+            self.stderr_thread = None
+            self.running = False
+            self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
+            self.lock = threading.Lock()
             self.interpreter = tflite.Interpreter(model_path=model_path)
             self.interpreter.allocate_tensors()
             self.input_details = self.interpreter.get_input_details()
             self.output_details = self.interpreter.get_output_details()
-            self.camera_name = camera_name
-            self.rtsp_url = rtsp_url
-            self.process = None
-            self.thread = None
-            self.running = False
-            self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
-            self.lock = threading.Lock()
-            self.analyze_callback = analyze_callback
+            self.should_reconnect = False
+            self.last_reconnect_attempt = None  # Timestamp of the last reconnection attempt
 
             # ffmpeg command
             self.command = [
@@ -91,25 +94,6 @@ class CameraAudioStream:
             if self.running:
                 return  # Prevent double-starting
 
-            # construct the FFMPEG command to stream audio from the RTSP path
-            command = [
-                'ffmpeg',
-                '-rtsp_transport', 'tcp',
-                '-i', self.rtsp_url,
-                '-f', 's16le',
-                '-acodec', 'pcm_s16le',
-                '-ac', '1',
-                '-ar', '16000',
-                '-reorder_queue_size', '0',
-                '-use_wallclock_as_timestamps', '1',
-                '-probesize', '50M',
-                '-analyzeduration', '10M',
-                '-max_delay', '500000',
-                '-flags', 'low_delay',
-                '-fflags', 'nobuffer',
-                '-'
-            ]
-
             try:
                 self.process = subprocess.Popen(
                     self.command,
@@ -119,7 +103,7 @@ class CameraAudioStream:
                 )
                 self.running = True
 
-                # Start this thread to read from the FFMPEG stream 
+                # Start threads to read from the FFmpeg stream and stderr
                 self.thread = threading.Thread(target=self.read_stream, daemon=True)
                 self.thread.start()
                 self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
@@ -131,7 +115,6 @@ class CameraAudioStream:
                 logger.error(f"Exception in start.CameraAudioStream: {self.camera_name}: {e}")
                 self.running = False
 
-
     def read_stderr(self):
         noisy_keywords = {"bitrate", "speed"}
         while self.running:
@@ -140,30 +123,31 @@ class CameraAudioStream:
                     stderr_output = self.process.stderr.read(1024).decode()
                     if stderr_output and not any(keyword in stderr_output for keyword in noisy_keywords):
                         logger.debug(f"FFmpeg stderr: {self.camera_name}: {stderr_output}")
-                else: #pause before continuing
+                else:
                     time.sleep(0.1)
             except Exception as e:
                 logger.error(f"Exception in read-stderr.CameraAudioStream: {self.camera_name}: {e}")
-                break # stop the thread if process is terminated
+                break  # stop the thread if process is terminated
 
-
-    def stop(self):
+    def stop(self, should_reconnect=False):
         with self.lock:
             if not self.running:
                 return
             self.running = False
+            self.should_reconnect = should_reconnect  # for supervisor
             if self.process:
                 self.process.terminate()
                 self.process.wait()
                 self.process = None
             logger.info(f"******-->STOP audio stream: {self.camera_name}.")
+            # Wait for threads to finish
+            if self.thread:
+                self.thread.join()
+            if self.stderr_thread:
+                self.stderr_thread.join()
 
     def read_stream(self):
         raw_audio = b""
-        restart_attempts = 0
-        max_restarts = 5
-        restart_delay = 5  # seconds
-
         while self.running:
             try:
                 while len(raw_audio) < self.buffer_size:
@@ -176,37 +160,20 @@ class CameraAudioStream:
                             # Handle EOF or process termination
                             return_code = self.process.poll()
                             if return_code is not None:
-                                logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}. Attempting to restart.")
-                                restart_attempts += 1
-                                if restart_attempts <= max_restarts:
-                                    self.restart_process()
-                                    time.sleep(restart_delay)
-                                    raw_audio = b""
-                                    break  # Break inner loop to restart reading
-                                else:
-                                    logger.error(f"{self.camera_name}: Max restart attempts reached ({max_restarts}). Stopping stream.")
-                                    self.stop()
-                                    return
+                                logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}.")
+                                self.stop(should_reconnect=True)
+                                return
                             else:
                                 logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
-                                # Optionally, restart process or wait before retrying
                                 time.sleep(1)
                                 continue
                         else:
                             raw_audio += chunk
                     else:
                         # Timeout occurred; handle accordingly
-                        logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg. Attempting to restart.")
-                        restart_attempts += 1
-                        if restart_attempts <= max_restarts:
-                            self.restart_process()
-                            time.sleep(restart_delay)
-                            raw_audio = b""
-                            break  # Break inner loop to restart reading
-                        else:
-                            logger.error(f"{self.camera_name}: Max restart attempts reached ({max_restarts}). Stopping stream.")
-                            self.stop()
-                            return
+                        logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg.")
+                        self.stop(should_reconnect=True)
+                        return
 
                 if len(raw_audio) < self.buffer_size:
                     logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
@@ -221,47 +188,13 @@ class CameraAudioStream:
                             self.input_details,
                             self.output_details
                         )
-                    # Reset restart attempts after successful read
-                    restart_attempts = 0
 
             except Exception as e:
                 logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}")
                 logger.error(f"--->{self.camera_name}: Error reading stream: {e}")
-                self.stop()
+                self.stop(should_reconnect=True)
                 return  # Exit the method to stop the thread
 
             finally:
                 raw_audio = b""
-
-
-
-    def restart_process(self):
-        self.stop_ffmpeg_process()
-        time.sleep(1)  # Short delay before restarting
-        self.start_ffmpeg_process()
-        logger.info(f"{self.camera_name}: FFmpeg process restarted.")
-
-    def stop_ffmpeg_process(self):
-        if self.process:
-            self.process.terminate()
-            try:
-                self.process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                logger.warning(f"{self.camera_name}: FFmpeg process did not terminate. Killing process.")
-                self.process.kill()
-                self.process.wait()
-            self.process = None
-
-    def start_ffmpeg_process(self):
-        # Reinitialize the FFmpeg process
-        self.process = subprocess.Popen(
-            self.command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            bufsize=10**8
-        )
-            # Set stdout to non-blocking mode
-        fd = self.process.stdout.fileno()
-        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-        fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
 
