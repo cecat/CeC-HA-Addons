@@ -111,12 +111,13 @@ class CameraAudioStream:
                 self.stderr_thread.start()
 
                 logger.info(f"START audio stream: {self.camera_name}.")
+                time.sleep(2) # give it 2 seconds to fire up
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Exception during start: {e}")
                 self.running = False
                 self.should_reconnect = True  # Ensure the supervisor continues reconnection attempts
-                # Optionally, notify the supervisor
+                # Notify the supervisor
                 self.supervisor.stream_stopped(self.camera_name)
 
 
