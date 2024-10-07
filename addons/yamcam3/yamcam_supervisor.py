@@ -139,7 +139,7 @@ class CameraStreamSupervisor:
                         sleep_time = max(1, int(next_check))
                     else:
                         sleep_time = 1  # Default sleep time
-                logger.debug(f"Supervisor sleeping for {sleep_time} seconds.")
+                #logger.debug(f"Supervisor sleeping for {sleep_time} seconds.")
                 time.sleep(sleep_time)
             except Exception as e:
                 logger.error(f"Exception in supervisor monitor_streams: {e}", exc_info=True)
