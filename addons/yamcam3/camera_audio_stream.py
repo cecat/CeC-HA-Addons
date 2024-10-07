@@ -168,9 +168,9 @@ class CameraAudioStream:
                 self.process = None
             logger.info(f"******-->STOP audio stream: {self.camera_name}.")
             # Wait for threads to finish
-            if self.thread:
+            if self.thread and self.thread != current_thread:
                 self.thread.join()
-            if self.stderr_thread:
+            if self.stderr_thread and self.stderr_thread != current_thread:
                 self.stderr_thread.join()
             # Inform supervisor that the stream has stopped
         if should_reconnect:
