@@ -36,8 +36,6 @@
 #
 
 import os
-import fcntl
-import select
 import subprocess
 import threading
 import numpy as np
@@ -64,8 +62,6 @@ class CameraAudioStream:
             self.interpreter.allocate_tensors()
             self.input_details = self.interpreter.get_input_details()
             self.output_details = self.interpreter.get_output_details()
-            self.should_reconnect = False
-            self.last_reconnect_attempt = None  # Timestamp of the last reconnection attempt
             self.supervisor = supervisor
 
             # ffmpeg command
@@ -112,48 +108,12 @@ class CameraAudioStream:
 
                 logger.info(f"START audio stream: {self.camera_name}.")
 
-                # *** Changes start here ***
-
-                # Wait briefly to check if process is still running
-                time.sleep(2)  # Wait 2 seconds
-                return_code = self.process.poll()
-                if return_code is not None:
-                    logger.error(f"{self.camera_name}: FFmpeg process exited immediately with return code {return_code}.")
-                    self.running = False
-                    self.should_reconnect = True
-                    # Notify the supervisor
-                    self.supervisor.stream_stopped(self.camera_name)
-                    # Raise an exception to indicate failure
-                    raise Exception(f"FFmpeg process exited with return code {return_code}")
-                elif not self.running:
-                    logger.error(f"{self.camera_name}: Stream stopped shortly after starting.")
-                    self.should_reconnect = True
-                    self.supervisor.stream_stopped(self.camera_name)
-                    raise Exception("Stream stopped immediately after starting.")
-
-                # *** Changes end here ***
-
             except Exception as e:
                 logger.error(f"{self.camera_name}: Exception during start: {e}", exc_info=True)
                 self.running = False
-                self.should_reconnect = True  # Ensure the supervisor continues reconnection attempts
-                # Notify the supervisor
                 self.supervisor.stream_stopped(self.camera_name)
 
-
-    def read_stderr(self):
-        noisy_keywords = {"bitrate", "speed"}
-        while self.running:
-            try:
-                if self.process and self.process.stderr:
-                    stderr_output = self.process.stderr.read(1024).decode()
-                    if stderr_output and not any(keyword in stderr_output for keyword in noisy_keywords):
-                        logger.debug(f"FFmpeg stderr: {self.camera_name}: {stderr_output}")
-                else:
-                    time.sleep(0.1)
-            except Exception as e:
-                logger.error(f"Exception in read-stderr.CameraAudioStream: {self.camera_name}: {e}")
-                break  # stop the thread if process is terminated
+    # Rest of the methods remain mostly the same, removing references to should_reconnect
 
     def stop(self):
         with self.lock:
@@ -174,6 +134,8 @@ class CameraAudioStream:
         # Inform supervisor that the stream has stopped
         self.supervisor.stream_stopped(self.camera_name)
 
+    # Ensure that read_stream calls self.stop() when appropriate
+
     def read_stream(self):
         raw_audio = b""
         while self.running:
@@ -189,7 +151,7 @@ class CameraAudioStream:
                             return_code = self.process.poll()
                             if return_code is not None:
                                 logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}.")
-                                self.stop(should_reconnect=True)
+                                self.stop()
                                 return
                             else:
                                 logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
@@ -200,26 +162,24 @@ class CameraAudioStream:
                     else:
                         # Timeout occurred; handle accordingly
                         logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg.")
-                        self.stop(should_reconnect=True)
+                        self.stop()
                         return
 
-                if len(raw_audio) < self.buffer_size:
-                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. Total buffer size: {len(raw_audio)}")
-                else:
-                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                    waveform = np.squeeze(waveform)
-                    if self.analyze_callback:
-                        self.analyze_callback(
-                            self.camera_name,
-                            waveform,
-                            self.interpreter,
-                            self.input_details,
-                            self.output_details
-                        )
+                # Process raw_audio
+                waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
+                waveform = np.squeeze(waveform)
+                if self.analyze_callback:
+                    self.analyze_callback(
+                        self.camera_name,
+                        waveform,
+                        self.interpreter,
+                        self.input_details,
+                        self.output_details
+                    )
 
             except Exception as e:
                 logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}", exc_info=True)
-                self.stop(should_reconnect=True)
+                self.stop()
                 return  # Exit the method to stop the thread
 
             finally:
