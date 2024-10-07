@@ -28,6 +28,11 @@
 #             results that can be sent (via the report function in yamnet_functions.py)
 #             to Home Assistant via MQTT.
 #             
+#        restart_process(self):
+#
+#        stop_ffmpeg_process(self):
+#
+#        start_ffmpeg_process(self):
 #
 
 import os
@@ -152,41 +157,6 @@ class CameraAudioStream:
                 self.process.wait()
                 self.process = None
             logger.info(f"******-->STOP audio stream: {self.camera_name}.")
-
-    def OLD_read_stream(self):
-        raw_audio = b""
-
-        while self.running:
-            try:
-                while len(raw_audio) < self.buffer_size:
-                    chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
-                    if not chunk:
-                        logger.error(f"Exception in read_stream.CameraAudioStream: "
-                                     f"{self.camera_name}: Failed to read additional data.")
-
-                        break
-                    raw_audio += chunk
-
-                if len(raw_audio) < self.buffer_size:
-                    logger.error(f"--->{self.camera_name}: Incomplete audio capture. "
-                                              f"Total buffer size: {len(raw_audio)}")
-                else:
-                    waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
-                    waveform = np.squeeze(waveform)
-                    if self.analyze_callback:
-                        self.analyze_callback(self.camera_name, waveform,
-                                              self.interpreter, self.input_details,
-                                              self.output_details)
-
-
-            except Exception as e:
-                logger.error(f"Exception in read_stream.CameraAudioStream: {self.camera_name}: {e}")
-                logger.error(f"--->{self.camera_name}: Error reading stream: {e}")
-                self.stop()
-
-            finally:
-                raw_audio = b""
-
 
     def read_stream(self):
         raw_audio = b""
