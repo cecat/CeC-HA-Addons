@@ -48,12 +48,15 @@ class CameraStreamSupervisor:
         camera_config = self.camera_configs.get(camera_name)
         if camera_config:
             rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
-            stream = CameraAudioStream(camera_name, rtsp_url, self.analyze_callback, self)
-            stream.start()
-            self.streams[camera_name] = stream
-            logger.info(f"Started stream for {camera_name}.")
+            try:
+                stream = CameraAudioStream(camera_name, rtsp_url, self.analyze_callback, self)
+                stream.start()
+                self.streams[camera_name] = stream
+                logger.info(f"Started stream for {camera_name}.")
+            except Exeption as e:
+                logger.error(f"{camera_name}: Failed to start stream {e}", exc_info=True)
         else:
-            logger.error(f"No configuration found for camera {camera_name}.")
+            logger.error(f"{camera_name}: No configuration found.")
 
     def stop_all_streams(self):
         with self.lock:
@@ -67,7 +70,7 @@ class CameraStreamSupervisor:
     def monitor_streams(self):
         logger.info("Supervisor monitoring started.")
         while self.running:
-            time.sleep(300)  # Sleep for 5 minutes
+            time.sleep(300)  # Sleep for 5m, make sure all streams are good, restart any dead ones
             with self.lock:
                 for camera_name in self.camera_configs.keys():
                     stream = self.streams.get(camera_name)
