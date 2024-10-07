@@ -56,6 +56,26 @@ class CameraAudioStream:
             self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
             self.lock = threading.Lock()
             self.analyze_callback = analyze_callback
+
+            # ffmpeg command
+            self.command = [
+                'ffmpeg',
+                '-rtsp_transport', 'tcp',
+                '-i', self.rtsp_url,
+                '-f', 's16le',
+                '-acodec', 'pcm_s16le',
+                '-ac', '1',
+                '-ar', '16000',
+                '-reorder_queue_size', '0',
+                '-use_wallclock_as_timestamps', '1',
+                '-probesize', '50M',
+                '-analyzeduration', '10M',
+                '-max_delay', '500000',
+                '-flags', 'low_delay',
+                '-fflags', 'nobuffer',
+                '-'
+            ]
+
         except Exception as e:
             logger.error(f"Exception in __init__.CameraAudioStream {self.camera_name}: {e}")
 
@@ -85,7 +105,7 @@ class CameraAudioStream:
 
             try:
                 self.process = subprocess.Popen(
-                    command,
+                    self.command,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
                     bufsize=0
