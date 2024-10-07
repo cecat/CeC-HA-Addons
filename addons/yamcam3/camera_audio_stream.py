@@ -7,20 +7,20 @@
 #
 #  Methods:
 #
-#         def __init__(self, camera_name, rtsp_url, analyze_callback)
+#         __init__(self, camera_name, rtsp_url, analyze_callback)
 #             Set up thread
 #
-#         def start(self)
+#         start(self)
 #             Start thread - set up FFMPEG to stream with proper settings
 #
-#         def read_stderr(self)
+#         read_stderr(self)
 #             Monitor stderr for messages from FFMPEG which can be informational
 #             or errors, but FFMPEG does not provide a code to differentiate between them.
 #
-#         def stop(self)
+#         stop(self)
 #             Stop thread
 #
-#         def read_stream(self)
+#         read_stream(self)
 #             Continuously pull data from FFMPEG stream.  When a 31,200 byte segment
 #             is in hand, convert to a form that YAMNet can classify.
 #             Pass the waveform to analyze_callback (in yamnet.py) which
@@ -129,11 +129,15 @@ class CameraAudioStream:
         noisy_keywords = {"bitrate", "speed"}
         while self.running:
             try:
-                stderr_output = self.process.stderr.read(1024).decode()
-                if stderr_output and not any(keyword in stderr_output for keyword in noisy_keywords):
-                    logger.debug(f"FFmpeg stderr: {self.camera_name}: {stderr_output}")
+                if self.process and self.process.stderr:
+                    stderr_output = self.process.stderr.read(1024).decode()
+                    if stderr_output and not any(keyword in stderr_output for keyword in noisy_keywords):
+                        logger.debug(f"FFmpeg stderr: {self.camera_name}: {stderr_output}")
+                else: #pause before continuing
+                    time.sleep(0.1)
             except Exception as e:
                 logger.error(f"Exception in read-stderr.CameraAudioStream: {self.camera_name}: {e}")
+                break # stop the thread if process is terminated
 
 
     def stop(self):
