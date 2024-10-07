@@ -188,7 +188,7 @@ class CameraAudioStream:
 
             try:
                 line = stderr.readline()
-                if line and ffmpeg_debug::
+                if line and ffmpeg_debug:
                     logger.debug(f"FFmpeg stderr: {self.camera_name}: "
                                  f"{line.decode('utf-8', errors='replace')}")
                 else:
