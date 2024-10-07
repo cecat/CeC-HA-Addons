@@ -1,13 +1,12 @@
 #
 # yamcam3 - CeC September 2024
-# (add streaming and threads)
 #
 # yamcam_functions.py - Functions for yamcam3
 # 
 #
+#  ### Communications via MQTT
 #
-#  Functions used by Yamnet
-#
+#         set_mqtt_client(client):
 #
 #         on_connect(client, userdata, flags, rc, properties=None)
 #             Set up thread
@@ -19,10 +18,14 @@
 #             Report via MQTT using topic prefix from configuration yaml file and
 #             with a JSON payload.
 #
+#  ### Analyse the waveform using YAMNet
+#
 #         analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
 #             Check waveform for compatibility with YAMNet interpreter, invoke the
 #             intepreter, and return scores (a [1,521] array of scores, ordered per the
 #             YAMNet class map CSV (files/yamnet_class_map.csv)
+#
+#  ### Ranking and Scoring Sounds
 #
 #         rank_sounds(scores, camera_name)
 #             Use noise_threshold to toss out very low scores; take the top_k highest
@@ -46,14 +49,12 @@
 #             composite score is 0.95 (unless the highest scoring class within the group 
 #             is higher).
 #
-#  ### New Functions for Sound Event Detect
+#  ### Sound Event Detection
 #
 #          update_sound_window(camera_name, detected_sounds)
 #             Set up sliding window for detecting start/end sound events
 #             
 #          report_event(camera_name, sound_class, event_type, timestamp)
-#
-#          set_mqtt_client(client)
 #
 
 import time
@@ -73,17 +74,10 @@ logger = yamcam_config.logger
 mqtt_client = None # will initialize in yamcam.py and set via a function
 
 # State management for sound event detection
-
 sound_windows = {}        # {camera_name: {sound_class: deque}}
 active_sounds = {}        # {camera_name: {sound_class: bool}}
 last_detection_time = {}  # {camera_name: {sound_class: timestamp}}
 state_lock = threading.Lock()
-#
-# for heavy debug early on; relevant code commented out for the moment
-#
-saveWave_path = '/config/waveform.npy'
-saveWave_dir = os.path.dirname(saveWave_path)
-
 
 ############# COMMUNICATIONS ##############
 
@@ -93,14 +87,12 @@ def set_mqtt_client(client):
     global mqtt_client
     mqtt_client = client
 
-
     #----- Make sure we are Connected before Sending -----#
 
 def on_connect(client, userdata, flags, rc, properties=None):
     
     if rc != 0:
         logger.error("FAILED to connect to MQTT broker. Check MQTT settings.")
-
 
     #----- CONNECT to Broker (host) -----#
 
@@ -131,7 +123,6 @@ def start_mqtt():
 
     return mqtt_client  
 
-
     #----- REPORT via MQTT -----#
 
 def report(results, mqtt_client, camera_name):
@@ -140,7 +131,13 @@ def report(results, mqtt_client, camera_name):
 
     if mqtt_client.is_connected():
         try:
-            formatted_results = [{'class': r['class'], 'score': float(f"{r['score']:.2f}")} for r in results]
+            formatted_results = [
+                {
+                    'class': r['class'],
+                    'score': float(f"{r['score']:.2f}")
+                }
+                for r in results
+            ]
 
             payload = {
                 'camera_name': camera_name,
@@ -148,12 +145,8 @@ def report(results, mqtt_client, camera_name):
             }
 
             payload_json = json.dumps(payload)
-
             logger.debug(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
-
             result = mqtt_client.publish( f"{mqtt_topic_prefix}", payload_json)
-
-            # Comment out for debugging
             result.wait_for_publish()
 
             if result.rc == mqtt.MQTT_ERR_SUCCESS:
