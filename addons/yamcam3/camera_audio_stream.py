@@ -36,7 +36,7 @@ import logging
 import time
 import tflite_runtime.interpreter as tflite
 import select  # <-- Added missing import
-from yamcam_config import logger, model_path
+from yamcam_config import logger, model_path, ffmpeg_debug
 
 class CameraAudioStream:
 
@@ -188,7 +188,7 @@ class CameraAudioStream:
 
             try:
                 line = stderr.readline()
-                if line:
+                if line and ffmpeg_debug::
                     logger.debug(f"FFmpeg stderr: {self.camera_name}: "
                                  f"{line.decode('utf-8', errors='replace')}")
                 else:

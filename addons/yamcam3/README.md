@@ -87,6 +87,8 @@ general:
   top_k: 10                     # Number of top scoring classes to analyze (default 10)
   log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
+  ffmpeg_debug: false           # Log ffmpeg stderr (a firehose - includes errors and info)
+                                #   Must also have log_level set to DEBUG
 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
@@ -153,6 +155,9 @@ we ignore classes with confidence levels below *noise_threshold*.
 - **log_level**: Level of detail to be logged. Levels are
 DEBUG->INFO->WARNING->ERROR->CRITICAL
 in order of decreasing verbosity.
+
+- **ffmpeg_debug**: Logs all messages to ffmpeg stderr, which have no codes nor does ffmpeg
+differentiate between info and errors - so it's a firehose (coming from all n sources)
 
 **MQTT configuration variables**
 
