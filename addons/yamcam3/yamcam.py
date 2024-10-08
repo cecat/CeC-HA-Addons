@@ -45,14 +45,14 @@ def log_summary():
             with history_lock:
                 for camera_name, history in detected_sounds_history.items():
                     if not history:
-                        logger.info(f"{camera_name}: No history to report")
+                        logger.info(f"{camera_name} SUMMARY: No history to report")
                         continue  # No sounds detected for this camera
                     num_sounds = len(history)
                     # Get unique sound classes detected
                     sound_classes = set(sound_class for _, sound_class in history)
                     # Sort the sound classes for consistent output
                     sound_list = ', '.join(sorted(sound_classes))
-                    logger.info(f"{camera_name}: {num_sounds} sounds detected "
+                    logger.info(f"{camera_name} SUMMARY: {num_sounds} sounds detected "
                                 f"in past {summary_interval} min: {sound_list}")
         except Exception as e:
             logger.error(f"Exception in log_summary: {e}", exc_info=True)
