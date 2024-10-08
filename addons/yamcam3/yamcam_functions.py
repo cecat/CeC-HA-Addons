@@ -205,7 +205,6 @@ def rank_sounds(scores, camera_name):
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
     sounds_filters = yamcam_config.sounds_filters
-    exclude_groups = general_settings.get('exclude_groups', []) #group to ignore
 
     # Step 1: Filter out scores below noise_threshold
     filtered_scores = [
