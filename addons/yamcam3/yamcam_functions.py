@@ -78,6 +78,11 @@ logger = yamcam_config.logger
 detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
 history_lock = threading.Lock()
 
+# Decay counter data structure for detecting sound event termination
+# Stores decay counters for each active sound class per camera
+decay_counters = {}  # Structure: {camera_name: {sound_class: remaining_chunks}}
+
+
 mqtt_client = None # will initialize in yamcam.py and set via a function
 
 # State management for sound event detection
@@ -316,10 +321,12 @@ def update_sound_window(camera_name, detected_sounds ):
             sound_windows[camera_name] = {}
             active_sounds[camera_name] = {}
             last_detection_time[camera_name] = {}
+            decay_counters[camera_name] = {}  # Initialize decay_counters for the camera
 
         window = sound_windows[camera_name]
         active = active_sounds[camera_name]
         last_time = last_detection_time[camera_name]
+        decay_camera = decay_counters[camera_name]
 
         for sound_class in yamcam_config.sounds_to_track:
             # Initialize deque for sound class
@@ -338,16 +345,22 @@ def update_sound_window(camera_name, detected_sounds ):
             if window[sound_class].count(True) >= yamcam_config.persistence:
                 if not active.get(sound_class, False):
                     active[sound_class] = True
+                    decay_counters[camera_name][sound_class] = yamcam_config.decay
                     report_event(camera_name, sound_class, 'start', current_time)
                     logger.info(f"{camera_name}: Sound '{sound_class}' started.")
             else:
-                # Check for stop event
+                # Check for stop event using decay counters
                 if active.get(sound_class, False):
-                    elapsed_chunks = len([d for d in window[sound_class] if not d])
-                    if elapsed_chunks >= yamcam_config.decay:
-                        active[sound_class] = False
-                        report_event(camera_name, sound_class, 'stop', current_time)
-                        logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
+                    if sound_class in detected_sounds:
+                        # Reset decay counter if sound is detected
+                        decay_counters[camera_name][sound_class] = yamcam_config.decay
+                    else:
+                        # Decrement decay counter if sound is not detected
+                        decay_counters[camera_name][sound_class] -= 1
+                        if decay_counters[camera_name][sound_class] <= 0:
+                            active[sound_class] = False
+                            report_event(camera_name, sound_class, 'stop', current_time)
+                            logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
 
     # Update detected sounds history for summaries
     with history_lock:
@@ -361,10 +374,9 @@ def update_sound_window(camera_name, detected_sounds ):
             history.append((current_time, sound_class))
 
         # Remove old detections beyond the summary interval
-        cutoff_time = current_time - (summary_interval * 60)
+        cutoff_time = current_time - (yamcam_config.summary_interval_minutes * 60)
         while history and history[0][0] < cutoff_time:
             history.popleft()
-
 
     #----- Report Sound Event -----#
 
