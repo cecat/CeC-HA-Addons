@@ -374,7 +374,7 @@ def update_sound_window(camera_name, detected_sounds ):
             history.append((current_time, sound_class))
 
         # Remove old detections beyond the summary interval
-        cutoff_time = current_time - (yamcam_config.summary_interval_minutes * 60)
+        cutoff_time = current_time - (yamcam_config.summary_interval * 60)
         while history and history[0][0] < cutoff_time:
             history.popleft()
 
