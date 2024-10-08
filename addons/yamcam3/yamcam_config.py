@@ -51,7 +51,7 @@ default_min_score    = general_settings.get('default_min_score', 0.5)
 top_k                = general_settings.get('top_k', 10)
 ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
 exclude_groups       = general_settings.get('exclude_groups', []) #group to ignore
-summary_interval     = general_settings.get('summary_interval', []) # periodic reports (min)
+summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
 
 if not (0.0 <= default_min_score <= 1.0):
@@ -66,6 +66,8 @@ if not (0.0 <= noise_threshold <= 1.0):
     )
     noise_threshold = 0.1
         
+logger.info (f"Summary reports every {summary_interval} min.")
+
              ######## Sound Event Detection Settings ######## 
 try:
     events_settings = config['events']
