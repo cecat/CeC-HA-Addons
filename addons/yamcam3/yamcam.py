@@ -45,6 +45,7 @@ def log_summary():
             with history_lock:
                 for camera_name, history in detected_sounds_history.items():
                     if not history:
+                        logger.info("No history to report")
                         continue  # No sounds detected for this camera
                     num_sounds = len(history)
                     # Get unique sound classes detected
