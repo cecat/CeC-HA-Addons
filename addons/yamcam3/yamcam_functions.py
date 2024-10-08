@@ -211,7 +211,7 @@ def rank_sounds(scores, camera_name):
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
 
-    logger.debug(f"{camera_name}: {len(filtered_scores)} sounds found.")
+    logger.debug(f"{camera_name}: {len(filtered_scores)} seunds found:")
 
     if not filtered_scores:
         return []
@@ -230,7 +230,7 @@ def rank_sounds(scores, camera_name):
 
     # Log the group names and composite scores
     for group, score in limited_composite_scores:
-        logger.debug(f"{camera_name}: Group '{group}' has a composite score of {score:.2f}")
+        logger.debug(f"{camera_name}: ----->{group}: {score:.2f}")
 
     # Step 4: Apply min_score filters and prepare results
     results = []
