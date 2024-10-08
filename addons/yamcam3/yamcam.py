@@ -41,7 +41,7 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
 def log_summary():
     while True:
         try:
-            time.sleep(summary_interval_minutes * 60)  # Sleep for the specified interval
+            time.sleep(summary_interval * 60)  # Sleep for the specified interval
             with history_lock:
                 for camera_name, history in detected_sounds_history.items():
                     if not history:
@@ -52,7 +52,7 @@ def log_summary():
                     # Sort the sound classes for consistent output
                     sound_list = ', '.join(sorted(sound_classes))
                     logger.info(f"{camera_name}: {num_sounds} sounds detected "
-                                f"in past {summary_interval_minutes} min: {sound_list}")
+                                f"in past {summary_interval} min: {sound_list}")
         except Exception as e:
             logger.error(f"Exception in log_summary: {e}", exc_info=True)
 
