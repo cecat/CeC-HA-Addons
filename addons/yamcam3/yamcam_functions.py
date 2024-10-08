@@ -67,9 +67,16 @@ import numpy as np
 import logging
 import json
 import yamcam_config
-from yamcam_config import interpreter, input_details, output_details, logger, exclude_groups
+from yamcam_config import (
+        interpreter, input_details, output_details, logger,
+        exclude_groups, summary_interval
+)
 
 logger = yamcam_config.logger
+
+# Initialize global data structures for summary reporting
+detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
+history_lock = threading.Lock()
 
 mqtt_client = None # will initialize in yamcam.py and set via a function
 
@@ -301,9 +308,8 @@ def calculate_composite_scores(group_scores_dict):
 
 def update_sound_window(camera_name, detected_sounds ):
 
+    current_time = time.time()
     with state_lock:
-
-        current_time = time.time()
 
         # Initialize if not present
         if camera_name not in sound_windows:
@@ -342,6 +348,22 @@ def update_sound_window(camera_name, detected_sounds ):
                         active[sound_class] = False
                         report_event(camera_name, sound_class, 'stop', current_time)
                         logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
+
+    # Update detected sounds history for summaries
+    with history_lock:
+        # Initialize deque if not present
+        if camera_name not in detected_sounds_history:
+            detected_sounds_history[camera_name] = deque()
+        history = detected_sounds_history[camera_name]
+
+        # Add current detections with timestamp
+        for sound_class in detected_sounds:
+            history.append((current_time, sound_class))
+
+        # Remove old detections beyond the summary interval
+        cutoff_time = current_time - (summary_interval * 60)
+        while history and history[0][0] < cutoff_time:
+            history.popleft()
 
 
     #----- Report Sound Event -----#
