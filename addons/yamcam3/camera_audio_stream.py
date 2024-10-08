@@ -127,7 +127,6 @@ class CameraAudioStream:
         self.supervisor.stream_stopped(self.camera_name)
 
 
-
     def read_stream(self):
         raw_audio = b""
         while self.running:
@@ -143,7 +142,6 @@ class CameraAudioStream:
                     if ready:
                         chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                         if not chunk:
-                            # Handle EOF or process termination
                             with self.lock:
                                 return_code = self.process.poll()
                             if return_code is not None:
@@ -157,7 +155,6 @@ class CameraAudioStream:
                         else:
                             raw_audio += chunk
                     else:
-                        # Timeout occurred; handle accordingly
                         logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg. Stopping thread.")
                         self.stop()
                         return
@@ -181,6 +178,8 @@ class CameraAudioStream:
 
             finally:
                 raw_audio = b""
+
+
 
 
     def read_stderr(self):

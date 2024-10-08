@@ -9,6 +9,7 @@ import time
 import threading
 import logging
 import signal
+import sys
 from yamcam_functions import (
     start_mqtt, analyze_audio_waveform,
     report, rank_sounds, set_mqtt_client, update_sound_window,
@@ -30,12 +31,16 @@ mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 #----------- Handle add-on stop gracefully ---------------#
 #            (using our KeyboardInterrupt code)
 
-def handle_termination(signum, frame):
-    raise KeyboardInterrupt
 
-         #--- register the signal handler ---#
-signal.signal(signal.SIGINT, handle_termination)
-signal.signal(signal.SIGTERM, handle_termination)
+def shutdown(signum, frame):
+    logger.info("******------> STOPPING ALL audio streams...")
+    supervisor.stop_all_streams()
+    logger.info("All audio streams stopped. Exiting.")
+    sys.exit(0)
+
+# Register the shutdown handler for SIGINT and SIGTERM
+signal.signal(signal.SIGINT, shutdown)
+signal.signal(signal.SIGTERM, shutdown)
 
 
 #----------- Hub for sound stream analysis within each thread -----------#
