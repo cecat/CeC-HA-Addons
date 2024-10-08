@@ -33,7 +33,12 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
 
     if scores is not None:
         results = rank_sounds(scores, camera_name)
-        detected_sounds = [result['class'] for result in results if result['class'] in yamcam_config.sounds_to_track]
+        detected_sounds = [
+            result['class']
+            for result in results
+            if result['class'] in yamcam_config.sounds_to_track
+        ]
+
         update_sound_window(camera_name, detected_sounds)
     else:
         logger.error(f"FAILED to analyze audio: {camera_name}")
@@ -43,17 +48,25 @@ def log_summary():
         try:
             time.sleep(summary_interval * 60)  # Sleep for the specified interval
             with history_lock:
+                summary_lines = []
                 for camera_name, history in detected_sounds_history.items():
                     if not history:
-                        logger.info(f"{camera_name} SUMMARY: No history to report")
+                        summary_lines.append(f"{camera_name} : No history to report")
                         continue  # No sounds detected for this camera
                     num_sounds = len(history)
                     # Get unique sound classes detected
                     sound_classes = set(sound_class for _, sound_class in history)
                     # Sort the sound classes for consistent output
                     sound_list = ', '.join(sorted(sound_classes))
-                    logger.info(f"{camera_name} SUMMARY: {num_sounds} sounds detected "
-                                f"in past {summary_interval} min: {sound_list}")
+                    summary_lines.append(f"{camera_name} : {num_sounds} sounds in "
+                                         f"past {summary_interval} min: {sound_list}")
+
+                if summary_lines:
+                    # Create a multi-line summary with indentation
+                    formatted_summary = "\n    ".join(summary_lines)
+                    logger.info(f"Summary:\n    {formatted_summary}")
+                else:
+                    logger.info("Summary: No history to report for any camera.")
         except Exception as e:
             logger.error(f"Exception in log_summary: {e}", exc_info=True)
 
