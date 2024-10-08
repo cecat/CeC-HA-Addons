@@ -60,7 +60,8 @@
 import time
 from datetime import datetime
 import threading
-import collections
+#import collections
+from collections import deque
 import paho.mqtt.client as mqtt
 import os
 import numpy as np
