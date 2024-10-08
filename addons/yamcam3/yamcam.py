@@ -9,7 +9,7 @@ import time
 import logging
 from yamcam_functions import (
     start_mqtt, analyze_audio_waveform,
-    report, rank_sounds, set_mqtt_client, update_sound_window
+    report, rank_sounds, set_mqtt_client, update_sound_window,
     detected_sounds_history, history_lock 
 )
 import yamcam_config  # all setup and config happens here
