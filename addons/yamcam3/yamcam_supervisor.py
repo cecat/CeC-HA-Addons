@@ -61,7 +61,8 @@ class CameraStreamSupervisor:
     def stop_all_streams(self):
         with self.lock:
             self.running = False
-            for stream in self.streams.values():
+            # Iterate over a copy of the streams to avoid modification during iteration
+            for stream in list(self.streams.values()):
                 stream.stop()
             logger.info("All audio streams stopped.")
         self.supervisor_thread.join()
