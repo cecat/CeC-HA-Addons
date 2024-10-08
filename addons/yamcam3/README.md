@@ -89,6 +89,9 @@ general:
                                 # DEBUG->INFO->WARNING->ERROR->CRITICAL 
   ffmpeg_debug: false           # Log ffmpeg stderr (a firehose - includes errors and info)
                                 #   Must also have log_level set to DEBUG
+  exclude_groups:               # Groups we don't want to report (or log), e.g., 
+    - group1                    #   the 'silence' group can be noisy...
+    - group2
 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
@@ -159,6 +162,11 @@ in order of decreasing verbosity.
 - **ffmpeg_debug**: Logs all messages to ffmpeg stderr, which have no codes nor does ffmpeg
 differentiate between info and errors - so it's a firehose (coming from all n sources)
 
+- **exclude_groups**: An optional list of groups to exclude from event detection and logging.
+The *silence* group is quite frequently detected, for instance, and is a bit redundant relative to
+nothing being reported.  See **Sounds and Filters** below for a list of groups.
+
+
 **MQTT configuration variables**
 
 - **host**: Typically this will be the hostname or IP address for your Home Assistant server.
@@ -184,19 +192,20 @@ configuration file), with the detected sound classes as the payload to this topi
 **Sounds and Filters**
 
 These are structured similarly to Frigate configuration. Nothing will be reported if no sound
-groups are listed here. If no min_score is set for a group, the general setting *default_min_score* is used.
-are not set.
+groups are listed here. If no min_score is set for a group, the general setting *default_min_score*
+is used.
 
 The sounds yaml group allows you to select the specific sound groups you want to track
 and (optionally) set thresholds for each.  Available sound groups are:
 - aircraft
-- alert (e.g., sirens, alarms, ringtones, loud pops...)
+- alert (e.g., sirens, alarms, loud bangs...)
 - animals
 - birds
 - construction (e.g., banging, sawing...)
 - insects
 - music
-- people
+- people (e.g., laughter, coughing, speaking, ringtones, doorbells...)
+- silence
 - vehicles
 - weather
 
