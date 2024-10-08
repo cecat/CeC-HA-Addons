@@ -211,7 +211,7 @@ def rank_sounds(scores, camera_name):
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
 
-    logger.debug(f"{camera_name}: {len(filtered_scores)} sounds found:")
+    logger.debug(f"{camera_name}: {len(filtered_scores)} classes found:")
         # Log individual classes and their scores before grouping
     for i, score in filtered_scores:
         class_name = class_names[i]
