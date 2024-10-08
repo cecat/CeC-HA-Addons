@@ -216,7 +216,7 @@ def rank_sounds(scores, camera_name):
     for i, score in filtered_scores:
         class_name = class_names[i]
         group = class_name.split('.')[0]  # Get the group prefix
-        if group in excluded_groups:
+        if group in exclude_groups:
             continue  # Skip logging this class from an excluded group
         logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
 
@@ -238,7 +238,7 @@ def rank_sounds(scores, camera_name):
 
     # Log the group names and composite scores
     for group, score in limited_composite_scores:
-        if group in excluded_groups:
+        if group in exclude_groups:
             continue # Skip logging this group
         logger.debug(f"{camera_name}: ----->{group}: {score:.2f}")
 
