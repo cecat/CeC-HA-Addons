@@ -60,7 +60,6 @@
 import time
 from datetime import datetime
 import threading
-#import collections
 from collections import deque
 import paho.mqtt.client as mqtt
 import os
@@ -325,7 +324,7 @@ def update_sound_window(camera_name, detected_sounds ):
         for sound_class in yamcam_config.sounds_to_track:
             # Initialize deque for sound class
             if sound_class not in window:
-                window[sound_class] = collections.deque(maxlen=yamcam_config.window_detect)
+                window[sound_class] = deque(maxlen=yamcam_config.window_detect)
 
             # Update detections
             is_detected = sound_class in detected_sounds
