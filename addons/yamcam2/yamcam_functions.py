@@ -209,6 +209,16 @@ def rank_sounds (scores, group_classes, camera_name):
     top_class_indices = np.argsort(scores)[::-1]
     top_class_indices = [i for i in top_class_indices[:top_k] if scores[i] >= noise_threshold]
 
+#debug for compare
+    logger.debug(f"{camera_name}: {len(top_class_indices)} classes found:")
+        # Log individual classes and their scores before grouping
+    for i, score in top_class_indices:
+        class_name = class_names[i]
+        logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
+#debug for compare
+
+    
+
     for i in top_class_indices[:top_k]:  # Log only top_k scores
         logger.debug(f"{camera_name}:{class_names[i]} {scores[i]:.2f}")
 
