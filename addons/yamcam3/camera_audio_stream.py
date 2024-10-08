@@ -126,35 +126,39 @@ class CameraAudioStream:
         # Inform supervisor that the stream has stopped
         self.supervisor.stream_stopped(self.camera_name)
 
+
+
     def read_stream(self):
         raw_audio = b""
         while self.running:
             try:
                 while len(raw_audio) < self.buffer_size:
-                    fd = self.process.stdout.fileno()
+                    with self.lock:
+                        if not self.running or not self.process or not self.process.stdout:
+                            logger.debug(f"{self.camera_name}: Process terminated or not running. Exiting read_stream.")
+                            return  # Exit if the process is no longer available
+                        fd = self.process.stdout.fileno()
                     # Wait up to 5 seconds for data to become available
                     ready, _, _ = select.select([fd], [], [], 5)
                     if ready:
                         chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                         if not chunk:
                             # Handle EOF or process termination
-                            return_code = self.process.poll()
+                            with self.lock:
+                                return_code = self.process.poll()
                             if return_code is not None:
-                                logger.error(f"{self.camera_name}: FFmpeg process terminated "
-                                             f"with return code {return_code}.")
+                                logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}.")
                                 self.stop()
                                 return
                             else:
-                                logger.error(f"{self.camera_name}: No data read from FFmpeg "
-                                              "stdout, but process is still running.")
+                                logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
                                 time.sleep(1)
                                 continue
                         else:
                             raw_audio += chunk
                     else:
                         # Timeout occurred; handle accordingly
-                        logger.error(f"{self.camera_name}: Timeout waiting for data from "
-                                      "FFmpeg. Stopping thread.")
+                        logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg. Stopping thread.")
                         self.stop()
                         return
 
@@ -177,6 +181,7 @@ class CameraAudioStream:
 
             finally:
                 raw_audio = b""
+
 
     def read_stderr(self):
         # Continuously read FFmpeg's stderr to prevent buffer blockage
