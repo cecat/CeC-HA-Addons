@@ -6,6 +6,7 @@
 #
 
 import time
+import threading
 import logging
 from yamcam_functions import (
     start_mqtt, analyze_audio_waveform,
