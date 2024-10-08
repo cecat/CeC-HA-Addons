@@ -212,6 +212,11 @@ def rank_sounds(scores, camera_name):
     ]
 
     logger.debug(f"{camera_name}: {len(filtered_scores)} sounds found:")
+        # Log individual classes and their scores before grouping
+    for i, score in filtered_scores:
+        class_name = class_names[i]
+        logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
+
 
     if not filtered_scores:
         return []
