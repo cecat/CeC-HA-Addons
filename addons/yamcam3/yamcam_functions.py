@@ -67,7 +67,7 @@ import numpy as np
 import logging
 import json
 import yamcam_config
-from yamcam_config import interpreter, input_details, output_details, logger
+from yamcam_config import interpreter, input_details, output_details, logger, exclude_groups
 
 logger = yamcam_config.logger
 
@@ -205,6 +205,7 @@ def rank_sounds(scores, camera_name):
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
     sounds_filters = yamcam_config.sounds_filters
+    exclude_groups = general_settings.get('exclude_groups', []) #group to ignore
 
     # Step 1: Filter out scores below noise_threshold
     filtered_scores = [
@@ -215,6 +216,9 @@ def rank_sounds(scores, camera_name):
         # Log individual classes and their scores before grouping
     for i, score in filtered_scores:
         class_name = class_names[i]
+        group = class_name.split('.')[0]  # Get the group prefix
+        if group in EXCLUDED_GROUPS:
+            continue  # Skip logging this class from an excluded group
         logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
 
 
@@ -235,6 +239,8 @@ def rank_sounds(scores, camera_name):
 
     # Log the group names and composite scores
     for group, score in limited_composite_scores:
+        if group in excluded_groups:
+            continue # Skip logging this group
         logger.debug(f"{camera_name}: ----->{group}: {score:.2f}")
 
     # Step 4: Apply min_score filters and prepare results

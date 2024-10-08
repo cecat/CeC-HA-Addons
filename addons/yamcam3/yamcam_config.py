@@ -50,6 +50,8 @@ noise_threshold      = general_settings.get('noise_threshold', 0.1)
 default_min_score    = general_settings.get('default_min_score', 0.5)
 top_k                = general_settings.get('top_k', 10)
 ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
+exclude_groups       = general_settings.get('exclude_groups', []) #group to ignore
+
 
 if not (0.0 <= default_min_score <= 1.0):
     logger.warning(f"Invalid default_min_score '{defult_min_score}'"
