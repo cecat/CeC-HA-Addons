@@ -108,5 +108,6 @@ try:
 finally:
     logger.info("******------> STOPPING ALL audio streams...")
     supervisor.stop_all_streams()
+    time.sleep(1) # pause for queued log messages to chirp
     logger.info("All audio streams stopped. Exiting.")
-
+    logging.shutdown() # make sure all logs are flushed

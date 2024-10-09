@@ -24,6 +24,8 @@
 #
 #
 
+# yamcam_supervisor.py
+
 import threading
 import time
 from camera_audio_stream import CameraAudioStream
@@ -52,7 +54,7 @@ class CameraStreamSupervisor:
                 stream = CameraAudioStream(camera_name, rtsp_url, self.analyze_callback, self)
                 stream.start()
                 self.streams[camera_name] = stream
-                logger.debug(f"Started stream for {camera_name}.")
+                logger.info(f"Started stream for {camera_name}.")
             except Exception as e:
                 logger.error(f"{camera_name}: Failed to start stream {e}", exc_info=True)
         else:
@@ -61,17 +63,24 @@ class CameraStreamSupervisor:
     def stop_all_streams(self):
         with self.lock:
             self.running = False
+            logger.info("******------> STOPPING ALL audio streams...")
             # Iterate over a copy to avoid modification during iteration
             for stream in list(self.streams.values()):
-                stream.stop()
-            logger.info("All audio streams stopped.")
-        self.supervisor_thread.join()
-        logger.info("Supervisor thread stopped.")
+                try:
+                    stream.stop()
+                except Exception as e:
+                    logger.error(f"Error stopping stream {stream.camera_name}: {e}", exc_info=True)
+            logger.info("All audio streams have been requested to stop.")
+        try:
+            self.supervisor_thread.join(timeout=5)  # Wait up to 5 seconds for supervisor_thread to finish
+            logger.info("Supervisor thread stopped.")
+        except Exception as e:
+            logger.error(f"Error stopping supervisor thread: {e}", exc_info=True)
 
     def monitor_streams(self):
         logger.info("Supervisor monitoring started.")
         while self.running:
-            time.sleep(60)  # Sleep for 1m, make sure all streams are good, restart any dead ones
+            time.sleep(60)  # Sleep for 1 minute
             with self.lock:
                 for camera_name in self.camera_configs.keys():
                     stream = self.streams.get(camera_name)
@@ -83,6 +92,7 @@ class CameraStreamSupervisor:
     def stream_stopped(self, camera_name):
         logger.info(f"Stream {camera_name} has stopped.")
         # Remove the stopped stream from the dictionary
-        if camera_name in self.streams:
-            del self.streams[camera_name]
+        with self.lock:
+            if camera_name in self.streams:
+                del self.streams[camera_name]
 
