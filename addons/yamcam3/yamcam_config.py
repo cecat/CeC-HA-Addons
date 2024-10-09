@@ -15,7 +15,7 @@ import os
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-sound_log_path = '/media/yamcam/sound_log.txt'
+sound_log_path = '/config/sound_log.txt'
 
 ##################### Set up Logging ################# 
 
