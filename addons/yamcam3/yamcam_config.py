@@ -14,7 +14,7 @@ import tflite_runtime.interpreter as tflite
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-sound_log_path = '/media/yamcam'
+sound_log_path = '/media/yamcam/sound_log.txt'
 
 ##################### Set up Logging ################# 
 
@@ -29,13 +29,17 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # set up additional logging to a file for later analysis
-file_handler = logging.FileHandler(sound_log_path, mode='a') #always append
-file_handler.setLevel(logging.DEBUG) # hard coding logfile to DEBUG
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
+try:
+    file_handler = logging.FileHandler(sound_log_path, mode='a')  # always append
+    file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
 
-# Add the file handler to the logger
-logger.addHandler(file_handler)
+    # Add the file handler to the logger
+    logger.addHandler(file_handler)
+
+except Exception as e:
+    logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
 
 
 
