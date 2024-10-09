@@ -85,6 +85,8 @@ class CameraAudioStream:
             if self.running:
                 return  # Prevent double-starting
 
+            logger.debug(f"START audio stream: {self.camera_name}.")
+
             try:
                 self.process = subprocess.Popen(
                     self.command,
@@ -99,8 +101,6 @@ class CameraAudioStream:
                 self.thread.start()
                 self.stderr_thread = threading.Thread(target=self.read_stderr, daemon=True)
                 self.stderr_thread.start()
-
-                logger.info(f"START audio stream: {self.camera_name}.")
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Exception during start: {e}", exc_info=True)
