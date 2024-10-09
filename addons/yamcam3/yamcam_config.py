@@ -29,6 +29,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # set up additional logging to a file for later analysis
+logger.info(f"Open (or create) sound_log file ({sound_log_path})for sound history analysis.")
 try:
     file_handler = logging.FileHandler(sound_log_path, mode='a')  # always append
     file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
@@ -37,6 +38,7 @@ try:
 
     # Add the file handler to the logger
     logger.addHandler(file_handler)
+    logger.info(f"Logging to {sound_log_path}).")
 
 except Exception as e:
     logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
