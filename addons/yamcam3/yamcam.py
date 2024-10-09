@@ -13,7 +13,7 @@ import sys
 from yamcam_functions import (
     start_mqtt, analyze_audio_waveform,
     report, rank_sounds, set_mqtt_client, update_sound_window,
-    detected_sounds_history, history_lock 
+    detected_sounds_history, history_lock
 )
 import yamcam_config  # all setup and config happens here
 from yamcam_config import logger, summary_interval
@@ -28,20 +28,19 @@ set_mqtt_client(mqtt_client)
 camera_settings = yamcam_config.camera_settings
 mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
-#----------- Handle add-on stop gracefully ---------------#
-#            (using our KeyboardInterrupt code)
+# Global variable to keep track of running state
+running = True
 
+#----------- Handle add-on stop gracefully ---------------#
 
 def shutdown(signum, frame):
-    logger.info("******------> STOPPING ALL audio streams...")
-    supervisor.stop_all_streams()
-    logger.info("All audio streams stopped. Exiting.")
-    sys.exit(0)
+    global running
+    logger.info(f"Received signal {signum}, shutting down...")
+    running = False  # Set flag to stop the main loop and threads
 
 # Register the shutdown handler for SIGINT and SIGTERM
 signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)
-
 
 #----------- Hub for sound stream analysis within each thread -----------#
 
@@ -61,9 +60,12 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
         logger.error(f"FAILED to analyze audio: {camera_name}")
 
 def log_summary():
-    while True:
+    while running:
         try:
             time.sleep(summary_interval * 60)  # Sleep for the specified interval
+            if not running:
+                break  # Exit if the shutdown flag is set
+
             with history_lock:
                 summary_lines = []
                 for camera_name, history in detected_sounds_history.items():
@@ -99,11 +101,11 @@ summary_thread = threading.Thread(target=log_summary, daemon=True)
 summary_thread.start()
 logger.info("Summary logging thread started.")
 
-# Keep the main thread alive
+# Keep the main thread alive and handle shutdown cleanly
 try:
-    while True:
-        time.sleep(1)  # Sleep to keep the main thread running
-except KeyboardInterrupt:
+    while running:
+        time.sleep(1)  # Keep the main thread running
+finally:
     logger.info("******------> STOPPING ALL audio streams...")
     supervisor.stop_all_streams()
     logger.info("All audio streams stopped. Exiting.")
