@@ -9,7 +9,6 @@ import logging
 import tflite_runtime.interpreter as tflite
 import os
 
-
 # File paths
 
 config_path = '/config/microphones.yaml'
@@ -29,20 +28,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# set up additional logging to a file for later analysis
-logger.info(f"Open (or create) sound_log file ({sound_log_path})for sound history analysis.")
-try:
-    file_handler = logging.FileHandler(sound_log_path, mode='a')  # always append
-    file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-
-    # Add the file handler to the logger
-    logger.addHandler(file_handler)
-    logger.info(f"Logging to {sound_log_path}).")
-
-except Exception as e:
-    logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
 
 
 
@@ -65,6 +50,7 @@ except KeyError as e:
     raise
 
 log_level            = general_settings.get('log_level', 'INFO').upper()
+logfile              = general_settings.get('logfile', False)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 default_min_score    = general_settings.get('default_min_score', 0.5)
 top_k                = general_settings.get('top_k', 10)
@@ -85,6 +71,22 @@ if not (0.0 <= noise_threshold <= 1.0):
     )
     noise_threshold = 0.1
         
+
+# set up additional logging to a file for later analysis
+if logfile:
+    logger.info(f"Open (or create) sound_log file ({sound_log_path})for sound history analysis.")
+    try:
+        file_handler = logging.FileHandler(sound_log_path, mode='a')  # always append
+        file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        # Add the file handler to the logger
+        logger.addHandler(file_handler)
+        logger.info(f"Logging to {sound_log_path}).")
+    except Exception as e:
+        logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
+
+
 logger.info (f"Summary reports every {summary_interval} min.")
 
              ######## Sound Event Detection Settings ######## 
