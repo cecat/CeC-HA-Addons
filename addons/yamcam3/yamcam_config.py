@@ -8,6 +8,7 @@ import csv
 import logging
 import tflite_runtime.interpreter as tflite
 import os
+import time
 
 # File paths
 
@@ -29,9 +30,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-
-
 logger.info("\n-----------> YamCam3 STARTING <-----------  \n")
+time.sleep(1) # see if we can fix out-of-order log messages with a slight pause
 
 ##################### Get Configuration ################# 
 
@@ -41,6 +41,7 @@ try:
 except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
+
 
              ######### general settings ######## 
 try:
