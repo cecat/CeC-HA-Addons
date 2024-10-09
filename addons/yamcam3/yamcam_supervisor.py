@@ -52,7 +52,7 @@ class CameraStreamSupervisor:
                 stream = CameraAudioStream(camera_name, rtsp_url, self.analyze_callback, self)
                 stream.start()
                 self.streams[camera_name] = stream
-                logger.info(f"Started stream for {camera_name}.")
+                logger.debug(f"Started stream for {camera_name}.")
             except Exception as e:
                 logger.error(f"{camera_name}: Failed to start stream {e}", exc_info=True)
         else:
