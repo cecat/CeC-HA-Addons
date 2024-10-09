@@ -55,7 +55,7 @@ summary_interval     = general_settings.get('summary_interval', 5 ) # periodic r
 
 
 if not (0.0 <= default_min_score <= 1.0):
-    logger.warning(f"Invalid default_min_score '{defult_min_score}'"
+    logger.warning(f"Invalid default_min_score '{default_min_score}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.5."
     )
     default_min_score = 0.5

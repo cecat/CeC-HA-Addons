@@ -53,7 +53,7 @@ class CameraStreamSupervisor:
                 stream.start()
                 self.streams[camera_name] = stream
                 logger.info(f"Started stream for {camera_name}.")
-            except Exeption as e:
+            except Exception as e:
                 logger.error(f"{camera_name}: Failed to start stream {e}", exc_info=True)
         else:
             logger.error(f"{camera_name}: No configuration found.")
