@@ -29,11 +29,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Log current user and permissions for /media/yamcam
-logger.info(f"Current user: {os.geteuid()}")
-logger.info(f"Permissions for /media/yamcam: {os.stat('/media/yamcam')}")
-
-
 # set up additional logging to a file for later analysis
 logger.info(f"Open (or create) sound_log file ({sound_log_path})for sound history analysis.")
 try:
