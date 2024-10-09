@@ -14,6 +14,7 @@ import tflite_runtime.interpreter as tflite
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
+sound_log_path = '/media/yamcam'
 
 ##################### Set up Logging ################# 
 
@@ -26,6 +27,17 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
+
+# set up additional logging to a file for later analysis
+file_handler = logging.FileHandler(sound_log_path, mode='a') #always append
+file_handler.setLevel(logging.DEBUG) # hard coding logfile to DEBUG
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+
+# Add the file handler to the logger
+logger.addHandler(file_handler)
+
+
 
 logger.info("\n-----------> YamCam3 STARTING <-----------  \n")
 
@@ -135,7 +147,9 @@ log_levels = {
 if log_level in log_levels:
     logger.setLevel(log_levels[log_level])
     for handler in logger.handlers:
-        handler.setLevel(log_levels[log_level])
+        #add for file log to stay at DEBUG
+        if not isinstance(handler, logging.FileHandler):  # Skip file handler
+            handler.setLevel(log_levels[log_level])
     logger.info(f"Logging level: {log_level}")
 else:
     logger.warning(f"Invalid log level {log_level}; Defaulting to INFO.")
