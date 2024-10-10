@@ -43,6 +43,9 @@ class ShutdownFilter(logging.Filter):
 for handler in logger.handlers:
     handler.addFilter(ShutdownFilter())
 
+##################### Announce startup ################# 
+
+logger.info("\n\nYAMCAM3 Started|n|n")
 
 ##################### Get Configuration ################# 
 
