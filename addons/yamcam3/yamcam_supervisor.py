@@ -65,9 +65,12 @@ class CameraStreamSupervisor:
 
     def stop_all_streams(self):
         with self.lock:
+            if not self.running:
+                return  # Already stopped
             self.running = False
-            self.shutdown_event.set() # set the shutdown flag
-            logger.info("******------> STOPPING ALL audio streams...")
+            if not self.shutdown_event.is_set():
+                self.shutdown_event.set()  # Set shutdown flag
+                logger.info("******------> STOPPING ALL audio streams...")
             # Iterate over a copy to avoid modification during iteration
             for stream in list(self.streams.values()):
                 try:

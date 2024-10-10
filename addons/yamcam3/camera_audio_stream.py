@@ -118,7 +118,9 @@ class CameraAudioStream:
                 self.process.terminate()
                 self.process.wait()
                 self.process = None
-            logger.info(f"******-->STOP audio stream: {self.camera_name}.")
+            if not self.shutdown_event.is_set():
+                logger.info(f"******-->STOP audio stream: {self.camera_name}.")
+
             # Wait for threads to finish
             current_thread = threading.current_thread()
             if self.thread and self.thread != current_thread:
@@ -157,9 +159,13 @@ class CameraAudioStream:
                         else:
                             raw_audio += chunk
                     else:
-                        logger.error(f"{self.camera_name}: Timeout waiting for data from FFmpeg. Stopping thread.")
-                        self.stop()
-                        return
+    # No data ready, select timed out
+                        if self.shutdown_event.is_set() or not self.running:
+                            logger.debug(f"{self.camera_name}: Shutdown detected. Exiting read_stream.")
+                            return
+                        else:
+                            # No data yet, continue waiting for data
+                            continue
 
                 # Process raw_audio
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
@@ -180,8 +186,6 @@ class CameraAudioStream:
 
             finally:
                 raw_audio = b""
-
-
 
 
     def read_stderr(self):
