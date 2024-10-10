@@ -1,38 +1,34 @@
 # Camera-sounds add-on for Home Assistant
 
-# THIS ADD-ON IS "Beta"
-
 This project uses TensorFlow Lite and the
 [YAMNet sound model](https://www.tensorflow.org/hub/tutorials/yamnet)
 to characterize sounds deteced by  microphones on networked cameras.
 *It does not record or keep any sound samples after analyzing them*. It
-takes brief (see settings) samples using FFMPEG and scores sound types 
-detected, based on a YAMnet's 520 sound classes.
+continually takes 0.975s samples from RTSP feeds, using FFMPEG, and
+pushes these samples to the YAMNet sound classifier model, which
+returns scores for each of its 521 sound classes.
 
-The project relies on MQTT for communicating with Home Assistant.
+The project uses MQTT to communicate *sound events* to  Home Assistant,
+where the parameters for determining the start and stop of a sound event
+are configurable.
 
-Designed as a Home Assistant addon, this version follows
-[Yamcam2](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam2),
-which is useful to monitor sound sources (microphones on cameras, or other
-rtsp sources) to get a feel for what sounds your microphones are picking up.
-Yamcam2 and this addon do the following:
-1. Analyze sound (in ~1s chunks) using Yamnet, which produces scores for each
+The add-on does the following (*italics* parameters are configurable)::
+
+1. Analyze sound (in 0.975s chunks) using YAMNet, which produces scores for each
    of 521 sound classes.
 2. Filter out all but the *top_k* sounds whose scores exceed *noise_threshold*.
 3. Aggregate those *top_k* scoring sound classes into groups such as "people," "music",
-   "insects," or "birds." This uses a custom yamnet_class_map.csv where each
-   of the 521 native classes has been grouped and renamed as *groupname*.*classname*.
-4. Assign a composite score to each group, based on the scores (that made the
-   *top_k* cut) of the individual yamnet classes within that group.
+   "insects," or "birds." This uses a modified yamnet_class_map.csv where each
+   of the 521 native classes has been grouped and renamed as groupname.classname.
+4. Assign a composite score to each group with classes that appear in the *top_k*,
+   based on the individual scores of the classes from that group that are detected
+   in the *top_k*. 
+5. Detects the start and end of "sound events" defined by three configurable
+   parameters (see configuration instructions below).
+6. Reports sound event start/stop to Home Assistant via MQTT.
 
-Yamnet3 differs from Yamnet2 in the following ways:
-1. Rather than polling sources by temporarily opening FFMPEG for a sample
-   duration, we open a continous ffmpeg stream to each source, read and analyzed
-   within a separate thread.
-2. Instead of continually reporting what sound classes are being detected, we
-   move toward something more like Frigate, where we report when a sound class
-   forms a "sound event" that starts and ends.  We use three parameters
-   (also in the config file) to define events, as outlined below.
+For longitudinal analysis, a log file can be created with all start/stop sound
+events, or (if log_level is set to DEBUG) all sound classes and groups detected.
 
 ## How to Use
 
@@ -52,7 +48,6 @@ of the **Manage add-on repositories** pop-up window and hit the blue **ADD** at 
 - The **CeC Home Assistant Add-ons** repository will appear in your Add-on Store; 
 Select the **YAMNet Camera Sounds** add-on.
 
-
 2. Manual Installation:
 
 - Download this repository (*https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam*)
@@ -68,30 +63,33 @@ MQTT username and password, and RTSP feeds. These will be the same feeds you use
 in Frigate (if you use Frigate), some of which may have embedded credentials
 (so treat this as a secrets file). 
 
-classes/scores reported.  Example:
-'''
-{
-    "camera_name": "pondcam",
-    "sound_class": "birds",
-    "event_type": "start",
-    "timestamp": "2024-10-03 16:46:29"
-}
-'''
+Note: if you are a Frigate user, you will find that you can copy/past your
+*mqtt* and *cameras* sections from your *frigate.yml* file.  The *sounds:* 
+section also follows the same syntax as the detection objects and optional 
+individual min_score thresholds (which override *default_min_store* for the
+associated groups).
 
 #### Sample Configuration File
 
 ```
 general:
-  noise_threshold: 0.1          # Filter out very very low scores
-  default_min_score: 0.5        # Default threshold for group scores (default 0.5)
-  top_k: 10                     # Number of top scoring classes to analyze (default 10)
-  log_level: DEBUG              # Default INFO. In order of decreasing verbosity:
-                                # DEBUG->INFO->WARNING->ERROR->CRITICAL 
-  ffmpeg_debug: false           # Log ffmpeg stderr (a firehose - includes errors and info)
-                                #   Must also have log_level set to DEBUG
-  exclude_groups:               # Groups we don't want to report (or log), e.g., 
-    - group1                    #   the 'silence' group can be noisy...
+  noise_threshold: 0.1       # Filter out very very low scores
+  default_min_score: 0.5     # Default threshold for group scores (default 0.5)
+                             # (must exceed this level for a sound event to be
+                             # detected as starting or continuing)
+  top_k: 10                  # Number of top scoring classes to analyze (default 10)
+  log_level: DEBUG           # Default INFO. In order of decreasing verbosity:
+                             # DEBUG->INFO->WARNING->ERROR->CRITICAL 
+  logfile: true              # dump all log messages to /config/sound_log.txt for offline
+                             #   analysis of trends (it gets big very fast, use carefully).
+                             #   Default is false
+  ffmpeg_debug: false        # Log ffmpeg stderr (a firehose - includes errors and info)
+                             #   Must also have log_level set to DEBUG
+  exclude_groups:            # Groups we don't want to report (or log), e.g., 
+    - group1                 #   the 'silence' group in particular can be noisy...
     - group2
+  summary_interval: 15       # log (INFO level) a summary every n minutes of the number
+                             #   of sound groups detected.
 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)

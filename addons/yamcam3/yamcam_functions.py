@@ -56,10 +56,12 @@
 #             
 #          report_event(camera_name, sound_class, event_type, timestamp)
 #
+#          log_summary()
+#
 
 import time
 from datetime import datetime
-import threading
+from threading import Lock
 from collections import deque
 import paho.mqtt.client as mqtt
 import os
@@ -77,6 +79,9 @@ logger = yamcam_config.logger
 # Initialize global data structures for summary reporting
 detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
 history_lock = threading.Lock()
+sound_event_tracker = {}
+sound_event_lock = Lock()
+event_counts = {}
 
 # Decay counter data structure for detecting sound event termination
 # Stores decay counters for each active sound class per camera
@@ -314,15 +319,12 @@ def calculate_composite_scores(group_scores_dict):
 
     return composite_scores
 
-
-
     #----- Manage Sound Event Window -----#
 
 def update_sound_window(camera_name, detected_sounds):
 
     if shutdown_event.is_set():
         return
-
 
     current_time = time.time()
     with state_lock:
@@ -333,11 +335,13 @@ def update_sound_window(camera_name, detected_sounds):
             active_sounds[camera_name] = {}
             last_detection_time[camera_name] = {}
             decay_counters[camera_name] = {}  # Initialize decay_counters for the camera
+            event_counts[camera_name] = {}    # Initialize event_counts for the camera
 
         window = sound_windows[camera_name]
         active = active_sounds[camera_name]
         last_time = last_detection_time[camera_name]
         decay_camera = decay_counters[camera_name]
+        counts = event_counts[camera_name]
 
         for sound_class in yamcam_config.sounds_to_track:
             # Initialize deque for sound class
@@ -356,7 +360,9 @@ def update_sound_window(camera_name, detected_sounds):
             if window[sound_class].count(True) >= yamcam_config.persistence:
                 if not active.get(sound_class, False):
                     active[sound_class] = True
-                    decay_counters[camera_name][sound_class] = yamcam_config.decay
+                    decay_camera[sound_class] = yamcam_config.decay
+                    # Increment the event count for this sound_class
+                    counts[sound_class] = counts.get(sound_class, 0) + 1
                     report_event(camera_name, sound_class, 'start', current_time)
                     if not shutdown_event.is_set():
                         logger.info(f"{camera_name}: Sound '{sound_class}' started.")
@@ -365,30 +371,16 @@ def update_sound_window(camera_name, detected_sounds):
                 if active.get(sound_class, False):
                     if sound_class in detected_sounds:
                         # Reset decay counter if sound is detected
-                        decay_counters[camera_name][sound_class] = yamcam_config.decay
+                        decay_camera[sound_class] = yamcam_config.decay
                     else:
                         # Decrement decay counter if sound is not detected
-                        decay_counters[camera_name][sound_class] -= 1
-                        if decay_counters[camera_name][sound_class] <= 0:
+                        decay_camera[sound_class] -= 1
+                        if decay_camera[sound_class] <= 0:
                             active[sound_class] = False
                             report_event(camera_name, sound_class, 'stop', current_time)
-                            logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
+                            if not shutdown_event.is_set():
+                                logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
 
-    # Update detected sounds history for summaries
-    with history_lock:
-        # Initialize deque if not present
-        if camera_name not in detected_sounds_history:
-            detected_sounds_history[camera_name] = deque()
-        history = detected_sounds_history[camera_name]
-
-        # Add current detections with timestamp
-        for sound_class in detected_sounds:
-            history.append((current_time, sound_class))
-
-        # Remove old detections beyond the summary interval
-        cutoff_time = current_time - (yamcam_config.summary_interval * 60)
-        while history and history[0][0] < cutoff_time:
-            history.popleft()
 
     #----- Report Sound Event -----#
 
@@ -421,4 +413,69 @@ def report_event(camera_name, sound_class, event_type, timestamp):
             logger.error(f"Exception: Failed to publish MQTT message: {e}")
     else:
         logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
+
+
+    #----- Generate Periodic summaries -----#
+
+def generate_summary():
+    logger.info("Summary:")
+    with state_lock:
+        for camera_name in yamcam_config.cameras:
+            counts = event_counts.get(camera_name, {})
+            total_events = sum(counts.values())
+            if total_events > 0:
+                groups = ', '.join(set(counts.keys()))
+                logger.info(f"    {camera_name} : {total_events} sounds in past {yamcam_config.n} min: {groups}")
+            else:
+                logger.info(f"    {camera_name} : No sounds detected in past {yamcam_config.n} min")
+
+        # Reset event counts after summary
+        for counts in event_counts.values():
+            counts.clear()
+
+
+    #----- Schedule Periodic summaries -----#
+
+def schedule_summary():
+    while not shutdown_event.is_set():
+        time.sleep(yamcam_config.summary_interval * 60)  # Wait for summary_interval minutes
+        generate_summary()
+
+
+    #----- Log a summary -----#
+
+# In yamcam_functions.py
+
+def log_summary():
+    while not shutdown_event.is_set():
+        try:
+            time.sleep(yamcam_config.summary_interval * 60)  # Sleep for the specified interval
+            if shutdown_event.is_set():
+                break  # Exit if the shutdown flag is set
+
+            with state_lock:
+                summary_lines = []
+                for camera_name in yamcam_config.camera_settings.keys():
+                    counts = event_counts.get(camera_name, {})
+                    total_events = sum(counts.values())
+                    if total_events > 0:
+                        groups = ', '.join(sorted(set(counts.keys())))
+                        summary_lines.append(f"{camera_name} : {total_events} sounds in "
+                                             f"past {yamcam_config.summary_interval} min: {groups}")
+                    else:
+                        summary_lines.append(f"{camera_name} : No sounds detected in past {yamcam_config.summary_interval} min")
+
+                if summary_lines:
+                    # Create a multi-line summary with indentation
+                    formatted_summary = "\n    ".join(summary_lines)
+                    logger.info(f"Summary:\n    {formatted_summary}")
+                else:
+                    logger.info("Summary: No sounds detected for any camera.")
+
+                # Reset event counts after summary
+                for counts in event_counts.values():
+                    counts.clear()
+
+        except Exception as e:
+            logger.error(f"Exception in log_summary: {e}", exc_info=True)
 

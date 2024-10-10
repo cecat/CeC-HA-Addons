@@ -18,7 +18,6 @@ action via an automation, and/or (b) track activities and conditions over time. 
 wish to turn lights on if people are detected, or an alarm goes off, or to keep track the
 use of a space over time.
 
-
 To make this easier, the classes have been grouped into categories.  In the modified
 *yamnet_class_map.csv* file, the display_names have been concatenated removing spaces
 and punctuation, then a group name is prepended with a "." delimeter.  For instance,
