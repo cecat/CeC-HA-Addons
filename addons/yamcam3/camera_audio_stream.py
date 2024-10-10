@@ -140,7 +140,7 @@ class CameraAudioStream:
                             return  # Exit if the process is no longer available
                         fd = self.process.stdout.fileno()
                     # Wait up to 5 seconds for data to become available
-                    ready, _, _ = select.select([fd], [], [], 1)
+                    ready, _, _ = select.select([fd], [], [], 5)
                     if ready:
                         chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                         if not chunk:
