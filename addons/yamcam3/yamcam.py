@@ -19,6 +19,9 @@ import yamcam_config  # all setup and config happens here
 from yamcam_config import logger, summary_interval
 from yamcam_supervisor import CameraStreamSupervisor  # Import the supervisor
 
+#----- Global shutdown event for clean shutdown ----------#
+shutdown_event = threading.Event()
+
 #----- Initialize MQTT client ---#
 mqtt_client = start_mqtt()
 set_mqtt_client(mqtt_client)
@@ -34,9 +37,15 @@ running = True
 #----------- Handle add-on stop gracefully ---------------#
 
 def shutdown(signum, frame):
-    global running
     logger.info(f"Received signal {signum}, shutting down...")
-    running = False  # Set flag to stop the main loop and threads
+    shutdown_event.set()  # Signal all threads to shut down
+    logger.info("******------> STOPPING ALL audio streams...")
+    supervisor.stop_all_streams()
+    time.sleep(1)  # Allow log messages to flush
+    logger.info("All audio streams stopped. Exiting.")
+    logging.shutdown()  # Ensure all logs are flushed
+    sys.exit(0)
+
 
 # Register the shutdown handler for SIGINT and SIGTERM
 signal.signal(signal.SIGINT, shutdown)
@@ -93,8 +102,9 @@ def log_summary():
 ############# Main #############
 
 # Create and start streams using the supervisor
-supervisor = CameraStreamSupervisor(camera_settings, analyze_callback)
+supervisor = CameraStreamSupervisor(camera_settings, analyze_callback, shutdown_event)
 supervisor.start_all_streams()
+
 
 # Start the summary logging thread
 summary_thread = threading.Thread(target=log_summary, daemon=True)

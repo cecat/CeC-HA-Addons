@@ -347,11 +347,11 @@ index,mid,display_name
 345,/t/dd00130,vehicles.engineStarting
 346,/m/07pb8fc,vehicles.idling
 347,/m/07q2z82,vehicles.acceleratingRevvingVroom
-348,/m/02dgv,doors.door
+348,/m/02dgv,domestic.door
 349,/m/03wwcy,alert.doorbell
 350,/m/07r67yg,alert.dingDong
 351,/m/02y_763,doors.slidingDoor
-352,/m/07rjzl8,doors.slam
+352,/m/07rjzl8,domestic.slam
 353,/m/07r4wb8,people.knock
 354,/m/07qcpgn,people.tap
 355,/m/07q6cd_,doors.squeak
@@ -363,7 +363,7 @@ index,mid,display_name
 361,/m/0dxrf,cooking.fryingFood
 362,/m/0fx9l,cooking.microwaveOven
 363,/m/02pjr4,cooking.blender
-364,/m/02jz0l,domestic.waterTapFaucet
+364,/m/02jz0l,water.waterTapFaucet
 365,/m/0130jx,domestic.sinkFillingOrWashing
 366,/m/03dnzn,domestic.bathtubFillingOrWashing
 367,/m/03wvsk,domestic.hairDryer
@@ -379,7 +379,7 @@ index,mid,display_name
 377,/m/05rj2,domestic.shufflingCards
 378,/m/0316dw,domestic.typing
 379,/m/0c2wf,domestic.typewriter
-380,/m/01m2v,domestic.computerKeyboard
+380,/m/01m2v,people.computerKeyboard
 381,/m/081rb,domestic.writing
 382,/m/07pp_mv,alert.alarm
 383,/m/07cx4,people.telephone
@@ -409,7 +409,7 @@ index,mid,display_name
 407,/m/025wky1,domestic.airConditioning
 408,/m/024dl,domestic.cashRegister
 409,/m/01m4t,domestic.printer
-410,/m/0dv5r,domestic.camera
+410,/m/0dv5r,people.camera
 411,/m/07bjf,people.singleLensReflexCamera
 412,/m/07k1x,construction.tools
 413,/m/03l9g,construction.hammer

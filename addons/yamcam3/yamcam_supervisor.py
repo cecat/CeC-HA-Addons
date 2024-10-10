@@ -32,9 +32,10 @@ from camera_audio_stream import CameraAudioStream
 from yamcam_config import logger
 
 class CameraStreamSupervisor:
-    def __init__(self, camera_configs, analyze_callback):
+    def __init__(self, camera_configs, analyze_callback, shutdown_event):
         self.camera_configs = camera_configs
         self.analyze_callback = analyze_callback
+        self.shutdown_event = shutdown_event # Store the shutdown event
         self.streams = {}  # {camera_name: CameraAudioStream}
         self.lock = threading.Lock()
         self.running = True
@@ -51,7 +52,9 @@ class CameraStreamSupervisor:
         if camera_config:
             rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
             try:
-                stream = CameraAudioStream(camera_name, rtsp_url, self.analyze_callback, self)
+                stream = CameraAudioStream(camera_name, rtsp_url,
+                           self.analyze_callback, self, self.shutdown_event)
+
                 stream.start()
                 self.streams[camera_name] = stream
                 logger.info(f"Started stream for {camera_name}.")
@@ -63,6 +66,7 @@ class CameraStreamSupervisor:
     def stop_all_streams(self):
         with self.lock:
             self.running = False
+            self.shutdown_event.set() # set the shutdown flag
             logger.info("******------> STOPPING ALL audio streams...")
             # Iterate over a copy to avoid modification during iteration
             for stream in list(self.streams.values()):
@@ -76,6 +80,7 @@ class CameraStreamSupervisor:
             logger.info("Supervisor thread stopped.")
         except Exception as e:
             logger.error(f"Error stopping supervisor thread: {e}", exc_info=True)
+
 
     def monitor_streams(self):
         logger.info("Supervisor monitoring started.")

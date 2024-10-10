@@ -40,15 +40,14 @@ from yamcam_config import logger, model_path, ffmpeg_debug
 
 class CameraAudioStream:
 
-    def __init__(self, camera_name, rtsp_url, analyze_callback, supervisor):
+    def __init__(self, camera_name, rtsp_url, analyze_callback, supervisor, shutdown_event):
         try:
             logger.info(f"Initializing CameraAudioStream: {camera_name}")
             self.camera_name = camera_name
             self.rtsp_url = rtsp_url
             self.analyze_callback = analyze_callback
-            self.process = None
-            self.thread = None
-            self.stderr_thread = None
+            self.supervisor = supervisor
+            self.shutdown_event = shutdown_event # store the shutdown event
             self.running = False
             self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
             self.lock = threading.Lock()
@@ -56,7 +55,10 @@ class CameraAudioStream:
             self.interpreter.allocate_tensors()
             self.input_details = self.interpreter.get_input_details()
             self.output_details = self.interpreter.get_output_details()
-            self.supervisor = supervisor
+            # leave these out???
+            self.stderr_thread = None
+            self.thread = None
+            self.process = None
 
             # ffmpeg command
             self.command = [
@@ -129,7 +131,7 @@ class CameraAudioStream:
 
     def read_stream(self):
         raw_audio = b""
-        while self.running:
+        while self.running and not self.shutdown_event.is_set():
             try:
                 while len(raw_audio) < self.buffer_size:
                     with self.lock:
@@ -138,7 +140,7 @@ class CameraAudioStream:
                             return  # Exit if the process is no longer available
                         fd = self.process.stdout.fileno()
                     # Wait up to 5 seconds for data to become available
-                    ready, _, _ = select.select([fd], [], [], 5)
+                    ready, _, _ = select.select([fd], [], [], 1)
                     if ready:
                         chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
                         if not chunk:
@@ -150,7 +152,7 @@ class CameraAudioStream:
                                 return
                             else:
                                 logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
-                                time.sleep(1)
+                                time.sleep(0.5)
                                 continue
                         else:
                             raw_audio += chunk
@@ -162,7 +164,7 @@ class CameraAudioStream:
                 # Process raw_audio
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                 waveform = np.squeeze(waveform)
-                if self.analyze_callback:
+                if self.analyze_callback and not self.shutdown_event.is_set():
                     self.analyze_callback(
                         self.camera_name,
                         waveform,
