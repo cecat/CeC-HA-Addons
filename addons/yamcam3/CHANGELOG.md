@@ -1,6 +1,18 @@
 
 # Changelog
 
+## 0.3.2
+- Clean up logging
+- Added a logfile capability for longitudinal analysis of sound activity
+- Implemented *sound events* as the reportable (via MQTT) measure, with 
+  start and end messages and settable parameters to define when to determine
+  an *event* has begun or ended.
+- Masked out FFMPEG stderr traffic from the rest of DEBUG logging, since FFMPEG
+  is verbose and has no codes to indicate the nature of its messages.
+- For logging, designed the INFO level to just track sound events while DEBUG
+  level will log all sound classes, groups, and events.
+- Added a summary report that every *summary_interval* minutes logs (INFO level)
+  how many sound events (and what sound groups) were detected for each source.
 ## 0.3.1
 - Overhaul how we use/report yamnet scores/detections.  In this version,
   we switch from capturing sound, analyzing, and reporting every n second intervals
