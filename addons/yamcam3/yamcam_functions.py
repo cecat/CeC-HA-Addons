@@ -80,7 +80,7 @@ logger = yamcam_config.logger
 detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
 history_lock = threading.Lock()
 sound_event_tracker = {}
-sound_event_lock = Lock()
+sound_event_lock = threading.Lock()
 event_counts = {}
 
 # Decay counter data structure for detecting sound event termination
