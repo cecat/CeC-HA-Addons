@@ -87,18 +87,18 @@ class CameraStreamSupervisor:
 
     def monitor_streams(self):
         logger.info("Supervisor monitoring started.")
-            while self.running and not self.shutdown_event.is_set():
-                time.sleep(60)  # Sleep for 1 minute
-                with self.lock:
-                    for camera_name in self.camera_configs.keys():
-                        if self.shutdown_event.is_set():
-                            break
-                        stream = self.streams.get(camera_name)
-                        if not stream or not stream.running:
-                            logger.info(f"{camera_name} stream not running. Attempting to restart.")
-                            self.start_stream(camera_name)
-            if not self.shutdown_event.is_set():
-                logger.info("Supervisor monitoring stopped.")
+        while self.running and not self.shutdown_event.is_set():
+            time.sleep(60)  # Sleep for 1 minute
+            with self.lock:
+                for camera_name in self.camera_configs.keys():
+                    if self.shutdown_event.is_set():
+                        break
+                    stream = self.streams.get(camera_name)
+                    if not stream or not stream.running:
+                        logger.info(f"{camera_name} stream not running. Attempting to restart.")
+                        self.start_stream(camera_name)
+        if not self.shutdown_event.is_set():
+            logger.info("Supervisor monitoring stopped.")
 
 
     def stream_stopped(self, camera_name):
