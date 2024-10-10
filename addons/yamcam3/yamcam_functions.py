@@ -224,20 +224,21 @@ def rank_sounds(scores, camera_name):
     class_names = yamcam_config.class_names
     sounds_filters = yamcam_config.sounds_filters
 
-    # Step 1: Filter out scores below noise_threshold
+
+# Step 1: Filter out scores below noise_threshold
     filtered_scores = [
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
 
     logger.debug(f"{camera_name}: {len(filtered_scores)} classes found:")
-        # Log individual classes and their scores before grouping
+    # Log individual classes and their scores before grouping
     for i, score in filtered_scores:
         class_name = class_names[i]
         group = class_name.split('.')[0]  # Get the group prefix
         if group in exclude_groups:
-            continue  # Skip logging this class from an excluded group
-        logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
-
+            logger.debug(f"{camera_name}:--> {class_name}: {score:.2f} (excluded_group)")
+        else:
+            logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
 
     if not filtered_scores:
         return []
