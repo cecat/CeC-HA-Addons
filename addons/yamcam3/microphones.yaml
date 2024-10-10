@@ -1,0 +1,69 @@
+# SAMPLE CONFIG FILE TO GET STARTED
+# 
+general:
+  noise_threshold: 0.1       # Filter out very very low scores
+  default_min_score: 0.5     # Default threshold for group scores (default 0.5)
+                             # (must exceed this level for a sound event to be
+                             # detected as starting or continuing)
+  top_k: 10                  # Number of top scoring classes to analyze (default 10)
+  log_level: DEBUG           # Default INFO. In order of decreasing verbosity:
+                             # DEBUG->INFO->WARNING->ERROR->CRITICAL 
+  logfile: true              # dump all log messages to /config/sound_log.txt for offline
+                             #   analysis of trends (it gets big very fast, use carefully).
+                             #   Default is false
+  ffmpeg_debug: false        # Log ffmpeg stderr (a firehose - includes errors and info)
+                             #   Must also have log_level set to DEBUG
+  exclude_groups:            # Groups we don't want to report (or log), e.g., 
+    - silence                 #   the 'silence' group in particular can be noisy...
+  summary_interval: 5       # log (INFO level) a summary every n minutes of the number
+                             #   of sound groups detected.
+
+mqtt:
+  host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
+  port: 1883                    # Default unless you specifically changed it in your broker
+  topic_prefix: "yamcam/sounds" # adjust to your taste
+  client_id: "yamcam"           # adjust to your taste (a "3" will be appended to avoid
+                                # colliding with Yamcam2 (which also uses this file) and
+                                # confusing MQTT.
+  user: "mymqttusername"        # your mqtt username on your broker (e.g., Home Asst server) 
+  password: "mymqttpassword"    #         & password
+
+# EVENTS (define 'event' parameters)
+events:
+  window_detect: 5              # Number of samples (~1s each) to examine to determine 
+                                #   if a sound is persistent.
+  persistence: 2                # Number of detections within window_detect to consider
+                                #   a sound event has started.
+  decay: 10                     # Number of waveforms without the sound to consider 
+                                #   the sound event has stopped.
+
+
+# SOURCES
+# examples of Amcrest and UniFi NVR camera rtsp feeds
+
+cameras:
+  doorfrontcam:
+    ffmpeg:
+      inputs:
+      - path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
+  frontyardcam:
+    ffmpeg:
+      inputs:
+      - path: "rtsp://x.x.x.x:7447/65dd5a1900f4cb70dffa2143_1"
+
+
+# sound groups to listen for, and optional individual thresholds (will override
+# reporting_threshold above in general settings). 
+sounds:                     
+  track:                    
+    - people
+    - birds
+    - alert
+  filters:
+    people:
+      min_score: 0.60
+    birds:
+      min_score: 0.70
+    alert:
+      min_score: 0.5
+
