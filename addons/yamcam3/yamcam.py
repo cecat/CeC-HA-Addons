@@ -13,7 +13,7 @@ import sys
 from yamcam_functions import (
     start_mqtt, analyze_audio_waveform,
     report, rank_sounds, set_mqtt_client, update_sound_window,
-    detected_sounds_history, history_lock
+    detected_sounds_history, history_lock, shutdown_event
 )
 import yamcam_config  # all setup and config happens here
 from yamcam_config import logger, summary_interval
@@ -56,19 +56,25 @@ signal.signal(signal.SIGTERM, shutdown)
 #----------- Hub for sound stream analysis within each thread -----------#
 
 def analyze_callback(camera_name, waveform, interpreter, input_details, output_details):
+    if shutdown_event.is_set():
+        return
     scores = analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details)
-
+    if shutdown_event.is_set():
+        return
     if scores is not None:
         results = rank_sounds(scores, camera_name)
+        if shutdown_event.is_set():
+            return
         detected_sounds = [
             result['class']
             for result in results
             if result['class'] in yamcam_config.sounds_to_track
         ]
-
         update_sound_window(camera_name, detected_sounds)
     else:
-        logger.error(f"FAILED to analyze audio: {camera_name}")
+        if not shutdown_event.is_set():
+            logger.error(f"FAILED to analyze audio: {camera_name}")
+
 
 def log_summary():
     while running:

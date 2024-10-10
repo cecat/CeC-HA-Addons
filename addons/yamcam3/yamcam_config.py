@@ -9,6 +9,7 @@ import logging
 import tflite_runtime.interpreter as tflite
 import os
 import time
+import threading
 
 # File paths
 
@@ -17,11 +18,16 @@ class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 sound_log_path = '/config/sound_log.txt'
 
+# Global shutdown event
+shutdown_event = threading.Event()
+
+
 ##################### Set up Logging ################# 
 
 # set logging to INFO and include timestamps
 # user can select different logging level via /config/microphones.yaml
 
+# logging configuration
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -29,9 +35,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Add the shutdown filter to all handlers
+class ShutdownFilter(logging.Filter):
+    def filter(self, record):
+        return not shutdown_event.is_set()
 
-logger.info("\n-----------> YamCam3 STARTING <-----------  \n")
-time.sleep(1) # see if we can fix out-of-order log messages with a slight pause
+for handler in logger.handlers:
+    handler.addFilter(ShutdownFilter())
+
 
 ##################### Get Configuration ################# 
 

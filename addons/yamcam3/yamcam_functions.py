@@ -69,7 +69,7 @@ import json
 import yamcam_config
 from yamcam_config import (
         interpreter, input_details, output_details, logger,
-        exclude_groups, summary_interval
+        exclude_groups, summary_interval, shutdown_event
 )
 
 logger = yamcam_config.logger
@@ -177,6 +177,9 @@ def report(results, mqtt_client, camera_name):
 
 def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details):
 
+    if shutdown_event.is_set():
+        return None
+
     try:
         # Ensure waveform is a 1D array of float32 values between -1 and 1
         waveform = np.squeeze(waveform).astype(np.float32)
@@ -211,6 +214,9 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
     #----- Calculate, Group, and Filter Scores  -----#
 
 def rank_sounds(scores, camera_name):
+    if shutdown_event.is_set():
+        return []
+
     # Get config settings
     default_min_score = yamcam_config.default_min_score
     top_k = yamcam_config.top_k
@@ -311,7 +317,11 @@ def calculate_composite_scores(group_scores_dict):
 
     #----- Manage Sound Event Window -----#
 
-def update_sound_window(camera_name, detected_sounds ):
+def update_sound_window(camera_name, detected_sounds):
+
+    if shutdown_event.is_set():
+        return
+
 
     current_time = time.time()
     with state_lock:
@@ -347,7 +357,8 @@ def update_sound_window(camera_name, detected_sounds ):
                     active[sound_class] = True
                     decay_counters[camera_name][sound_class] = yamcam_config.decay
                     report_event(camera_name, sound_class, 'start', current_time)
-                    logger.info(f"{camera_name}: Sound '{sound_class}' started.")
+                    if not shutdown_event.is_set():
+                        logger.info(f"{camera_name}: Sound '{sound_class}' started.")
             else:
                 # Check for stop event using decay counters
                 if active.get(sound_class, False):
