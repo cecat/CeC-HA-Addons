@@ -61,7 +61,7 @@
 
 import time
 from datetime import datetime
-from threading import Lock
+import threading 
 from collections import deque
 import paho.mqtt.client as mqtt
 import os
