@@ -45,7 +45,7 @@ for handler in logger.handlers:
 
 ##################### Announce startup ################# 
 
-logger.info("\n\nYAMCAM3 Started|n|n")
+logger.info("\n\n-------- YAMCAM3 Started-------- \n\n")
 
 ##################### Get Configuration ################# 
 
