@@ -1,5 +1,8 @@
 # Camera-sounds add-on for Home Assistant
 
+This add-on is a work in progress.  Please report any issues
+[here](https://github.com/cecat/CeC-HA-Addons/issues). 
+
 This project uses TensorFlow Lite and the
 [YAMNet sound model](https://www.tensorflow.org/hub/tutorials/yamnet)
 to characterize sounds deteced by  microphones on networked cameras.
@@ -157,12 +160,21 @@ we ignore classes with confidence levels below *noise_threshold*.
 DEBUG->INFO->WARNING->ERROR->CRITICAL
 in order of decreasing verbosity.
 
+- **logfile**: Creates or appends to a logfile in */config* for longitudinal analysis. It will grow very quickly if in DEBUG mode (and especially if you also turn on ffmpeg_debug).
+
 - **ffmpeg_debug**: Logs all messages to ffmpeg stderr, which have no codes nor does ffmpeg
 differentiate between info and errors - so it's a firehose (coming from all n sources)
 
 - **exclude_groups**: An optional list of groups to exclude from event detection and logging.
 The *silence* group is quite frequently detected, for instance, and is a bit redundant relative to
 nothing being reported.  See **Sounds and Filters** below for a list of groups.
+
+**Sound Event Parameters**
+
+- **window_detect**: Number of samples (~1s each) to examine to determine if a sound is persistent.
+
+- **persistence**:   Number of detections within window_detect to consider a sound event has started.
+- **decay**:         Number of waveforms without the sound to consider the sound event has stopped.
 
 
 **MQTT configuration variables**
@@ -180,12 +192,6 @@ configuration file), with the detected sound classes as the payload to this topi
 - **user**: Here you will use the username/login on your server (e.g., that you set up for MQTT).
 
 - **password**: The password to the username/login you are using as *user*.
-
-**Sound Event Parameters**
-
-- **window_detect**: Number of samples (~1s each) to examine to determine if a sound is persistent.
-- **persistence**:   Number of detections within window_detect to consider a sound event has started.
-- **decay**:         Number of waveforms without the sound to consider the sound event has stopped.
 
 **Sounds and Filters**
 
@@ -268,4 +274,6 @@ This add-on has only been tested using RTSP feeds from Amcrest and UniFi (via NV
 cameras. It's been tested on Home Assistant running on a Raspberry Pi 4 and on
 an Intel Celeron (neither of which support Advanced Vector
 Extensions (AVX) instructions).
+
+Did I mention this is a work in progress?
 
