@@ -249,6 +249,9 @@ This allows automations to check for group names rather than lists of 30 or 40
 sound classes that might be related to what we are wanting to detect (e.g., 
 human activity, traffic sounds, etc.).
 
+Read more about groupings (and how you can customize)
+[here](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam3/files).
+
 The code pulls the *top_k* classes with the highest scores (assuming there are 
 at leaste *top_k* classes that exceed *noise_threshold*), then calculates a
 group score from these.
