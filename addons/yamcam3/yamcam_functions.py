@@ -469,3 +469,5 @@ def report(results, mqtt_client, camera_name):
         except Exception as e:
             logger.error(f"Exception: Failed to form/publish MQTT message: {e}")
     else:
+            logger.error("MQTT client is not connected. Skipping publish.")
+
