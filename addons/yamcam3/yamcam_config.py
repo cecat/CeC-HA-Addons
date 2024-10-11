@@ -1,13 +1,12 @@
 #
-# yamcam3 - CeC - September 2024
-# yamcam_config.py # config and setup for yamcam
+# yamcam3 - CeC - October 2024
+# yamcam_config.py 
 #
 
 import yaml
 import csv
 import logging
 import tflite_runtime.interpreter as tflite
-#import os
 import time
 import threading
 
@@ -21,10 +20,11 @@ sound_log_path = '/config/sound_log.txt'
 # Global shutdown event
 shutdown_event = threading.Event()
 
+#                                              #
+### ---------- SET UP LOGGING  --------------###
+#                                              #
 
-##################### Set up Logging ################# 
-
-# set logging to INFO and include timestamps
+# set logging to (default) INFO and include timestamps
 # user can select different logging level via /config/microphones.yaml
 
 # logging configuration
@@ -35,6 +35,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+#                                              #
+### ---------- SHUT_DOWN HANDLING -----------###
+#                                              #
+
 # Add the shutdown filter to all handlers
 class ShutdownFilter(logging.Filter):
     def filter(self, record):
@@ -43,11 +47,11 @@ class ShutdownFilter(logging.Filter):
 for handler in logger.handlers:
     handler.addFilter(ShutdownFilter())
 
-##################### Announce startup ################# 
-
 logger.info("\n\n-------- YAMCAM3 Started-------- \n")
 
-##################### Get Configuration ################# 
+#                                                #
+### ---------- GET CONFIGURATION --------------###
+#                                                #
 
 try:
     with open(config_path) as f:
@@ -56,8 +60,7 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
-
-             ######### general settings ######## 
+     # -------- GENERAL 
 try:
     general_settings = config['general']
 except KeyError as e:
@@ -73,21 +76,19 @@ ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
 exclude_groups       = general_settings.get('exclude_groups', []) #group to ignore
 summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
-
+# default_min_score and noise_thresholdmust be between 0 and 1
 if not (0.0 <= default_min_score <= 1.0):
     logger.warning(f"Invalid default_min_score '{default_min_score}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.5."
     )
     default_min_score = 0.5
-
 if not (0.0 <= noise_threshold <= 1.0):
     logger.warning(f"Invalid noise_threshold '{noise_threshold}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.1."
     )
     noise_threshold = 0.1
         
-
-# set up additional logging to a file for later analysis
+     # -------- LOGFILE FOR ANALYSIS 
 if logfile:
     logger.info(f"Open (or create) sound_log file ({sound_log_path})for sound history analysis.")
     try:
@@ -101,10 +102,9 @@ if logfile:
     except Exception as e:
         logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
 
-
 logger.info (f"Summary reports every {summary_interval} min.")
 
-             ######## Sound Event Detection Settings ######## 
+     # -------- SOUND EVENT PARAMETERS 
 try:
     events_settings = config['events']
 except KeyError:
@@ -119,7 +119,7 @@ window_detect = events_settings.get('window_detect', 5)
 persistence = events_settings.get('persistence', 3)
 decay = events_settings.get('decay', 15)
 
-             ######## Sounds to Track and Filters/thresholds######## 
+     # -------- SOUND CHOICES
 try:
     sounds = config['sounds']
 except KeyError:
@@ -127,7 +127,8 @@ except KeyError:
 
 sounds_to_track = sounds.get('track', [])
 sounds_filters = sounds.get('filters', {})
-# Validate min_score values
+
+# min_score values also need to be between 0 and 1
 for group, settings in sounds_filters.items():
     min_score = settings.get('min_score')
     if not (0.0 <= min_score <= 1.0):
@@ -136,16 +137,14 @@ for group, settings in sounds_filters.items():
         )
         settings['min_score'] = default_min_score 
 
-
-             ######## cameras = sound sources ######## 
+     # -------- SOUND SOURCES 
 try:
     camera_settings  = config['cameras']
 except KeyError as e:
     logger.error(f"Missing camera settings in the configuration file: {e}")
     raise
 
-
-             ######## MQTT settings ########  
+     # -------- MQTT SETTINGS 
 try:
     mqtt_settings = config['mqtt']
 except KeyError as e:
@@ -159,8 +158,7 @@ mqtt_client_id       = mqtt_settings['client_id'] + "3" #yamcam version 3
 mqtt_username        = mqtt_settings['user']
 mqtt_password        = mqtt_settings['password']
 
-             ######### Set Log Level ######## 
-
+     # -------- LOG LEVEL
 log_levels = {
     'DEBUG'    : logging.DEBUG,
     'INFO'     : logging.INFO,
@@ -181,10 +179,11 @@ else:
     for handler in logger.handlers:
         handler.setLevel(logging.INFO)
 
-##################### Set up YAMNet Model ################# 
+#                                              #
+### ---------- SET UP YAMNET MODEL ----------###
+#                                              #
 
-             ######## Easy reading for debug logging ########
-
+     # -------- LOG DETAILS FOR DEBUG
 def format_input_details(details):
     formatted_details = "Input Details:\n"
     for detail in details:
@@ -193,10 +192,8 @@ def format_input_details(details):
             formatted_details += f"    {key}: {value}\n"
     return formatted_details
 
-             ######## Load YAMNet model using TensorFlow Lite ########  
 
-# todo: for tpu - check to see if we are using a Coral TPU
-# if no tpu
+     # -------- LOAD MODEL (using TensorFLow Lite)
 logger.debug("Loading YAMNet model")
 interpreter    = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
@@ -204,12 +201,8 @@ input_details  = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 logger.debug("YAMNet model loaded.")
 logger.debug(format_input_details(input_details))
-# else --- tpu logic here
 
-             ######## YAMNet Class_names ########  
-
-# build the class_names dictionary from the Yamnet class map csv
-
+     # -------- BUILD CLASS NAMES DICTIONARY
 class_names = []
 with open(class_map_path, 'r') as file:
     reader = csv.reader(file)

@@ -34,7 +34,7 @@ import numpy as np
 import logging
 import time
 import tflite_runtime.interpreter as tflite
-import select  # <-- Added missing import
+import select  
 from yamcam_config import logger, model_path, ffmpeg_debug
 
 class CameraAudioStream:
@@ -81,6 +81,8 @@ class CameraAudioStream:
         except Exception as e:
             logger.error(f"Exception in __init__.CameraAudioStream {self.camera_name}: {e}")
 
+# -------------- START --------------#
+
     def start(self):
         with self.lock:
             if self.running:
@@ -108,6 +110,8 @@ class CameraAudioStream:
                 self.running = False
                 self.supervisor.stream_stopped(self.camera_name)
 
+# -------------- STOP --------------#
+
     def stop(self):
         with self.lock:
             if not self.running:
@@ -129,6 +133,7 @@ class CameraAudioStream:
         # Inform supervisor that the stream has stopped
         self.supervisor.stream_stopped(self.camera_name)
 
+# ----------- READ_STREM -----------#
 
     def read_stream(self):
         raw_audio = b""
@@ -161,7 +166,7 @@ class CameraAudioStream:
                         else:
                             raw_audio += chunk
                     else:
-    # No data ready, select timed out
+                    # No data ready, select timed out
                         if self.shutdown_event.is_set() or not self.running:
                             logger.debug(f"{self.camera_name}: Shutdown detected. Exiting read_stream.")
                             return
@@ -169,7 +174,8 @@ class CameraAudioStream:
                             # No data yet, continue waiting for data
                             continue
 
-                # Process raw_audio
+                #### Process raw_audio ####
+
                 waveform = np.frombuffer(raw_audio, dtype=np.int16) / 32768.0
                 waveform = np.squeeze(waveform)
                 if self.analyze_callback and not self.shutdown_event.is_set():
@@ -189,6 +195,7 @@ class CameraAudioStream:
             finally:
                 raw_audio = b""
 
+# ----------- READ_STDERR -----------#
 
     def read_stderr(self):
         # Continuously read FFmpeg's stderr to prevent buffer blockage
