@@ -1,29 +1,20 @@
 #
-#
 # Supervisor function to keep track of sources going offline and
 # reconnecting them when they come online again
 # Oct 2024
 #
-
 #    __init__(self, camera_configs, analyze_callback):
-#
 #
 #    start_all_streams(self):
 #
-#
 #    start_stream(self, camera_name):
-#
 #
 #    stop_all_streams(self):
 #
-#
 #    monitor_streams(self):
-#
 #
 #    stream_stopped(self, camera_name):
 #
-#
-
 # yamcam_supervisor.py
 
 import threading
@@ -31,7 +22,13 @@ import time
 from camera_audio_stream import CameraAudioStream
 from yamcam_config import logger
 
+#                                              #
+### ------ CLASS FOR CAM STREAMS/THREADS ----###
+#                                              #
+
 class CameraStreamSupervisor:
+    
+     # -------- INIT 
     def __init__(self, camera_configs, analyze_callback, shutdown_event):
         self.camera_configs = camera_configs
         self.analyze_callback = analyze_callback
@@ -41,12 +38,14 @@ class CameraStreamSupervisor:
         self.running = True
         self.supervisor_thread = threading.Thread(target=self.monitor_streams, daemon=True)
 
+     # -------- START ALL STREAMS
     def start_all_streams(self):
         for camera_name, camera_config in self.camera_configs.items():
             self.start_stream(camera_name)
         self.supervisor_thread.start()
         logger.info("Supervisor thread started.")
 
+     # -------- START STREAM
     def start_stream(self, camera_name):
         camera_config = self.camera_configs.get(camera_name)
         if camera_config:
@@ -63,6 +62,7 @@ class CameraStreamSupervisor:
         else:
             logger.error(f"{camera_name}: No configuration found.")
 
+     # -------- STOP ALL STREAMS
     def stop_all_streams(self):
         with self.lock:
             if not self.running:
@@ -84,7 +84,7 @@ class CameraStreamSupervisor:
         except Exception as e:
             logger.error(f"Error stopping supervisor thread: {e}", exc_info=True)
 
-
+     # -------- MONITOR STREAMS
     def monitor_streams(self):
         logger.info("Supervisor monitoring started.")
         while self.running and not self.shutdown_event.is_set():
@@ -100,7 +100,7 @@ class CameraStreamSupervisor:
         if not self.shutdown_event.is_set():
             logger.info("Supervisor monitoring stopped.")
 
-
+     # -------- STREAM STOPPED
     def stream_stopped(self, camera_name):
         logger.info(f"Stream {camera_name} has stopped.")
         # Remove the stopped stream from the dictionary

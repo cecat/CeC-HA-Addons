@@ -19,23 +19,17 @@ import yamcam_config  # all setup and config happens here
 from yamcam_config import logger #, summary_interval
 from yamcam_supervisor import CameraStreamSupervisor  # Import the supervisor
 
-#----- Global shutdown event for clean shutdown ----------#
-#shutdown_event = threading.Event()
-
-#----- Initialize MQTT client ---#
+     # -------- INITIALIZE MQTT CLIENT
 mqtt_client = start_mqtt()
 set_mqtt_client(mqtt_client)
 
-#----------- PULL things we need from CONFIG -------------#
-# (see config for definitions)
+     # -------- PULL FROM CONFIG
 camera_settings = yamcam_config.camera_settings
-#mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
-# Global variable to keep track of running state
+     # -------- GLOBALS
 running = True
 
-#----------- Handle add-on stop gracefully ---------------#
-
+     # -------- GRACEFUL SHUT-DOWN
 def shutdown(signum, frame):
     global running
     logger.info(f"Received signal {signum}, shutting down...")
@@ -48,12 +42,14 @@ def shutdown(signum, frame):
     logging.shutdown()  # Ensure all logs are flushed
     sys.exit(0)
 
-
-# Register the shutdown handler for SIGINT and SIGTERM
+    # Register the shutdown handler for SIGINT and SIGTERM
+    # (i.e., when HASS user hits "stop")
 signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)
 
-#----------- Sound Analysis Hub --------------------------#
+#                                                #
+### ---------- SOUND ANALYSIS HUB -------------###
+#                                                #
 
 def analyze_callback(camera_name, waveform, interpreter, input_details, output_details):
     if shutdown_event.is_set():
@@ -76,7 +72,9 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
             logger.error(f"FAILED to analyze audio: {camera_name}")
 
 
-########################## Main ########################## 
+#                                                #
+### ---------- START STREAMS ------------------###
+#                                                #
 
 # Create and start streams using the supervisor
 supervisor = CameraStreamSupervisor(camera_settings, analyze_callback, shutdown_event)
@@ -88,7 +86,10 @@ summary_thread = threading.Thread(target=log_summary, daemon=True)
 summary_thread.start()
 logger.info("Summary logging thread started.")
 
-# Keep the main thread alive and handle shutdown cleanly
+#                                                #
+### ---------- MAIN ---------------------------###
+#                                                #
+
 try:
     while running:
         time.sleep(1)  # Keep the main thread running
@@ -98,3 +99,5 @@ finally:
     time.sleep(1) # pause for queued log messages to chirp
     logger.info("All audio streams stopped. Exiting.")
     logging.shutdown() # make sure all logs are flushed
+
+

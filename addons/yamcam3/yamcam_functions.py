@@ -64,8 +64,6 @@ from datetime import datetime
 import threading 
 from collections import deque
 import paho.mqtt.client as mqtt
-#import os
-#import logging
 import numpy as np
 import json
 import yamcam_config
@@ -76,43 +74,44 @@ from yamcam_config import (
 
 logger = yamcam_config.logger
 
-# Initialize global data structures for summary reporting
-#detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
-#history_lock = threading.Lock()
+#                                                #
+### ---------- REPORTING SETUP ----------------###
+#                                                #
+
+     # -------- GLOBALS FOR SUMMARY REPORTING
 sound_event_tracker = {}
 sound_event_lock = threading.Lock()
 event_counts = {}
 
+     # -------- DATA STRUCTS FOR EVENTS
 # Decay counter data structure for detecting sound event termination
 # Stores decay counters for each active sound class per camera
 decay_counters = {}  # Structure: {camera_name: {sound_class: remaining_chunks}}
-
-
-mqtt_client = None # will initialize in yamcam.py and set via a function
 
 # State management for sound event detection
 sound_windows = {}        # {camera_name: {sound_class: deque}}
 active_sounds = {}        # {camera_name: {sound_class: bool}}
 last_detection_time = {}  # {camera_name: {sound_class: timestamp}}
+
 state_lock = threading.Lock()
 
-############# COMMUNICATIONS ##############
+#                                                #
+### ---------- COMMUNICATIONS -----------------###
+#                                                #
 
-    #----- Set MQTT client as global -----#
+mqtt_client = None # will initialize in yamcam.py and set via a function
 
+     # -------- MQTT CLIENT AS GLOBAL
 def set_mqtt_client(client):
     global mqtt_client
     mqtt_client = client
 
-    #----- Make sure we are Connected before Sending -----#
-
+     # -------- VERIFY CONNECTION
 def on_connect(client, userdata, flags, rc, properties=None):
-    
     if rc != 0:
         logger.error("FAILED to connect to MQTT broker. Check MQTT settings.")
 
-    #----- CONNECT to Broker (host) -----#
-
+     # -------- CONNECT TO BROKER
 def start_mqtt():
     mqtt_host = yamcam_config.mqtt_host
     mqtt_port = yamcam_config.mqtt_port
@@ -140,48 +139,41 @@ def start_mqtt():
 
     return mqtt_client  
 
-    #----- REPORT via MQTT -----#
-    #----- this function deprecated by report_event
-    #----- leaving it in case we decide to report more detail
-
-def report(results, mqtt_client, camera_name):
+     # -------- REPORT SOUND EVENT
+def report_event(camera_name, sound_class, event_type, timestamp):
+    global mqtt_client
 
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
+    formatted_timestamp = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
+    payload = {
+        'camera_name': camera_name,
+        'sound_class': sound_class,
+        'event_type': event_type,
+        'timestamp': formatted_timestamp
+    }
+
+    payload_json = json.dumps(payload)
+
     if mqtt_client.is_connected():
         try:
-            formatted_results = [
-                {
-                    'class': r['class'],
-                    'score': float(f"{r['score']:.2f}")
-                }
-                for r in results
-            ]
-
-            payload = {
-                'camera_name': camera_name,
-                'sound_classes': formatted_results
-            }
-
-            payload_json = json.dumps(payload)
-            logger.debug(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
-            result = mqtt_client.publish( f"{mqtt_topic_prefix}", payload_json)
+            result = mqtt_client.publish(f"{mqtt_topic_prefix}/{event_type}", payload_json)
             result.wait_for_publish()
-
-            if result.rc == mqtt.MQTT_ERR_SUCCESS:
-                logger.info(f"\n{payload_json}")
-            else:
+            if result.rc != mqtt.MQTT_ERR_SUCCESS:
                 logger.error(f"FAILED to publish MQTT message: {result.rc}")
         except Exception as e:
-            logger.error(f"Exception: Failed to form/publish MQTT message: {e}")
+            logger.error(f"Exception: Failed to publish MQTT message: {e}")
     else:
+        logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
         logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
 
 
-############# SOUND FUNCTIONS ##############
+#                                                #
+### ---------- SOUND FUNCTIONS ----------------###
+#                                                #
 
-    #----- Analyze Waveform using YAMNet  -----#
-
+     # -------- ANALYZE Waveform using YAMNet  
 def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, output_details):
 
     if shutdown_event.is_set():
@@ -218,8 +210,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
         return None
 
 
-    #----- Calculate, Group, and Filter Scores  -----#
-
+     # -------- Calculate, Group, and Filter Scores  
 def rank_sounds(scores, camera_name):
     if shutdown_event.is_set():
         return []
@@ -279,10 +270,9 @@ def rank_sounds(scores, camera_name):
     return results
 
 
-    #----- Combine filtered class/score Pairs into Groups  -----#
-
-    # Group scores by prefix (e.g., 'music.*'), and keep track of the individual class scores.
-
+     # -------- Combine filtered class/score Pairs into Groups  
+     # Group scores by prefix (e.g., 'music.*'), and keep track 
+     # of the individual class scores.
 def group_scores_by_prefix(filtered_scores, class_names):
     group_scores_dict = {}
 
@@ -298,14 +288,12 @@ def group_scores_by_prefix(filtered_scores, class_names):
     return group_scores_dict
 
 
-    #----- Calculate Composite Scores for Groups -----#
-
-    # Group scores by prefix (e.g., 'music.*'), and keep track of the individual class scores.
-    # Algorithm to create a group score using the scores of the component classes from that group
-    # - If max score in group is > 0.7, use this as the group composite score.
-    # - Otherwise, boost score with credit based on number of group classes that were found:
-    #   Max score + 0.05 * number of classes in the group (Cap Max score at 0.95).
-
+     # -------- Calculate Composite Scores for Groups 
+     # Group scores by prefix (e.g., 'music.*'), and keep track of the individual class scores.
+     # Algorithm to create a group score using the scores of the component classes from that group
+     # - If max score in group is > 0.7, use this as the group composite score.
+     # - Otherwise, boost score with credit based on number of group classes that were found:
+     #   Max score + 0.05 * number of classes in the group (Cap Max score at 0.95).
 def calculate_composite_scores(group_scores_dict):
 
     composite_scores = []
@@ -321,8 +309,7 @@ def calculate_composite_scores(group_scores_dict):
 
     return composite_scores
 
-    #----- Manage Sound Event Window -----#
-
+     # -------- Manage Sound Event Window 
 def update_sound_window(camera_name, detected_sounds):
 
     if shutdown_event.is_set():
@@ -384,40 +371,8 @@ def update_sound_window(camera_name, detected_sounds):
                                 logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
 
 
-    #----- Report Sound Event -----#
 
-def report_event(camera_name, sound_class, event_type, timestamp):
-
-    global mqtt_client
-
-    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
-
-    # Format the timestamp as a human-readable date and time
-    formatted_timestamp = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
-
-
-    payload = {
-        'camera_name': camera_name,
-        'sound_class': sound_class,
-        'event_type': event_type,
-        'timestamp': formatted_timestamp
-    }
-
-    payload_json = json.dumps(payload)
-
-    if mqtt_client.is_connected():
-        try:
-            result = mqtt_client.publish(f"{mqtt_topic_prefix}/{event_type}", payload_json)
-            result.wait_for_publish()
-            if result.rc != mqtt.MQTT_ERR_SUCCESS:
-                logger.error(f"FAILED to publish MQTT message: {result.rc}")
-        except Exception as e:
-            logger.error(f"Exception: Failed to publish MQTT message: {e}")
-    else:
-        logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
-
-
-    #----- Generate Periodic summaries -----#
+     # -------- Generate Periodic summaries
 
 def generate_summary():
     logger.info("Summary:")
@@ -436,7 +391,7 @@ def generate_summary():
             counts.clear()
 
 
-    #----- Schedule Periodic summaries -----#
+     # -------- Schedule Periodic summaries 
 
 def schedule_summary():
     while not shutdown_event.is_set():
@@ -444,9 +399,7 @@ def schedule_summary():
         generate_summary()
 
 
-    #----- Log a summary -----#
-
-# In yamcam_functions.py
+     # -------- Log a summary
 
 def log_summary():
     while not shutdown_event.is_set():
@@ -481,3 +434,38 @@ def log_summary():
         except Exception as e:
             logger.error(f"Exception in log_summary: {e}", exc_info=True)
 
+
+     # -------- REPORT (deprecated, see REPORT_EVENT)
+     #----- this function deprecated by report_event
+     #----- leaving it in case we decide to report more detail
+def report(results, mqtt_client, camera_name):
+
+    mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
+
+    if mqtt_client.is_connected():
+        try:
+            formatted_results = [
+                {
+                    'class': r['class'],
+                    'score': float(f"{r['score']:.2f}")
+                }
+                for r in results
+            ]
+
+            payload = {
+                'camera_name': camera_name,
+                'sound_classes': formatted_results
+            }
+
+            payload_json = json.dumps(payload)
+            logger.debug(f"{camera_name}: {mqtt_topic_prefix}, {payload_json}")
+            result = mqtt_client.publish( f"{mqtt_topic_prefix}", payload_json)
+            result.wait_for_publish()
+
+            if result.rc == mqtt.MQTT_ERR_SUCCESS:
+                logger.info(f"\n{payload_json}")
+            else:
+                logger.error(f"FAILED to publish MQTT message: {result.rc}")
+        except Exception as e:
+            logger.error(f"Exception: Failed to form/publish MQTT message: {e}")
+    else:
