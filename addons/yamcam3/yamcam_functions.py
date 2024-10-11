@@ -64,9 +64,9 @@ from datetime import datetime
 import threading 
 from collections import deque
 import paho.mqtt.client as mqtt
-import os
+#import os
+#import logging
 import numpy as np
-import logging
 import json
 import yamcam_config
 from yamcam_config import (
@@ -77,8 +77,8 @@ from yamcam_config import (
 logger = yamcam_config.logger
 
 # Initialize global data structures for summary reporting
-detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
-history_lock = threading.Lock()
+#detected_sounds_history = {}  # {camera_name: deque of (timestamp, sound_class)}
+#history_lock = threading.Lock()
 sound_event_tracker = {}
 sound_event_lock = threading.Lock()
 event_counts = {}
@@ -141,6 +141,8 @@ def start_mqtt():
     return mqtt_client  
 
     #----- REPORT via MQTT -----#
+    #----- this function deprecated by report_event
+    #----- leaving it in case we decide to report more detail
 
 def report(results, mqtt_client, camera_name):
 

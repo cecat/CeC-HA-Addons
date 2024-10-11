@@ -1,8 +1,6 @@
 #
-# yamcam.py - CeC September 2024
+# yamcam.py - CeC October 2024
 #
-#
-# yamcam3 (streaming) - CeC September 2024
 #
 
 import time
@@ -12,16 +10,17 @@ import signal
 import sys
 from yamcam_functions import (
     start_mqtt, analyze_audio_waveform,
-    report, rank_sounds, set_mqtt_client, update_sound_window,
-    detected_sounds_history, history_lock, shutdown_event,
-    event_counts, state_lock, log_summary
+    rank_sounds, set_mqtt_client, update_sound_window,
+    #detected_sounds_history, history_lock, report,
+    #event_counts, state_lock,
+    log_summary, shutdown_event
 )
 import yamcam_config  # all setup and config happens here
-from yamcam_config import logger, summary_interval
+from yamcam_config import logger #, summary_interval
 from yamcam_supervisor import CameraStreamSupervisor  # Import the supervisor
 
 #----- Global shutdown event for clean shutdown ----------#
-shutdown_event = threading.Event()
+#shutdown_event = threading.Event()
 
 #----- Initialize MQTT client ---#
 mqtt_client = start_mqtt()
@@ -30,7 +29,7 @@ set_mqtt_client(mqtt_client)
 #----------- PULL things we need from CONFIG -------------#
 # (see config for definitions)
 camera_settings = yamcam_config.camera_settings
-mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
+#mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
 # Global variable to keep track of running state
 running = True
@@ -54,7 +53,7 @@ def shutdown(signum, frame):
 signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)
 
-#----------- Hub for sound stream analysis within each thread -----------#
+#----------- Sound Analysis Hub --------------------------#
 
 def analyze_callback(camera_name, waveform, interpreter, input_details, output_details):
     if shutdown_event.is_set():
@@ -77,7 +76,7 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
             logger.error(f"FAILED to analyze audio: {camera_name}")
 
 
-############# Main #############
+########################## Main ########################## 
 
 # Create and start streams using the supervisor
 supervisor = CameraStreamSupervisor(camera_settings, analyze_callback, shutdown_event)

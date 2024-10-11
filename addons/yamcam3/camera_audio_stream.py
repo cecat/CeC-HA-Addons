@@ -28,7 +28,6 @@
 #             Monitor stderr for messages from FFMPEG which can be informational
 #             or errors, but FFMPEG does not provide a code to differentiate between them.
 
-import os
 import subprocess
 import threading
 import numpy as np
@@ -138,7 +137,8 @@ class CameraAudioStream:
                 while len(raw_audio) < self.buffer_size:
                     with self.lock:
                         if not self.running or not self.process or not self.process.stdout:
-                            logger.debug(f"{self.camera_name}: Process terminated or not running. Exiting read_stream.")
+                            logger.debug(f"{self.camera_name}: Process terminated or "
+                                          "not running. Exiting read_stream.")
                             return  # Exit if the process is no longer available
                         fd = self.process.stdout.fileno()
                     # Wait up to 5 seconds for data to become available
@@ -149,11 +149,13 @@ class CameraAudioStream:
                             with self.lock:
                                 return_code = self.process.poll()
                             if return_code is not None:
-                                logger.error(f"{self.camera_name}: FFmpeg process terminated with return code {return_code}.")
+                                logger.error(f"{self.camera_name}: FFmpeg process terminated "
+                                             f"with return code {return_code}.")
                                 self.stop()
                                 return
                             else:
-                                logger.error(f"{self.camera_name}: No data read from FFmpeg stdout, but process is still running.")
+                                logger.error(f"{self.camera_name}: No data read from FFmpeg "
+                                              " stdout, but process is still running.")
                                 time.sleep(0.5)
                                 continue
                         else:

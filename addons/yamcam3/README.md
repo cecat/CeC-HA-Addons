@@ -74,6 +74,10 @@ associated groups).
 
 #### Sample Configuration File
 
+You can grab a starter configuration file and just fill in your MQTT and
+camera details 
+[here](https://github.com/cecat/CeC-HA-Addons/blob/main/addons/yamcam3/microphones.yaml).
+
 ```
 general:
   noise_threshold: 0.1       # Filter out very very low scores
