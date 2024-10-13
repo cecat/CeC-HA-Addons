@@ -58,8 +58,15 @@
 #
 #          log_summary()
 #
+# ###  Misc
+#
+#          close_sound_log_file()
+#             Make sure the sound_log CSV file is closed at exit
+#
 
 import time
+import atexit
+import csv
 from datetime import datetime
 import threading 
 from collections import deque
@@ -69,10 +76,38 @@ import json
 import yamcam_config
 from yamcam_config import (
         interpreter, input_details, output_details, logger,
+        sound_log, sound_log_path,
         exclude_groups, summary_interval, shutdown_event
 )
 
 logger = yamcam_config.logger
+
+#                                                #
+### ---------- SOUND LOG CSV SETUP --------------###
+#                                                #
+
+sound_log_lock = threading.Lock() 
+
+if sound_log:
+    try:
+        sound_log_file = open(sound_log_path, 'a', newline='')
+        sound_log_writer = csv.writer(sound_log_file)
+    except Exception as e:
+        logger.error(f"Could not create or open the sound log file at {sound_log_path}: {e}")
+        sound_log_file = None
+        sound_log_writer = None
+else:
+    sound_log_file = None
+    sound_log_writer = None
+
+     # -------- MAKE SURE WE CLOSE CSV AT EXIT
+
+def close_sound_log_file():
+    if sound_log_file is not None:
+        sound_log_file.close()
+        logger.info("Sound log file closed.")
+
+atexit.register(close_sound_log_file)
 
 #                                                #
 ### ---------- REPORTING SETUP ----------------###
@@ -237,6 +272,13 @@ def rank_sounds(scores, camera_name):
             logger.debug(f"{camera_name}:--> {class_name}: {score:.2f} (excluded_group)")
         else:
             logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
+        # CSV logging (classes)
+        if sound_log_writer is not None:
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            row = [timestamp, camera_name, '', '', class_name, f"{score:.2f}"]
+            with sound_log_lock:
+                sound_log_writer.writerow(row)
+                sound_log_file.flush()
 
     if not filtered_scores:
         return []
@@ -258,6 +300,14 @@ def rank_sounds(scores, camera_name):
         if group in exclude_groups:
             continue # Skip logging this group
         logger.debug(f"{camera_name}: ----->{group}: {score:.2f}")
+
+        # CSV logging (groups)
+        if sound_log_writer is not None:
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            row = [timestamp, camera_name, group, f"{score:.2f}", '', '']
+            with sound_log_lock:
+                sound_log_writer.writerow(row)
+                sound_log_file.flush()
 
     # Step 4: Apply min_score filters and prepare results
     results = []
@@ -434,7 +484,6 @@ def log_summary():
         except Exception as e:
             logger.error(f"Exception in log_summary: {e}", exc_info=True)
 
-
      # -------- REPORT (deprecated, see REPORT_EVENT)
      #----- this function deprecated by report_event
      #----- leaving it in case we decide to report more detail
@@ -470,4 +519,5 @@ def report(results, mqtt_client, camera_name):
             logger.error(f"Exception: Failed to form/publish MQTT message: {e}")
     else:
             logger.error("MQTT client is not connected. Skipping publish.")
+
 

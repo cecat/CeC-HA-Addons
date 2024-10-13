@@ -87,9 +87,8 @@ general:
   top_k: 10                  # Number of top scoring classes to analyze (default 10)
   log_level: DEBUG           # Default INFO. In order of decreasing verbosity:
                              # DEBUG->INFO->WARNING->ERROR->CRITICAL 
-  logfile: true              # dump all log messages to /config/sound_log.txt for offline
-                             #   analysis of trends (it gets big very fast, use carefully).
-                             #   Default is false
+  sound_log: False           # Create a CSV with all sound group and class scores for
+                             #   longitudinal analysis
   ffmpeg_debug: false        # Log ffmpeg stderr (a firehose - includes errors and info)
                              #   Must also have log_level set to DEBUG
   exclude_groups:            # Groups we don't want to report (or log), e.g., 
@@ -164,7 +163,9 @@ we ignore classes with confidence levels below *noise_threshold*.
 DEBUG->INFO->WARNING->ERROR->CRITICAL
 in order of decreasing verbosity.
 
-- **logfile**: Creates or appends to a logfile in */config* for longitudinal analysis. It will grow very quickly if in DEBUG mode (and especially if you also turn on ffmpeg_debug).
+- **sound_log**: Creates or appends to a sound logfile in */config* for longitudinal analysis. 
+The file is a csv with date/time, camera_name, group, group_score, class, class_score
+(one class *or* group per line)
 
 - **ffmpeg_debug**: Logs all messages to ffmpeg stderr, which have no codes nor does ffmpeg
 differentiate between info and errors - so it's a firehose (coming from all n sources)

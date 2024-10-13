@@ -15,7 +15,8 @@ import threading
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-sound_log_path = '/config/sound_log.txt'
+log_path = '/config/yamcam_log.txt'
+sound_log_path = '/config/sound_log.csv'
 
 # Global shutdown event
 shutdown_event = threading.Event()
@@ -69,6 +70,7 @@ except KeyError as e:
 
 log_level            = general_settings.get('log_level', 'INFO').upper()
 logfile              = general_settings.get('logfile', False)
+sound_log            = general_settings.get('sound_log', False)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 default_min_score    = general_settings.get('default_min_score', 0.5)
 top_k                = general_settings.get('top_k', 10)
@@ -88,9 +90,27 @@ if not (0.0 <= noise_threshold <= 1.0):
     )
     noise_threshold = 0.1
         
-     # -------- LOGFILE FOR ANALYSIS 
+# interval for summary entry log messages
+logger.info (f"Summary reports every {summary_interval} min.")
+
+     # -------- LOGFILE FOR DEBUG ANALYSIS 
 if logfile:
-    logger.info(f"Open (or create) sound_log file ({sound_log_path})for sound history analysis.")
+    logger.info(f"Open (or create) log file ({log_path})for sound history analysis.")
+    try:
+        file_handler = logging.FileHandler(log_path, mode='a')  # always append
+        file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        # Add the file handler to the logger
+        logger.addHandler(file_handler)
+        logger.info(f"Logging to {log_path}).")
+    except Exception as e:
+        logger.error(f"Could not create or open the log file at {log_path}: {e}")
+
+
+     # -------- SOUND LOG FOR SOUND ANALYSIS 
+if sound_log:
+    logger.info(f"Open (or create) sound_log csv ({sound_log_path})for sound history analysis.")
     try:
         file_handler = logging.FileHandler(sound_log_path, mode='a')  # always append
         file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
@@ -101,8 +121,6 @@ if logfile:
         logger.info(f"Logging to {sound_log_path}).")
     except Exception as e:
         logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
-
-logger.info (f"Summary reports every {summary_interval} min.")
 
      # -------- SOUND EVENT PARAMETERS 
 try:
