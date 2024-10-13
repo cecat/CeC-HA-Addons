@@ -1,6 +1,15 @@
 
 # Changelog
 
+## 0.3.3
+- Added a configuration boolean, sound_log, to create a csv with all group
+  and class detections and scores.  CSV has 6 columns, 1 row per class or
+  group detected (i.e, with score >noise_threshold):
+  date_time, camera_name, group_name, group_score, class_name, class_score
+- Removed the -logfile boolean from README but it's still implemented, and
+  could be useful to diagnose issues that are intermittent (as these are
+  log messages including errors.
+
 ## 0.3.2
 - Clean up logging
 - Added a logfile capability for longitudinal analysis of sound activity
