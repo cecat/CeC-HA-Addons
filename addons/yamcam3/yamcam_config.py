@@ -111,16 +111,6 @@ if logfile:
      # -------- SOUND LOG FOR SOUND ANALYSIS 
 if sound_log:
     logger.info(f"Open (or create) sound_log csv ({sound_log_path})for sound history analysis.")
-    try:
-        file_handler = logging.FileHandler(sound_log_path, mode='a')  # always append
-        file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handler.setFormatter(formatter)
-        # Add the file handler to the logger
-        logger.addHandler(file_handler)
-        logger.info(f"Logging to {sound_log_path}).")
-    except Exception as e:
-        logger.error(f"Could not create or open the log file at {sound_log_path}: {e}")
 
      # -------- SOUND EVENT PARAMETERS 
 try:
