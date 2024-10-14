@@ -154,11 +154,11 @@ in order of decreasing verbosity.
 The file is a csv with date/time, camera_name, group, group_score, class, class_score
 (one class *or* group per line). The add-on will create (or append, if it exists alread)
 the CSV file **/config/sound_log.csv**.  
-- **ffmpeg_debug**: Logs all messages to ffmpeg stderr, which have no codes nor does ffmpeg
-differentiate between info and errors - so it's a firehose (coming from all n sources)
+- **ffmpeg_debug**: Logs all ffmpeg stderr messages, which have no codes nor does ffmpeg
+differentiate between info and errors - so it's a firehose (coming from all n sources).
 - **exclude_groups**: An optional list of groups to exclude from event detection and logging.
 The *silence* group is quite frequently detected, for instance, and is a bit redundant relative to
-nothing being reported.  See **Sounds and Filters** below for a list of groups.
+nothing being reported.  See **Sounds** below for a list of groups.
 
 **MQTT configuration variables**
 
@@ -196,13 +196,21 @@ Available sound groups are:
 - alert (e.g., sirens, alarms, loud bangs...)
 - animals
 - birds
+- boats
 - construction (e.g., banging, sawing...)
+- cooking
+- domestic (e.g., vacuum cleaner, door squeek...)
+- environment (e.g., wind, white noise, rustling leaves...)
 - insects
 - music
 - people (e.g., laughter, coughing, speaking, ringtones, doorbells...)
 - silence
+- trains
 - vehicles
+- water
 - weather
+- yardcare (e.g., chainsaw, lawn mower)
+
 
 More on sound groups below.
 

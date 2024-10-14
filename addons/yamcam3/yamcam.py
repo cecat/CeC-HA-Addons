@@ -32,7 +32,7 @@ running = True
      # -------- GRACEFUL SHUT-DOWN
 def shutdown(signum, frame):
     global running
-    logger.info(f"Received signal {signum}, shutting down...")
+    logger.info(f"Received Order 66 (signal {signum}), shutting down...")
     running = False  # Set the running flag to False to exit the main loop
     shutdown_event.set()  # Signal all threads to shut down
     logger.info("******------> STOPPING ALL audio streams...")
