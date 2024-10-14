@@ -162,7 +162,7 @@ except KeyError as e:
 mqtt_host            = mqtt_settings['host']
 mqtt_port            = mqtt_settings['port']
 mqtt_topic_prefix    = mqtt_settings['topic_prefix']
-mqtt_client_id       = mqtt_settings['client_id'] + "3" #yamcam version 3
+mqtt_client_id       = mqtt_settings['client_id'] 
 mqtt_username        = mqtt_settings['user']
 mqtt_password        = mqtt_settings['password']
 
