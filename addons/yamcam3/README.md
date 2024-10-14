@@ -15,7 +15,7 @@ The project uses MQTT to communicate *sound events* to  Home Assistant,
 where the parameters for determining the start and stop of a sound event
 are configurable.
 
-The add-on does the following (*italics* parameters are configurable)::
+The add-on does the following (*italics* parameters are configurable):
 
 1. Analyze sound (in 0.975s chunks) using YAMNet, which produces scores for each
    of 521 sound classes. A **score** is YAMNet's certainty, from 0 to 1, that
