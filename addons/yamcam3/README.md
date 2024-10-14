@@ -153,7 +153,7 @@ in order of decreasing verbosity.
 - **sound_log**: Creates or appends to a sound logfile in */config* for longitudinal analysis. 
 The file is a csv with date/time, camera_name, group, group_score, class, class_score
 (one class *or* group per line). The add-on will create (or append, if it exists alread)
-the CSV file **config/sound_log.csv**.  
+the CSV file **/config/sound_log.csv**.  
 - **ffmpeg_debug**: Logs all messages to ffmpeg stderr, which have no codes nor does ffmpeg
 differentiate between info and errors - so it's a firehose (coming from all n sources)
 - **exclude_groups**: An optional list of groups to exclude from event detection and logging.
