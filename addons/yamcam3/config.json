@@ -13,7 +13,7 @@
   ],
   "startup": "services",
   "options": {},
-  "schema": {}
+  "schema": {},
   "logo": "logo.png",
   "icon": "icon.png",
   "map": [
