@@ -13,7 +13,13 @@
   ],
   "startup": "services",
   "options": {},
-  "schema": {},
+  "schema": {
+    "note": {
+       "type": "string",
+       "title": "Configuration Instructions",
+       "description": "See README for configuration instructions",
+       "read_only": true
+  },
   "logo": "logo.png",
   "icon": "icon.png",
   "map": [
