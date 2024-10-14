@@ -83,18 +83,18 @@ its NVR).
 
 ```
 general:
-  noise_threshold: 0.1       # Filter out very very low scores
-  default_min_score: 0.5     # Default threshold for group scores (default 0.5)
-  top_k: 10                  # Number of top scoring classes to analyze (default 10)
-  log_level: INFO            # Default INFO. In order of decreasing verbosity:
-                             # DEBUG->INFO->WARNING->ERROR->CRITICAL 
-  sound_log: false           # Create a CSV with all sound group and class scores over time
-  ffmpeg_debug: false        # Log ffmpeg stderr (a firehose - includes errors and info)
-                             #   Must also have log_level set to DEBUG
-  summary_interval: 15       # log a summary every n min showing the sound groups detected.
-  exclude_groups:            # Groups we don't want to report (or log), e.g., 
-    - group1                 #   the 'silence' group in particular can be noisy...
-    - group2
+  noise_threshold: 0.1          # Filter out very very low scores
+  default_min_score: 0.5        # Default threshold for group scores (default 0.5)
+  top_k: 10                     # Number of top scoring classes to analyze (default 10)
+  log_level: INFO               # Default INFO. In order of decreasing verbosity:
+                                # DEBUG->INFO->WARNING->ERROR->CRITICAL 
+  sound_log: false              # Create a CSV with all sound group and class scores over time
+  ffmpeg_debug: false           # Log ffmpeg stderr (a firehose - includes errors and info)
+                                #   Must also have log_level set to DEBUG
+  summary_interval: 15          # log a summary every n min showing the sound groups detected.
+  exclude_groups:               # Groups we don't want to report (or log), e.g., 
+    - silence                   #   the 'silence' group in particular can be noisy...
+    - group2                    #   
 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
