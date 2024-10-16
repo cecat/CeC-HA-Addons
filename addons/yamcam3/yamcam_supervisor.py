@@ -46,17 +46,24 @@ class CameraStreamSupervisor:
         logger.info("Supervisor thread started.")
 
      # -------- START STREAM
+# -------- START STREAM
     def start_stream(self, camera_name):
         camera_config = self.camera_configs.get(camera_name)
 
         if camera_config:
             try:
-                # Check if the RTSP path is provided and valid
-                rtsp_url = camera_config['ffmpeg']['inputs'][0].get('path')
+                # Check if 'ffmpeg' and 'inputs' exist and contain the necessary data
+                ffmpeg_config = camera_config.get('ffmpeg')
+                if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
+                    raise ValueError(f"{camera_name}: 'ffmpeg' section missing or invalid in the configuration.")
 
+                inputs = ffmpeg_config.get('inputs')
+                if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
+                    raise ValueError(f"{camera_name}: 'inputs' section missing or invalid in the 'ffmpeg' configuration.")
+
+                rtsp_url = inputs[0].get('path')
                 if not rtsp_url or not isinstance(rtsp_url, str):
-                    logger.error(f"{camera_name}: RTSP path is missing or invalid in the configuration.")
-                    raise ValueError(f"Invalid RTSP path for camera '{camera_name}'. Halting the program.")
+                    raise ValueError(f"{camera_name}: RTSP path is missing or invalid in the configuration.")
 
                 # Start the stream if the path is valid
                 stream = CameraAudioStream(camera_name, rtsp_url,
@@ -64,7 +71,7 @@ class CameraStreamSupervisor:
                 stream.start()
                 self.streams[camera_name] = stream
                 logger.info(f"Started stream for {camera_name}.")
-            except (KeyError, IndexError, TypeError) as e:
+            except (KeyError, IndexError, TypeError, ValueError) as e:
                 logger.error(f"{camera_name}: Invalid camera configuration: {e}. Halting the program.", exc_info=True)
                 raise ValueError(f"Configuration error for camera '{camera_name}'. Halting the program.")
             except Exception as e:
