@@ -1,6 +1,14 @@
 
 # Changelog
 
+## 0.3.4
+- Moved location of logs (debug and sound) to /media/yamcam.  Those running
+  Frigate will already have /media but /media/yamcam will be created if it
+  does not already exist.
+- .log files (debug logging) and .csv files (sound logging) created at
+  add-on startup with filenames yyyymmdd-hhmm rather than appending to
+  one mamoth file.
+
 ## 0.3.3
 - Added a configuration boolean, sound_log, to create a csv with all group
   and class detections and scores.  CSV has 6 columns, 1 row per class or

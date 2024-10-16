@@ -27,6 +27,7 @@ shutdown_event = threading.Event()
 ### ---------- SET UP LOGGING  --------------###
 #                                              #
 
+     # -------- MAKE SURE THE LOG DIRECTORY EXISTS
 def check_for_log_dir():
     try:
         os.makedirs(sound_log_dir, exist_ok=True)
@@ -39,6 +40,24 @@ def check_for_log_dir():
 
         sys.exit(1)  # Exit with a non-zero code to indicate failure
 
+     # -------- KEEP THE USER INFORMED OF ACCUMULATED LOGS
+def check_storage(directory, file_extension):
+    try:
+        # count *.file_extension files
+        files = [f for f in os.listdir(directory) if f.endswith(file_extension)]
+        file_count = len(files)
+
+        # Calculate total size (B) and convert to MB
+        total_size_bytes = sum(os.path.getsize(os.path.join(directory, f)) for f in files)
+        total_size_mb = total_size_bytes / (1024 * 1024)
+
+        # Log the file count and total size
+        print(f"NOTE: You have {file_count} '{file_extension}' files in {directory}, "
+                    f"taking up {total_size_mb:.2f} MB of disk space.")
+    except Exception as e:
+        print(f"Error while counting files or calculating size in {directory}: {e}")
+
+    
 
 # set logging to (default) INFO and include timestamps
 # user can select different logging level via /config/microphones.yaml
@@ -112,6 +131,7 @@ logger.info (f"Summary reports every {summary_interval} min.")
 if logfile:
 
     check_for_log_dir() # make sure /media/yamcam exists
+    check_storage(log_path, '.log') # let the user know how much storage they're using
 
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
     log_path = f"{log_dir}/{timestamp}.log"
