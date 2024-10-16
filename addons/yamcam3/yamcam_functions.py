@@ -89,7 +89,7 @@ logger = yamcam_config.logger
 
 sound_log_lock = threading.Lock()  # lock the file when writing since we have multiple threads writing
 
-timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') # timestamp as log filename
+timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M') # timestamp as log filename
 sound_log_path = os.path.join(sound_log_dir, f"{timestamp}.csv") # create the log file
 
 if sound_log:
