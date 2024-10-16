@@ -129,7 +129,7 @@ window_detect = events_settings.get('window_detect', 5)
 persistence = events_settings.get('persistence', 3)
 decay = events_settings.get('decay', 15)
 
-     # -------- SOUND CHOICES
+     # -------- SOUND GROUPS TO WATCH 
 try:
     sounds = config['sounds']
 except KeyError:
