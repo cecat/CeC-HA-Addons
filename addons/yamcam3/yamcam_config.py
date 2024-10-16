@@ -17,7 +17,7 @@ config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
 log_path = '/media/yamcam//yamcam_log.txt'
-sound_log_dir = '/media/yamcam/'
+sound_log_dir = '/media/yamcam/test'
 
 # Global shutdown event
 shutdown_event = threading.Event()
