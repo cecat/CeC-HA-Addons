@@ -197,7 +197,7 @@ except KeyError as e:
     logger.error(f"Missing mqtt settings in the configuration file: {e}")
     raise
 
-mqtt_host            = mqtt_settings['host', 0.0.0.0]
+mqtt_host            = mqtt_settings['host', '0.0.0.0']
 mqtt_port            = mqtt_settings['port', 1883]
 mqtt_topic_prefix    = mqtt_settings['topic_prefix', 'yamcam/sounds' ]
 mqtt_client_id       = mqtt_settings['client_id', 'yamcam'] 
