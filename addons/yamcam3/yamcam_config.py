@@ -190,7 +190,7 @@ def validate_camera_config(camera_settings):
     for camera_name, camera_config in camera_settings.items():
         ffmpeg_config = camera_config.get('ffmpeg')
         if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
-            raise ValueError(f"Camera '{camera_name}': 'ffmpeg' section is missing or invalid.")
+            raise ValueError(f"STOPPING. Camera '{camera_name}': 'ffmpeg' section is missing or invalid.")
 
         inputs = ffmpeg_config.get('inputs')
         if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
