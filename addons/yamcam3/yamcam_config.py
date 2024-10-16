@@ -10,6 +10,7 @@ import tflite_runtime.interpreter as tflite
 import time
 import threading
 import os
+import sys
 from datetime import datetime
 
 # File paths
@@ -184,12 +185,41 @@ for group, settings in sounds_filters.items():
         )
         settings['min_score'] = default_min_score 
 
+     # -------- VALIDATE CAMERA CONFIGURATION
+def validate_camera_config(camera_settings):
+    for camera_name, camera_config in camera_settings.items():
+        ffmpeg_config = camera_config.get('ffmpeg')
+        if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
+            raise ValueError(f"Camera '{camera_name}': 'ffmpeg' section is missing or invalid.")
+
+        inputs = ffmpeg_config.get('inputs')
+        if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
+            raise ValueError(f"Camera '{camera_name}': 'inputs' section is missing or invalid.")
+
+        rtsp_url = inputs[0].get('path')
+        if not rtsp_url or not isinstance(rtsp_url, str):
+            raise ValueError(f"Camera '{camera_name}': RTSP path is missing or invalid.")
+
+    logger.info("Camera configuration validated successfully.")
+
      # -------- SOUND SOURCES 
 try:
     camera_settings  = config['cameras']
 except KeyError as e:
     logger.error(f"Missing camera settings in the configuration file: {e}")
     raise
+
+     # -------- VALIDATE CAM SETTINGS
+try:
+    camera_settings = config['cameras']
+    validate_camera_config(camera_settings)
+except KeyError as e:
+    logger.error(f"Missing camera settings in the configuration file: {e}")
+    sys.exit(1)
+except ValueError as e:
+    logger.error(f"Configuration error: {e}")
+    sys.exit(1)
+
 
      # -------- MQTT SETTINGS 
 try:

@@ -46,32 +46,13 @@ class CameraStreamSupervisor:
         logger.info("Supervisor thread started.")
 
      # -------- START STREAM
-# -------- START STREAM
     def start_stream(self, camera_name):
         camera_config = self.camera_configs.get(camera_name)
 
         if camera_config:
             try:
-                # Check if 'ffmpeg' and 'inputs' exist and contain the necessary data
-                ffmpeg_config = camera_config.get('ffmpeg')
-                if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
-                    logger.error(f"{camera_name}: 'ffmpeg' section missing or invalid in the configuration. "
-                                 "Please check your 'ffmpeg' configuration and ensure it includes 'inputs'.")
-                    sys.exit(1)  # Gracefully exit the program
-
-                inputs = ffmpeg_config.get('inputs')
-                if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
-                    logger.error(f"{camera_name}: 'inputs' section missing or invalid in the 'ffmpeg' configuration. "
-                                 "Please ensure 'inputs' is a non-empty list with at least one item.")
-                    sys.exit(1)  # Gracefully exit the program
-
-                rtsp_url = inputs[0].get('path')
-                if not rtsp_url or not isinstance(rtsp_url, str):
-                    logger.error(f"{camera_name}: RTSP path is missing or invalid in the configuration. "
-                                 "Please ensure a valid RTSP path is specified for the camera.")
-                    sys.exit(1)  # Gracefully exit the program
-
-                # Start the stream if the path is valid
+                # We assume the configuration is valid at this point
+                rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
                 stream = CameraAudioStream(camera_name, rtsp_url,
                                            self.analyze_callback, self, self.shutdown_event)
                 stream.start()
@@ -79,10 +60,11 @@ class CameraStreamSupervisor:
                 logger.info(f"Started stream for {camera_name}.")
             except Exception as e:
                 logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.")
-                sys.exit(1)  # Gracefully exit the program
+                sys.exit(1)
         else:
             logger.error(f"{camera_name}: No configuration found. Halting the program.")
-            sys.exit(1)  # Gracefully exit the program
+            sys.exit(1)
+
 
      # -------- STOP ALL STREAMS
     def stop_all_streams(self):
