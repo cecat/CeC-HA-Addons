@@ -110,7 +110,7 @@ logger.info (f"Summary reports every {summary_interval} min.")
 
      # -------- LOG TO FILE FOR DEBUG ANALYSIS 
 if logfile:
-    logger.info(f"Open (or create) log file ({log_path})for sound history analysis.")
+    logger.info(f"Creating (or opening) log file ({log_path}) for sound history analysis.")
     try:
         file_handler = logging.FileHandler(log_path, mode='a')  # always append
         file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG

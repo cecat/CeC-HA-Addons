@@ -93,7 +93,7 @@ timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M') # timestamp as log filenam
 sound_log_path = os.path.join(sound_log_dir, f"{timestamp}.csv") # create the log file
 
 if sound_log:
-    logger.info(f"Create {sound_log_path} for sound history analysis.")
+    logger.info(f"Creating {sound_log_path} for sound history analysis.")
     try:
         sound_log_file = open(sound_log_path, 'a', newline='')
         sound_log_writer = csv.writer(sound_log_file)
