@@ -113,7 +113,7 @@ if logfile:
 
     check_for_log_dir() # make sure /media/yamcam exists
 
-    timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M') # timestamp for filename
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M') # timestamp for filename
     log_path = f"{log_dir}/{timestamp}.log"
 
     logger.info(f"Creating {log_path} for debug analysis.")
@@ -124,7 +124,7 @@ if logfile:
         file_handler.setFormatter(formatter)
         # Add the file handler to the logger
         logger.addHandler(file_handler)
-        logger.info(f"Logging to {log_path}).")
+        logger.info(f"Logging to {log_path}.")
     except Exception as e:
         logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
