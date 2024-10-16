@@ -10,14 +10,15 @@ import tflite_runtime.interpreter as tflite
 import time
 import threading
 import os
+from datetime import datetime
 
 # File paths
 
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-log_path = '/media/yamcam//yamcam_log.txt'
-sound_log_dir = '/media/yamcam/test'
+log_dir = '/media/yamcam'
+sound_log_dir = '/media/yamcam'
 
 # Global shutdown event
 shutdown_event = threading.Event()
@@ -26,18 +27,17 @@ shutdown_event = threading.Event()
 ### ---------- SET UP LOGGING  --------------###
 #                                              #
 
-try:
-    os.makedirs(sound_log_dir, exist_ok=True)
-    print(f"Sound log directory '{sound_log_dir}' OK.")
-except OSError as e:
-    # Use print since logging is not configured yet
-    print(f"Error: Failed to create logging directory '{sound_log_dir}': {e}")
-    print(f"STOPPING the add-on. Use *Terminal* or SSH CLI to manually create {sound_log_dir}"
-           " or set sound_log to false")
-    print(f"STOPPING the add-on. Use *Terminal* or SSH CLI to manually create {sound_log_dir} "
-           "or set sound_log to false")
+def check_for_log_dir():
+    try:
+        os.makedirs(sound_log_dir, exist_ok=True)
+        print(f"Sound log directory '{sound_log_dir}' OK.")
+    except OSError as e:
+        # Use print since logging is not configured yet
+        print(f"Error: Failed to create logging directory '{sound_log_dir}': {e}")
+        print(f"STOPPING the add-on. Use *Terminal* or SSH CLI to manually create {sound_log_dir} "
+               "or set sound_log to false")
 
-    sys.exit(1)  # Exit with a non-zero code to indicate failure
+        sys.exit(1)  # Exit with a non-zero code to indicate failure
 
 
 # set logging to (default) INFO and include timestamps
@@ -108,9 +108,15 @@ if not (0.0 <= noise_threshold <= 1.0):
 # interval for summary entry log messages
 logger.info (f"Summary reports every {summary_interval} min.")
 
-     # -------- LOG TO FILE FOR DEBUG ANALYSIS 
+     # -------- SET UP LOGGING TO FILE FOR DEBUG ANALYSIS 
 if logfile:
-    logger.info(f"Creating (or opening) log file ({log_path}) for sound history analysis.")
+
+    check_for_log_dir() # make sure /media/yamcam exists
+
+    timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M') # timestamp for filename
+    log_path = f"{log_dir}/{timestamp}.log"
+
+    logger.info(f"Creating {log_path} for debug analysis.")
     try:
         file_handler = logging.FileHandler(log_path, mode='a')  # always append
         file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
@@ -122,7 +128,9 @@ if logfile:
     except Exception as e:
         logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
-
+     # -------- SET UP LOGGING TO FILE FOR SOUND ANALYSIS
+if sound_log:
+    check_for_log_dir() # make sure /media/yamcam exists
 
      # -------- SOUND EVENT PARAMETERS 
 try:
