@@ -165,6 +165,10 @@ def start_mqtt():
     mqtt_username = yamcam_config.mqtt_username
     mqtt_password = yamcam_config.mqtt_password
         
+    if mqtt_host == '0.0.0.0' or mqtt_username == 'noUser' or mqtt_password == 'noPassword':
+        logger.error("Invalid MQTT configuration detected: Check host, username, or password "
+                     "in /config/microphones.yaml file.")
+
     logger.debug(
         f"MQTT Settings:\n"
         f"   Host: {mqtt_host} ; Port: {mqtt_port}\n"
