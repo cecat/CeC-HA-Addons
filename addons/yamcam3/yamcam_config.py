@@ -113,7 +113,7 @@ if logfile:
 
     check_for_log_dir() # make sure /media/yamcam exists
 
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M') # timestamp for filename
+    timestamp = datetime.now().strftime('%Y_%m_%d-%H_%M') # timestamp for filename
     log_path = f"{log_dir}/{timestamp}.log"
 
     logger.info(f"Creating {log_path} for debug analysis.")
