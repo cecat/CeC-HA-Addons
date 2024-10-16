@@ -55,15 +55,21 @@ class CameraStreamSupervisor:
                 # Check if 'ffmpeg' and 'inputs' exist and contain the necessary data
                 ffmpeg_config = camera_config.get('ffmpeg')
                 if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
-                    raise ValueError(f"{camera_name}: 'ffmpeg' section missing or invalid in the configuration.")
+                    logger.error(f"{camera_name}: 'ffmpeg' section missing or invalid in the configuration. "
+                                 "Please check your 'ffmpeg' configuration and ensure it includes 'inputs'.")
+                    sys.exit(1)  # Gracefully exit the program
 
                 inputs = ffmpeg_config.get('inputs')
                 if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
-                    raise ValueError(f"{camera_name}: 'inputs' section missing or invalid in the 'ffmpeg' configuration.")
+                    logger.error(f"{camera_name}: 'inputs' section missing or invalid in the 'ffmpeg' configuration. "
+                                 "Please ensure 'inputs' is a non-empty list with at least one item.")
+                    sys.exit(1)  # Gracefully exit the program
 
                 rtsp_url = inputs[0].get('path')
                 if not rtsp_url or not isinstance(rtsp_url, str):
-                    raise ValueError(f"{camera_name}: RTSP path is missing or invalid in the configuration.")
+                    logger.error(f"{camera_name}: RTSP path is missing or invalid in the configuration. "
+                                 "Please ensure a valid RTSP path is specified for the camera.")
+                    sys.exit(1)  # Gracefully exit the program
 
                 # Start the stream if the path is valid
                 stream = CameraAudioStream(camera_name, rtsp_url,
@@ -71,16 +77,12 @@ class CameraStreamSupervisor:
                 stream.start()
                 self.streams[camera_name] = stream
                 logger.info(f"Started stream for {camera_name}.")
-            except (KeyError, IndexError, TypeError, ValueError) as e:
-                logger.error(f"{camera_name}: Invalid camera configuration: {e}. Halting the program.", exc_info=True)
-                raise ValueError(f"Configuration error for camera '{camera_name}'. Halting the program.")
             except Exception as e:
-                logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.", exc_info=True)
-                raise e
+                logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.")
+                sys.exit(1)  # Gracefully exit the program
         else:
             logger.error(f"{camera_name}: No configuration found. Halting the program.")
-            raise ValueError(f"Missing configuration for camera '{camera_name}'. Halting the program.")
-
+            sys.exit(1)  # Gracefully exit the program
 
      # -------- STOP ALL STREAMS
     def stop_all_streams(self):
