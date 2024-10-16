@@ -201,8 +201,8 @@ mqtt_host            = mqtt_settings['host', 0.0.0.0]
 mqtt_port            = mqtt_settings['port', 1883]
 mqtt_topic_prefix    = mqtt_settings['topic_prefix', 'yamcam/sounds' ]
 mqtt_client_id       = mqtt_settings['client_id', 'yamcam'] 
-mqtt_username        = mqtt_settings['user', 'yourUserName']
-mqtt_password        = mqtt_settings['password' 'yourPassWord']
+mqtt_username        = mqtt_settings['user', 'noUser']
+mqtt_password        = mqtt_settings['password' 'noPassword']
     
      # -------- LOG LEVEL
 log_levels = {
