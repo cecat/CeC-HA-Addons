@@ -138,6 +138,7 @@ if logfile:
     log_path = f"{log_dir}/{timestamp}.log"
 
     try:
+        logger.debug(f"calling check_storage with {log_dir} and .log")
         check_storage(log_dir, '.log') # let the user know how much storage they're using
     except:
         logger.debug(f"could not call check_storage with {log_dir} and .log")
