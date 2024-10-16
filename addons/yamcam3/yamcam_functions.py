@@ -94,7 +94,10 @@ if sound_log:
 
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
     sound_log_path = os.path.join(sound_log_dir, f"{timestamp}.csv") # create the log file
-    check_storage(sound_log_dir, '.csv') # tell the user how much space they're using
+    try:
+        check_storage(sound_log_dir, '.csv') # tell the user how much space they're using
+    except: logger.debug(f"problem calling check_storage with {sound_log_dir} and .csv")
+
     logger.info(f"Creating {sound_log_path} for sound history analysis.")
     try:
         sound_log_file = open(sound_log_path, 'a', newline='')

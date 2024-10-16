@@ -137,7 +137,10 @@ if logfile:
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
     log_path = f"{log_dir}/{timestamp}.log"
 
-    check_storage(log_dir, '.log') # let the user know how much storage they're using
+    try:
+        check_storage(log_dir, '.log') # let the user know how much storage they're using
+    except:
+        logger.debug(f"could not call check_storage with {log_dir} and .log")
 
     logger.info(f"Creating {log_path} for debug analysis.")
     try:
@@ -151,9 +154,11 @@ if logfile:
     except Exception as e:
         logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
+
      # -------- SET UP LOGGING TO FILE FOR SOUND ANALYSIS
 if sound_log:
     check_for_log_dir() # make sure /media/yamcam exists
+
 
      # -------- SOUND EVENT PARAMETERS 
 try:
