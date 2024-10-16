@@ -15,9 +15,8 @@ import threading
 config_path = '/config/microphones.yaml'
 class_map_path = 'yamnet_class_map.csv'
 model_path = 'yamnet.tflite'
-log_path = '/config/yamcam_log.txt'
-sound_log_path = '/config/sound_log.csv'
-
+log_path = '/media/yamcam//yamcam_log.txt'
+sound_log_path = '/media/yamcam/'
 
 
 # Global shutdown event
@@ -95,7 +94,7 @@ if not (0.0 <= noise_threshold <= 1.0):
 # interval for summary entry log messages
 logger.info (f"Summary reports every {summary_interval} min.")
 
-     # -------- LOGFILE FOR DEBUG ANALYSIS 
+     # -------- LOG TO FILE FOR DEBUG ANALYSIS 
 if logfile:
     logger.info(f"Open (or create) log file ({log_path})for sound history analysis.")
     try:
@@ -110,9 +109,6 @@ if logfile:
         logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
 
-     # -------- SOUND LOG FOR SOUND ANALYSIS 
-if sound_log:
-    logger.info(f"Open (or create) sound_log csv ({sound_log_path})for sound history analysis.")
 
      # -------- SOUND EVENT PARAMETERS 
 try:

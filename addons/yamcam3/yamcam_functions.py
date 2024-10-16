@@ -65,6 +65,7 @@
 #
 
 import time
+import os
 import atexit
 import csv
 from datetime import datetime
@@ -86,14 +87,18 @@ logger = yamcam_config.logger
 ### ---------- SOUND LOG CSV SETUP --------------###
 #                                                #
 
-sound_log_lock = threading.Lock() 
+sound_log_lock = threading.Lock()  # lock the file when writing since we have multiple threads writing
+
+timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M') # timestamp as log filename
+sound_log_path = os.path.join(sound_log_dir, f"{timestamp}.csv") # create the log file
 
 if sound_log:
+    logger.info(f"Create {sound_log_path} for sound history analysis.")
     try:
         sound_log_file = open(sound_log_path, 'a', newline='')
         sound_log_writer = csv.writer(sound_log_file)
     except Exception as e:
-        logger.error(f"Could not create or open the sound log file at {sound_log_path}: {e}")
+        logger.error(f"Could not create {sound_log_path}: {e}")
         sound_log_file = None
         sound_log_writer = None
 else:
