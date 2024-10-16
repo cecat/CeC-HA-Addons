@@ -128,7 +128,8 @@ if logfile:
     check_for_log_dir() # make sure /media/yamcam exists
 
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
-    log_path = f"{log_dir}/{timestamp}.log"
+    #log_path = f"{log_dir}/{timestamp}.log"
+    log_path = os.path.join(log_dir, f"{timestamp}.log")
 
     check_storage(log_dir, '.log') # let the user know how much storage they're using
 
@@ -202,7 +203,7 @@ mqtt_port            = mqtt_settings.get('port', 1883)
 mqtt_topic_prefix    = mqtt_settings.get('topic_prefix', 'yamcam/sounds' )
 mqtt_client_id       = mqtt_settings.get('client_id', 'yamcam') 
 mqtt_username        = mqtt_settings.get('user', 'noUser')
-mqtt_password        = mqtt_settings.get('password' 'noPassword')
+mqtt_password        = mqtt_settings.get('password', 'noPassword')
     
      # -------- LOG LEVEL
 log_levels = {
