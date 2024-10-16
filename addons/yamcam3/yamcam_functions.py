@@ -77,7 +77,7 @@ import json
 import yamcam_config
 from yamcam_config import (
         interpreter, input_details, output_details, logger,
-        sound_log, sound_log_path,
+        sound_log, sound_log_dir,
         exclude_groups, summary_interval, shutdown_event
 )
 
