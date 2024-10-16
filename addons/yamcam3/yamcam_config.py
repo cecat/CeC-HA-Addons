@@ -193,7 +193,7 @@ else:
 
 #### debug file system access ####
 
-test_path = '/media/testfile.txt'
+test_path = '/media/yamcam/testfile.txt'
 logger.info(f"Trying to open {test_path}")
 try:
     with open(test_path, 'w') as testf:
