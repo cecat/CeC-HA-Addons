@@ -31,7 +31,6 @@ shutdown_event = threading.Event()
 def check_for_log_dir():
     try:
         os.makedirs(sound_log_dir, exist_ok=True)
-        print(f"Sound log directory '{sound_log_dir}' OK.")
     except OSError as e:
         # Use print since logging is not configured yet
         print(f"Error: Failed to create logging directory '{sound_log_dir}': {e}")
@@ -53,18 +52,13 @@ def check_storage(directory, file_extension):
         total_size_mb = total_size_bytes / (1024 * 1024)
 
         # Log the file count and total size if we are taking up more than 100MB
-        if total_size_mb > 1:
-            logger.info(f"NOTE: You have {file_count} '{file_extension}' files in {directory}, "
-                        f"taking up {total_size_mb:.2f} MB of disk space.")
+        if total_size_mb > 100:
+            logger.info(f"NOTE: You have {file_count} {file_extension} files in {directory}, "
+                        f"({total_size_mb:.2f}MB)")
     except Exception as e:
         print(f"Error while counting files or calculating size in {directory}: {e}")
 
-    
-
-# set logging to (default) INFO and include timestamps
-# user can select different logging level via /config/microphones.yaml
-
-# logging configuration
+     # -------- SET INITIAL LOGGING LEVEL
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -137,11 +131,7 @@ if logfile:
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
     log_path = f"{log_dir}/{timestamp}.log"
 
-    try:
-        logger.info(f"calling check_storage with {log_dir} and .log")
-        check_storage(log_dir, '.log') # let the user know how much storage they're using
-    except:
-        logger.info(f"could not call check_storage with {log_dir} and .log")
+    check_storage(log_dir, '.log') # let the user know how much storage they're using
 
     logger.info(f"Creating {log_path} for debug analysis.")
     try:
