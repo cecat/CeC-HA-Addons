@@ -105,6 +105,8 @@ else:
     sound_log_file = None
     sound_log_writer = None
 
+
+
      # -------- MAKE SURE WE CLOSE CSV AT EXIT
 
 def close_sound_log_file():
