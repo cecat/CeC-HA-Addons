@@ -251,7 +251,8 @@ group_score = max_score
 number of classes from that group are in the top_k scores. 
 - group_score is capped at 0.95.
 
-The *sound_log* option will create a csv file in */media/yamcam* with 5 columns:
+The *sound_log* option will create a csv file in */media/yamcam*. If this
+directory does not exist, the add-on will create it.   The CSV format is 5 columns:
 *(date/time), (group_name), (group_score), (class_name), (class_score)*
 And one row per sound (class or group) detected in the *top_k*.  This will give
 you a feel for what sounds are being detected by each of your cameras. As importantly,
