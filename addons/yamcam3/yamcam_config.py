@@ -9,6 +9,7 @@ import logging
 import tflite_runtime.interpreter as tflite
 import time
 import threading
+import os
 
 # File paths
 
@@ -18,13 +19,26 @@ model_path = 'yamnet.tflite'
 log_path = '/media/yamcam//yamcam_log.txt'
 sound_log_dir = '/media/yamcam/'
 
-
 # Global shutdown event
 shutdown_event = threading.Event()
 
 #                                              #
 ### ---------- SET UP LOGGING  --------------###
 #                                              #
+
+try:
+    os.makedirs(sound_log_dir, exist_ok=True)
+    print(f"Sound log directory '{sound_log_dir}' OK.")
+except OSError as e:
+    # Use print since logging is not configured yet
+    print(f"Error: Failed to create logging directory '{sound_log_dir}': {e}")
+    print(f"STOPPING the add-on. Use *Terminal* or SSH CLI to manually create {sound_log_dir}"
+           " or set sound_log to false")
+    print(f"STOPPING the add-on. Use *Terminal* or SSH CLI to manually create {sound_log_dir} "
+           "or set sound_log to false")
+
+    sys.exit(1)  # Exit with a non-zero code to indicate failure
+
 
 # set logging to (default) INFO and include timestamps
 # user can select different logging level via /config/microphones.yaml
