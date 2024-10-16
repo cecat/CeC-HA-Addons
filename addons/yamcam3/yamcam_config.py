@@ -41,7 +41,6 @@ def check_for_log_dir():
 
      # -------- KEEP THE USER INFORMED OF ACCUMULATED LOGS
 def check_storage(directory, file_extension):
-    logger.info(f"checking {directory} for {file_extension} files")
     try:
         # count *.file_extension files
         files = [f for f in os.listdir(directory) if f.endswith(file_extension)]
