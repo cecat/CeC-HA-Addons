@@ -48,19 +48,32 @@ class CameraStreamSupervisor:
      # -------- START STREAM
     def start_stream(self, camera_name):
         camera_config = self.camera_configs.get(camera_name)
-        if camera_config:
-            rtsp_url = camera_config['ffmpeg']['inputs'][0]['path']
-            try:
-                stream = CameraAudioStream(camera_name, rtsp_url,
-                           self.analyze_callback, self, self.shutdown_event)
 
+        if camera_config:
+            try:
+                # Check if the RTSP path is provided and valid
+                rtsp_url = camera_config['ffmpeg']['inputs'][0].get('path')
+
+                if not rtsp_url or not isinstance(rtsp_url, str):
+                    logger.error(f"{camera_name}: RTSP path is missing or invalid in the configuration.")
+                    raise ValueError(f"Invalid RTSP path for camera '{camera_name}'. Halting the program.")
+
+                # Start the stream if the path is valid
+                stream = CameraAudioStream(camera_name, rtsp_url,
+                                           self.analyze_callback, self, self.shutdown_event)
                 stream.start()
                 self.streams[camera_name] = stream
                 logger.info(f"Started stream for {camera_name}.")
+            except (KeyError, IndexError, TypeError) as e:
+                logger.error(f"{camera_name}: Invalid camera configuration: {e}. Halting the program.", exc_info=True)
+                raise ValueError(f"Configuration error for camera '{camera_name}'. Halting the program.")
             except Exception as e:
-                logger.error(f"{camera_name}: Failed to start stream {e}", exc_info=True)
+                logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.", exc_info=True)
+                raise e
         else:
-            logger.error(f"{camera_name}: No configuration found.")
+            logger.error(f"{camera_name}: No configuration found. Halting the program.")
+            raise ValueError(f"Missing configuration for camera '{camera_name}'. Halting the program.")
+
 
      # -------- STOP ALL STREAMS
     def stop_all_streams(self):
