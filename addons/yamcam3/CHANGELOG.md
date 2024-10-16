@@ -8,6 +8,10 @@
 - .log files (debug logging) and .csv files (sound logging) created at
   add-on startup with filenames yyyymmdd-hhmm rather than appending to
   one mamoth file.
+- Informational warning if there is more than 100MB of .log or .csv files
+  in /media/yamcam (in case the user cares).
+- Initial logic to check for and handle mistakes in microphones.yaml config
+  file, such as missing mqtt or camera settings.
 
 ## 0.3.3
 - Added a configuration boolean, sound_log, to create a csv with all group
