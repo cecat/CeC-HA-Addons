@@ -18,14 +18,6 @@ model_path = 'yamnet.tflite'
 log_path = '/config/yamcam_log.txt'
 sound_log_path = '/config/sound_log.csv'
 
-#### debug file system access ####
-test_path = '/media/testfile.txt'
-try:
-    with open(test_path, 'w') as testf:
-        testf.write("Hello filesystem\n")
-except OSError as e:
-    logger.error(f"Error opening or writing to file {test_path}: {e}")
-    raise
 
 
 # Global shutdown event
@@ -196,6 +188,22 @@ else:
     logger.setLevel(logging.INFO)
     for handler in logger.handlers:
         handler.setLevel(logging.INFO)
+
+
+
+#### debug file system access ####
+
+test_path = '/media/testfile.txt'
+logger.info(f"Trying to open {test_path}")
+try:
+    with open(test_path, 'w') as testf:
+        logger.info(f"SUCCESS opening {test_path}")
+        testf.write("Hello filesystem\n")
+        logger.info(f"WROTE to {test_path}")
+except OSError as e:
+    logger.error(f"Error opening or writing to file {test_path}: {e}")
+    raise
+
 
 #                                              #
 ### ---------- SET UP YAMNET MODEL ----------###
