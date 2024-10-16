@@ -42,7 +42,7 @@ def check_for_log_dir():
 
      # -------- KEEP THE USER INFORMED OF ACCUMULATED LOGS
 def check_storage(directory, file_extension):
-    print(f"checking {directory} for {file_extension} files")
+    logger.info(f"checking {directory} for {file_extension} files")
     try:
         # count *.file_extension files
         files = [f for f in os.listdir(directory) if f.endswith(file_extension)]
@@ -53,8 +53,8 @@ def check_storage(directory, file_extension):
         total_size_mb = total_size_bytes / (1024 * 1024)
 
         # Log the file count and total size if we are taking up more than 100MB
-        if total_size_mb > 100:
-            print(f"NOTE: You have {file_count} '{file_extension}' files in {directory}, "
+        if total_size_mb > 1:
+            logger.info(f"NOTE: You have {file_count} '{file_extension}' files in {directory}, "
                         f"taking up {total_size_mb:.2f} MB of disk space.")
     except Exception as e:
         print(f"Error while counting files or calculating size in {directory}: {e}")
@@ -138,10 +138,10 @@ if logfile:
     log_path = f"{log_dir}/{timestamp}.log"
 
     try:
-        logger.debug(f"calling check_storage with {log_dir} and .log")
+        logger.info(f"calling check_storage with {log_dir} and .log")
         check_storage(log_dir, '.log') # let the user know how much storage they're using
     except:
-        logger.debug(f"could not call check_storage with {log_dir} and .log")
+        logger.info(f"could not call check_storage with {log_dir} and .log")
 
     logger.info(f"Creating {log_path} for debug analysis.")
     try:
