@@ -131,10 +131,11 @@ logger.info (f"Summary reports every {summary_interval} min.")
 if logfile:
 
     check_for_log_dir() # make sure /media/yamcam exists
-    check_storage(log_path, '.log') # let the user know how much storage they're using
 
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
     log_path = f"{log_dir}/{timestamp}.log"
+
+    check_storage(log_dir, '.log') # let the user know how much storage they're using
 
     logger.info(f"Creating {log_path} for debug analysis.")
     try:
