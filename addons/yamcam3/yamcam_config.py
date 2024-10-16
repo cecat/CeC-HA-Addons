@@ -18,6 +18,16 @@ model_path = 'yamnet.tflite'
 log_path = '/config/yamcam_log.txt'
 sound_log_path = '/config/sound_log.csv'
 
+#### debug file system access ####
+test_path = '/media/testfile.txt'
+try:
+    with open(test_path, 'w') as testf:
+        testf.write("Hello filesystem\n")
+except OSError as e:
+    logger.error(f"Error opening or writing to file {test_path}: {e}")
+    raise
+
+
 # Global shutdown event
 shutdown_event = threading.Event()
 
