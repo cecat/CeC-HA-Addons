@@ -185,22 +185,6 @@ else:
     for handler in logger.handlers:
         handler.setLevel(logging.INFO)
 
-
-
-#### debug file system access ####
-
-test_path = '/media/yamcam/testfile.txt'
-logger.info(f"Trying to open {test_path}")
-try:
-    with open(test_path, 'w') as testf:
-        logger.info(f"SUCCESS opening {test_path}")
-        testf.write("Hello filesystem\n")
-        logger.info(f"WROTE to {test_path}")
-except OSError as e:
-    logger.error(f"Error opening or writing to file {test_path}: {e}")
-    raise
-
-
 #                                              #
 ### ---------- SET UP YAMNET MODEL ----------###
 #                                              #
