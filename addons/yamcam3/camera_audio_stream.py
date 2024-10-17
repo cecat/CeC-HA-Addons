@@ -210,20 +210,20 @@ class CameraAudioStream:
                 if line:
                     line_decoded = line.decode('utf-8', errors='replace').strip()
                     if "401 Unauthorized" in line_decoded: # this is not going away without fixing config
-                        logger.info(f"*****--------> FFmpeg FAILED: Invalid credentials for {self.camera_name}.")
-                        logger.info(f"*****--------> Please STOP add-on and fix config for {self.camera_name}.")
+                        logger.warning(f"*****--------> FFmpeg FAILED: Invalid credentials for {self.camera_name}.")
+                        logger.warning(f"*****--------> Please STOP add-on and fix config for {self.camera_name}.")
                         break
                     elif "No route to host" in line_decoded: # this might be a temporary outage
-                        logger.info(f"*****--------> FFmpeg FAILED: No route to host for {self.camera_name}.")
-                        logger.info(f"*****--------> Please check IP address for {self.camera_name}.")
+                        logger.warning(f"*****--------> FFmpeg FAILED: No route to host for {self.camera_name}.")
+                        logger.warning(f"*****--------> Please check IP address for {self.camera_name}.")
                         break
                     elif "Connection refused" in line_decoded: # this could be temp or may need fixing config
-                        logger.info(f"*****--------> FFmpeg FAILED: Connection refused for {self.camera_name}.")
-                        logger.info(f"*****--------> Please check port number in path for {self.camera_name}.")
+                        logger.warning(f"*****--------> FFmpeg FAILED: Connection refused for {self.camera_name}.")
+                        logger.warning(f"*****--------> Please check port number in path for {self.camera_name}.")
                         break
                     elif "403 Forbidden" in line_decoded: # this could be temp or may need fixing config
-                        logger.info(f"*****--------> FFmpeg FAILED: Access denied for {self.camera_name}.")
-                        logger.info(f"*****--------> Please check channel number in path for {self.camera_name}.")
+                        logger.warning(f"*****--------> FFmpeg FAILED: Access denied for {self.camera_name}.")
+                        logger.warning(f"*****--------> Please check channel number in path for {self.camera_name}.")
                         break
                     elif ffmpeg_debug:
                         logger.debug(f"FFmpeg stderr: {self.camera_name}: {line_decoded}")
