@@ -449,8 +449,7 @@ def update_sound_window(camera_name, detected_sounds):
 
      # -------- Generate Periodic summaries
 
-#def generate_summary():
-def log_summary():
+def generate_summary():
     logger.info(f"Events Summary ({yamcam_config.summary_interval} min):")
     
     cameras_with_events = []
@@ -491,7 +490,7 @@ def log_summary():
 
      # -------- Log a summary
 
-def old_log_summary():
+def log_summary():
     while not shutdown_event.is_set():
         try:
             time.sleep(yamcam_config.summary_interval * 60)  # Sleep for the specified interval
