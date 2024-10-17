@@ -57,7 +57,7 @@ class CameraStreamSupervisor:
                                            self.analyze_callback, self, self.shutdown_event)
                 stream.start()
                 self.streams[camera_name] = stream
-                logger.info(f"Started stream for {camera_name}.")
+                logger.info(f"Starting stream for {camera_name}.")
             except Exception as e:
                 logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.")
                 sys.exit(1)
