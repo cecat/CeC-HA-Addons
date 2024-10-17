@@ -446,7 +446,7 @@ def generate_summary():
             total_events = sum(counts.values())
             if total_events > 0:
                 groups = ', '.join(set(counts.keys()))
-                logger.info(f"    {camera_name} : {total_events : {groups}")
+                logger.info(f"    {camera_name} : {total_events} : {groups}")
             else:
                 logger.info(f"    {camera_name} : No sound events detected.")
 
