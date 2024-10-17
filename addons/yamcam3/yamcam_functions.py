@@ -195,7 +195,7 @@ def report_event(camera_name, sound_class, event_type, timestamp):
     # CSV logging (events)
     if sound_log_writer is not None:
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        if event_type = 'start':   # column 7 is start
+        if event_type == 'start':   # column 7 is start
             row = [timestamp, camera_name, '', '', '', '', class_name, '']
         else                       # column 8 is end 
             row = [timestamp, camera_name, '', '', '', '', '', class_name]
