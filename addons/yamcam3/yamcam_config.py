@@ -108,12 +108,16 @@ ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
 exclude_groups       = general_settings.get('exclude_groups', [])   # groups to ignore
 summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
-# default_min_score and noise_thresholdmust be between 0 and 1
+# logfile must be true or false
+logger.info(f"logfile entered as {logfile}")
+
+# default_min_score must be between 0 and 1
 if not (0.0 <= default_min_score <= 1.0):
     logger.warning(f"Invalid default_min_score '{default_min_score}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.5."
     )
     default_min_score = 0.5
+# noise_threshold must be between 0 and 1
 if not (0.0 <= noise_threshold <= 1.0):
     logger.warning(f"Invalid noise_threshold '{noise_threshold}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.1."
