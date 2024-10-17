@@ -43,7 +43,7 @@ class CameraStreamSupervisor:
         for camera_name, camera_config in self.camera_configs.items():
             self.start_stream(camera_name)
         self.supervisor_thread.start()
-        logger.info("Supervisor thread started.")
+        logger.debug("Supervisor thread started.")
 
      # -------- START STREAM
     def start_stream(self, camera_name):

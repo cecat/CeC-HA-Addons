@@ -84,7 +84,7 @@ supervisor.start_all_streams()
 # Start the summary logging thread
 summary_thread = threading.Thread(target=log_summary, daemon=True)
 summary_thread.start()
-logger.info("Summary logging thread started.")
+logger.debug("Summary logging thread started.")
 
 #                                                #
 ### ---------- MAIN ---------------------------###

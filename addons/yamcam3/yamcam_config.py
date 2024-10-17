@@ -262,8 +262,6 @@ def validate_camera_config(camera_settings):
         if not rtsp_url or not isinstance(rtsp_url, str):
             raise ValueError(f"Camera '{camera_name}': RTSP path is missing or invalid.")
 
-    logger.info("Camera configuration validated successfully.")
-
      # -------- SOUND SOURCES 
 try:
     camera_settings  = config['cameras']
