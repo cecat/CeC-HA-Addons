@@ -63,6 +63,7 @@ class CameraAudioStream:
             self.command = [
                 'ffmpeg',
                 '-rtsp_transport', 'tcp',
+                '-timeout', '30000000',    # timeout in 30s
                 '-i', self.rtsp_url,
                 '-f', 's16le',
                 '-acodec', 'pcm_s16le',
