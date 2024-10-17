@@ -13,8 +13,7 @@ from yamcam_functions import (
     rank_sounds, set_mqtt_client, update_sound_window,
     #detected_sounds_history, history_lock, report,
     #event_counts, state_lock,
-    #log_summary,
-    shutdown_event
+    log_summary, shutdown_event
 )
 import yamcam_config  # all setup and config happens here
 from yamcam_config import logger #, summary_interval
