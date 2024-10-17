@@ -194,19 +194,19 @@ def report_event(camera_name, sound_class, event_type, timestamp):
 
     # CSV logging (events)
     if sound_log_writer is not None:
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        log_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Use current time for CSV log
         if event_type == 'start':   # column 7 is start
-            row = [timestamp, camera_name, '', '', '', '', sound_class, '']
-        else:                       # column 8 is end 
-            row = [timestamp, camera_name, '', '', '', '', '', sound_class]
+            row = [log_timestamp, camera_name, '', '', '', '', sound_class, '']
+        else:                       # column 8 is end
+            row = [log_timestamp, camera_name, '', '', '', '', '', sound_class]
 
         with sound_log_lock:
             sound_log_writer.writerow(row)
             sound_log_file.flush()
 
+    # MQTT logging (events)
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
-
-    formatted_timestamp = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+    formatted_timestamp = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')  # Use the original timestamp
 
     payload = {
         'camera_name': camera_name,
@@ -226,7 +226,6 @@ def report_event(camera_name, sound_class, event_type, timestamp):
         except Exception as e:
             logger.error(f"Exception: Failed to publish MQTT message: {e}")
     else:
-        logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
         logger.error("MQTT client is NOT CONNECTED. Skipping publish.")
 
 
