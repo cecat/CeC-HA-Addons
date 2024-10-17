@@ -449,7 +449,7 @@ def update_sound_window(camera_name, detected_sounds):
 
      # -------- Generate Periodic summaries
 
-def generate_summary():
+def deprecated_generate_summary():
     logger.info(f"Events Summary ({yamcam_config.summary_interval} min):")
     
     cameras_with_events = []
@@ -526,7 +526,7 @@ def log_summary():
      # -------- REPORT (deprecated, see REPORT_EVENT)
      #----- this function deprecated by report_event
      #----- leaving it in case we decide to report more detail
-def report(results, mqtt_client, camera_name):
+def deprecated_report(results, mqtt_client, camera_name):
 
     mqtt_topic_prefix = yamcam_config.mqtt_topic_prefix
 
