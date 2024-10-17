@@ -118,13 +118,13 @@ if isinstance(logfile, str):
     elif logfile_lower == "false":
         logfile = False
     else:                       # Handle mistyped or invalid boolean values
-        logfile = False
         logger.warning(f"Invalid boolean value '{logfile}' for logfile. Defaulting to False.")
+        logfile = False
 elif isinstance(logfile, bool):
     pass                        # Value is already a valid boolean, no action needed
 else:                           # Value is neither string nor boolean, default to False
-    logfile = False
     logger.warning(f"Invalid boolean type for '{logfile}' for logfile. Defaulting to False.")
+    logfile = False
 
     # SOUND_LOG must be boolean
 if isinstance(sound_log, str):
@@ -134,13 +134,13 @@ if isinstance(sound_log, str):
     elif sound_log_lower == "false":
         sound_log = False
     else:                       # Handle mistyped or invalid boolean values
-        sound_log = False
         logger.warning(f"Invalid boolean value '{sound_log}' for sound_log. Defaulting to False.")
+        sound_log = False
 elif isinstance(sound_log, bool):
     pass                        # Value is already a valid boolean, no action needed
 else:                           # Value is neither string nor boolean, default to False
-    sound_log = False
     logger.warning(f"Invalid boolean value '{sound_log}' for sound_log. Defaulting to False.")
+    sound_log = False
 
     # FFMPEG_DEBUG must be boolean
 if isinstance(ffmpeg_debug, str):
@@ -150,13 +150,13 @@ if isinstance(ffmpeg_debug, str):
     elif ffmpeg_debug_lower == "false":
         ffmpeg_debug = False
     else:                       # Handle mistyped or invalid boolean values
-        ffmpeg_debug = False
         logger.warning(f"Invalid boolean value '{ffmpeg_debug}' for ffmpeg_debug. Defaulting to False.")
+        ffmpeg_debug = False
 elif isinstance(logfile, bool):
     pass                        # Value is already a valid boolean, no action needed
 else:                           # Value is neither string nor boolean, default to False
-    logfile = False
     logger.warning(f"Invalid boolean value '{ffmpeg_debug}' for ffmpeg_debug. Defaulting to False.")
+    logfile = False
 
     # DEFAULT_MIN_SCORE must be between 0 and 1
 if not (0.0 <= default_min_score <= 1.0):
