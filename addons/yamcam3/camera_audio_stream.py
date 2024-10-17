@@ -221,6 +221,10 @@ class CameraAudioStream:
                         logger.info(f"*****--------> FFmpeg FAILED: Connection refused for {self.camera_name}.")
                         logger.info(f"*****--------> Please check port number in path for {self.camera_name}.")
                         break
+                    elif "403 Forbidden" in line_decoded: # this could be temp or may need fixing config
+                        logger.info(f"*****--------> FFmpeg FAILED: Access denied for {self.camera_name}.")
+                        logger.info(f"*****--------> Please check channel number in path for {self.camera_name}.")
+                        break
                     elif ffmpeg_debug:
                         logger.debug(f"FFmpeg stderr: {self.camera_name}: {line_decoded}")
                 else:
