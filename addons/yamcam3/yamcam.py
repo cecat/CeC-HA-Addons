@@ -42,7 +42,7 @@ def shutdown(signum, frame):
     logging.shutdown()  # Ensure all logs are flushed
     sys.exit(0)
 
-    # Register the shutdown handler for SIGINT and SIGTERM
+     # -------- REGISTER SHUTDOWN HANDLERS
     # (i.e., when HASS user hits "stop")
 signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)

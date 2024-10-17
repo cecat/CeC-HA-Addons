@@ -225,6 +225,10 @@ class CameraAudioStream:
                         logger.warning(f"*****--------> FFmpeg FAILED: Access denied for {self.camera_name}.")
                         logger.warning(f"*****--------> Please check channel number in path for {self.camera_name}.")
                         break
+                    elif "timed out" in line_decoded: # this could be temp or may need fixing config
+                        logger.warning(f"*****--------> FFmpeg FAILED: connection timeout for {self.camera_name}.")
+                        logger.warning(f"*****--------> Please check IP address for {self.camera_name}.")
+                        break
                     elif ffmpeg_debug:
                         logger.debug(f"FFmpeg stderr: {self.camera_name}: {line_decoded}")
                 else:
