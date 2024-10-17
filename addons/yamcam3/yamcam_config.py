@@ -218,7 +218,7 @@ if sound_log:
 try:
     events_settings = config['events']
 except KeyError:
-    logger.debug("Missing events settings in the configuration file. Using default values.")
+    logger.warning("Missing events settings in the configuration file. Using default values.")
     events_settings = {
         'window_detect': 5,  # Default value
         'persistence': 3,    # Default value
@@ -233,7 +233,7 @@ decay = events_settings.get('decay', 15)
 try:
     sounds = config['sounds']
 except KeyError:
-    logger.debug("Missing sounds settings in the configuration file. Using default values.")
+    logger.warning("Missing sounds settings in the configuration file. Using default values.")
 
 sounds_to_track = sounds.get('track', [])
 sounds_filters = sounds.get('filters', {})

@@ -122,7 +122,7 @@ class CameraAudioStream:
                 self.process.wait()
                 self.process = None
             if not self.shutdown_event.is_set():
-                logger.info(f"******-->STOP audio stream: {self.camera_name}.")
+                logger.warning(f"******-->STOP audio stream: {self.camera_name}.")
 
             # Wait for threads to finish
             current_thread = threading.current_thread()
@@ -142,7 +142,7 @@ class CameraAudioStream:
                 while len(raw_audio) < self.buffer_size:
                     with self.lock:
                         if not self.running or not self.process or not self.process.stdout:
-                            logger.debug(f"{self.camera_name}: Process terminated or "
+                            logger.error(f"{self.camera_name}: Process terminated or "
                                           "not running. Exiting read_stream.")
                             return  # Exit if the process is no longer available
                         fd = self.process.stdout.fileno()
@@ -159,7 +159,7 @@ class CameraAudioStream:
                                 self.stop()
                                 return
                             else:
-                                logger.error(f"{self.camera_name}: No data read from FFmpeg "
+                                logger.warning(f"{self.camera_name}: No data read from FFmpeg "
                                               " stdout, but process is still running.")
                                 time.sleep(0.5)
                                 continue
@@ -168,7 +168,7 @@ class CameraAudioStream:
                     else:
                     # No data ready, select timed out
                         if self.shutdown_event.is_set() or not self.running:
-                            logger.debug(f"{self.camera_name}: Shutdown detected. Exiting read_stream.")
+                            logger.warning(f"{self.camera_name}: Shutdown detected. Exiting read_stream.")
                             return
                         else:
                             # No data yet, continue waiting for data
@@ -207,7 +207,7 @@ class CameraAudioStream:
 
             try:
                 line = stderr.readline()
-                if line:
+                if line:                    # use warning since other cams may be fine
                     line_decoded = line.decode('utf-8', errors='replace').strip()
                     if "401 Unauthorized" in line_decoded: # this is not going away without fixing config
                         logger.warning(f"*****--------> FFmpeg FAILED: Invalid credentials for {self.camera_name}.")
@@ -232,7 +232,7 @@ class CameraAudioStream:
                         if self.process:
                             return_code = self.process.poll()
                             if return_code is not None:
-                                logger.debug(f"{self.camera_name}: FFmpeg process has "
+                                logger.warning(f"{self.camera_name}: FFmpeg process has "
                                              f"terminated with return code {return_code}.")
                                 break  # Exit the loop as the process has terminated
                     time.sleep(0.1)

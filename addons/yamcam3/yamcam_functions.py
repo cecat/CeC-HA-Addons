@@ -104,7 +104,7 @@ if sound_log:
         sound_log_file = open(sound_log_path, 'a', newline='')
         sound_log_writer = csv.writer(sound_log_file)
     except Exception as e:
-        logger.error(f"Could not create {sound_log_path}: {e}")
+        logger.warning(f"Could not create {sound_log_path}: {e}")
         sound_log_file = None
         sound_log_writer = None
 else:
@@ -259,7 +259,7 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
             scores = np.copy(interpreter.get_tensor(output_details[0]['index']))  
 
             if scores.size == 0:
-                logger.error(f"{camera_name}: No scores available to analyze.")
+                logger.warning(f"{camera_name}: No scores available to analyze.")
                 return None
 
         except Exception as e:

@@ -62,7 +62,7 @@ class CameraStreamSupervisor:
                 logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.")
                 sys.exit(1)
         else:
-            logger.error(f"{camera_name}: No configuration found. Halting the program.")
+            logger.error(f"{camera_name}: No configuration found. Halting the add-on.")
             sys.exit(1)
 
 
@@ -74,14 +74,14 @@ class CameraStreamSupervisor:
             self.running = False
             if not self.shutdown_event.is_set():
                 self.shutdown_event.set()  # Set shutdown flag
-                logger.info("******------> STOPPING ALL audio streams...")
+                logger.warning("******------> STOPPING ALL audio streams...")
             # Iterate over a copy to avoid modification during iteration
             for stream in list(self.streams.values()):
                 try:
                     stream.stop()
                 except Exception as e:
                     logger.error(f"Error stopping stream {stream.camera_name}: {e}", exc_info=True)
-            logger.info("All audio streams have been requested to stop.")
+            logger.warning("All audio streams have been requested to stop.")
         try:
             self.supervisor_thread.join(timeout=5)  # Wait up to 5 seconds for supervisor_thread to finish
             logger.info("Supervisor thread stopped.")
@@ -99,14 +99,14 @@ class CameraStreamSupervisor:
                         break
                     stream = self.streams.get(camera_name)
                     if not stream or not stream.running:
-                        logger.info(f"{camera_name} stream not running. Attempting to restart.")
+                        logger.warning(f"{camera_name} stream not running. Attempting to restart.")
                         self.start_stream(camera_name)
         if not self.shutdown_event.is_set():
             logger.info("Supervisor monitoring stopped.")
 
      # -------- STREAM STOPPED
     def stream_stopped(self, camera_name):
-        logger.info(f"Stream {camera_name} has stopped.")
+        logger.warning(f"Stream {camera_name} has stopped.")
         # Remove the stopped stream from the dictionary
         with self.lock:
             if camera_name in self.streams:

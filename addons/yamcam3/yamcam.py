@@ -32,13 +32,13 @@ running = True
      # -------- GRACEFUL SHUT-DOWN
 def shutdown(signum, frame):
     global running
-    logger.info(f"Received Order 66 (signal {signum}), shutting down...")
+    logger.warning(f"Received Order 66 (signal {signum}), shutting down...")
     running = False  # Set the running flag to False to exit the main loop
     shutdown_event.set()  # Signal all threads to shut down
-    logger.info("******------> STOPPING ALL audio streams...")
+    logger.warning("******------> STOP ALL audio streams...")
     supervisor.stop_all_streams()
     time.sleep(1)  # Allow log messages to flush
-    logger.info("All audio streams stopped. Exiting.")
+    logger.warning("All audio streams stopped. Exiting.")
     logging.shutdown()  # Ensure all logs are flushed
     sys.exit(0)
 
@@ -93,11 +93,10 @@ logger.debug("Summary logging thread started.")
 try:
     while running:
         time.sleep(1)  # Keep the main thread running
-finally:
-    logger.info("******------> STOPPING ALL audio streams...")
+    logger.warning("******------> STOPPING ALL audio streams...")
     supervisor.stop_all_streams()
     time.sleep(1) # pause for queued log messages to chirp
-    logger.info("All audio streams stopped. Exiting.")
+    logger.warning("All audio streams stopped. Exiting.")
     logging.shutdown() # make sure all logs are flushed
 
 
