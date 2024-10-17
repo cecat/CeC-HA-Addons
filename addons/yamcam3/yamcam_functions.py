@@ -197,7 +197,7 @@ def report_event(camera_name, sound_class, event_type, timestamp):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         if event_type == 'start':   # column 7 is start
             row = [timestamp, camera_name, '', '', '', '', class_name, '']
-        else                       # column 8 is end 
+        else:                       # column 8 is end 
             row = [timestamp, camera_name, '', '', '', '', '', class_name]
 
         with sound_log_lock:
