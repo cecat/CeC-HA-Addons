@@ -57,12 +57,15 @@
 #          report_event(camera_name, sound_class, event_type, timestamp)
 #
 #          log_summary()
+#             Periodically send a summary to the log with the number and type of sound 
+#             events detected for each camera.
 #
 # ###  Misc
 #
 #          close_sound_log_file()
 #             Make sure the sound_log CSV file is closed at exit
 #
+
 
 import time
 import os
@@ -504,16 +507,16 @@ def log_summary():
                     total_events = sum(counts.values())
                     if total_events > 0:
                         groups = ', '.join(sorted(set(counts.keys())))
-                        summary_lines.append(f"{camera_name} : {total_events} sound events: {groups}")
+                        summary_lines.append(f"{camera_name}: {total_events} events: {groups}")
                     else:
-                        summary_lines.append(f"{camera_name} : No sound events")
+                        summary_lines.append(f"{camera_name}: No sound events")
 
                 if summary_lines:
                     # Create a multi-line summary with indentation
                     formatted_summary = "\n    ".join(summary_lines)
                     logger.info(f"Summary (past {yamcam_config.summary_interval} min):\n    {formatted_summary}")
                 else:
-                    logger.info(f"Summary (past {yamcam_config.summary_interval} min): No sound events detected for any camera.")
+                    logger.info(f"Summary (past {yamcam_config.summary_interval} min): No events detected.")
 
                 # Reset event counts after summary
                 for counts in event_counts.values():
