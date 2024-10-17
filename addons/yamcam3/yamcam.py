@@ -93,6 +93,7 @@ logger.debug("Summary logging thread started.")
 try:
     while running:
         time.sleep(1)  # Keep the main thread running
+finally:
     logger.warning("******------> STOPPING ALL audio streams...")
     supervisor.stop_all_streams()
     time.sleep(1) # pause for queued log messages to chirp
