@@ -216,9 +216,11 @@ class CameraAudioStream:
                     elif "No route to host" in line_decoded: # this might be a temporary outage
                         logger.info(f"*****--------> FFmpeg FAILED: No route to host for {self.camera_name}.")
                         logger.info(f"*****--------> Please check IP address for {self.camera_name}.")
+                        break
                     elif "Connection refused" in line_decoded: # this could be temp or may need fixing config
                         logger.info(f"*****--------> FFmpeg FAILED: Connection refused for {self.camera_name}.")
                         logger.info(f"*****--------> Please check port number in path for {self.camera_name}.")
+                        break
                     elif ffmpeg_debug:
                         logger.debug(f"FFmpeg stderr: {self.camera_name}: {line_decoded}")
                 else:
