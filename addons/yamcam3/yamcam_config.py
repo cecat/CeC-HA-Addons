@@ -101,31 +101,87 @@ except KeyError as e:
 log_level            = general_settings.get('log_level', 'INFO').upper()
 logfile              = general_settings.get('logfile', False)
 sound_log            = general_settings.get('sound_log', False)
-noise_threshold      = general_settings.get('noise_threshold', 0.1)   
-default_min_score    = general_settings.get('default_min_score', 0.5)
-top_k                = general_settings.get('top_k', 10)
 ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
+default_min_score    = general_settings.get('default_min_score', 0.5)
+noise_threshold      = general_settings.get('noise_threshold', 0.1)   
+top_k                = general_settings.get('top_k', 10)
 exclude_groups       = general_settings.get('exclude_groups', [])   # groups to ignore
 summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
-# logfile must be true or false
-logger.info(f"logfile entered as {logfile}")
+    # --------- VERIFY values
 
-# default_min_score must be between 0 and 1
+    # LOGFILE must be boolean
+if isinstance(logfile, str):
+    logfile_lower = logfile.lower()
+    if logfile_lower == "true":
+        logfile = True
+    elif logfile_lower == "false":
+        logfile = False
+    else:                       # Handle mistyped or invalid boolean values
+        logfile = False
+        logger.warning(f"Invalid boolean value '{logfile}'. Defaulting to False.")
+elif isinstance(logfile, bool):
+    pass                        # Value is already a valid boolean, no action needed
+else:                           # Value is neither string nor boolean, default to False
+    logfile = False
+    logger.warning(f"Invalid boolean type for 'logfile'. Defaulting to False.")
+
+    # SOUND_LOG must be boolean
+if isinstance(sound_log, str):
+    sound_log_lower = sound_log.lower()
+    if sound_log_lower == "true":
+        sound_log = True
+    elif sound_log_lower == "false":
+        sound_log = False
+    else:                       # Handle mistyped or invalid boolean values
+        sound_log = False
+        logger.warning(f"Invalid boolean value '{sound_log}'. Defaulting to False.")
+elif isinstance(sound_log, bool):
+    pass                        # Value is already a valid boolean, no action needed
+else:                           # Value is neither string nor boolean, default to False
+    sound_log = False
+    logger.warning(f"Invalid boolean type for 'sound_log'. Defaulting to False.")
+
+    # FFMPEG_DEBUG must be boolean
+if isinstance(ffmpeg_debug, str):
+    ffmpeg_debug_lower = ffmpeg_debug.lower()
+    if ffmpeg_debug_lower == "true":
+        ffmpeg_debug = True
+    elif ffmpeg_debug_lower == "false":
+        ffmpeg_debug = False
+    else:                       # Handle mistyped or invalid boolean values
+        ffmpeg_debug = False
+        logger.warning(f"Invalid boolean value '{ffmpeg_debug}'. Defaulting to False.")
+elif isinstance(logfile, bool):
+    pass                        # Value is already a valid boolean, no action needed
+else:                           # Value is neither string nor boolean, default to False
+    logfile = False
+    logger.warning(f"Invalid boolean type for 'logfile'. Defaulting to False.")
+
+    # DEFAULT_MIN_SCORE must be between 0 and 1
 if not (0.0 <= default_min_score <= 1.0):
     logger.warning(f"Invalid default_min_score '{default_min_score}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.5."
     )
     default_min_score = 0.5
-# noise_threshold must be between 0 and 1
+
+    # NOISE_THRESHOLD must be between 0 and 1
 if not (0.0 <= noise_threshold <= 1.0):
     logger.warning(f"Invalid noise_threshold '{noise_threshold}'"
                     "Should be between 0.0 and 1.0. Defaulting to 0.1."
     )
     noise_threshold = 0.1
+
+    # TOP_K cannot exceed 521 (more than about 20 is silly)
+if not (1 <= top_k <= 20):
+    logger.warning(f"Invalid top_k '{top_k}'"
+                    "Should be between 1 and 20. Defaulting to 10."
+    )
+    top_k = 10
         
-# interval for summary entry log messages
+    # interval for summary entry log messages
 logger.info (f"Summary reports every {summary_interval} min.")
+        
 
      # -------- SET UP LOGGING TO FILE FOR DEBUG ANALYSIS 
 if logfile:
