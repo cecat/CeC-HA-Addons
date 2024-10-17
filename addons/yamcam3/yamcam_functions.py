@@ -457,46 +457,46 @@ def generate_summary():
 
      # -------- Schedule Periodic summaries 
 
-def schedule_summary():
-    while not shutdown_event.is_set():
-        time.sleep(yamcam_config.summary_interval * 60)  # Wait for summary_interval minutes
-        generate_summary()
+#def schedule_summary():
+#    while not shutdown_event.is_set():
+#        time.sleep(yamcam_config.summary_interval * 60)  # Wait for summary_interval minutes
+#        generate_summary()
 
 
      # -------- Log a summary
 
-def log_summary():
-    while not shutdown_event.is_set():
-        try:
-            time.sleep(yamcam_config.summary_interval * 60)  # Sleep for the specified interval
-            if shutdown_event.is_set():
-                break  # Exit if the shutdown flag is set
-
-            with state_lock:
-                summary_lines = []
-                for camera_name in yamcam_config.camera_settings.keys():
-                    counts = event_counts.get(camera_name, {})
-                    total_events = sum(counts.values())
-                    if total_events > 0:
-                        groups = ', '.join(sorted(set(counts.keys())))
-                        summary_lines.append(f"{camera_name} : {total_events} sounds in "
-                                             f"past {yamcam_config.summary_interval} min: {groups}")
-                    else:
-                        summary_lines.append(f"{camera_name} : No sounds detected in past {yamcam_config.summary_interval} min")
-
-                if summary_lines:
-                    # Create a multi-line summary with indentation
-                    formatted_summary = "\n    ".join(summary_lines)
-                    logger.info(f"Summary:\n    {formatted_summary}")
-                else:
-                    logger.info("Summary: No sounds detected for any camera.")
-
-                # Reset event counts after summary
-                for counts in event_counts.values():
-                    counts.clear()
-
-        except Exception as e:
-            logger.error(f"Exception in log_summary: {e}", exc_info=True)
+#def log_summary():
+#    while not shutdown_event.is_set():
+#        try:
+#            time.sleep(yamcam_config.summary_interval * 60)  # Sleep for the specified interval
+#            if shutdown_event.is_set():
+#                break  # Exit if the shutdown flag is set
+#
+#            with state_lock:
+#                summary_lines = []
+#                for camera_name in yamcam_config.camera_settings.keys():
+#                    counts = event_counts.get(camera_name, {})
+#                    total_events = sum(counts.values())
+#                    if total_events > 0:
+#                        groups = ', '.join(sorted(set(counts.keys())))
+#                        summary_lines.append(f"{camera_name} : {total_events} sounds in "
+#                                             f"past {yamcam_config.summary_interval} min: {groups}")
+#                    else:
+#                        summary_lines.append(f"{camera_name} : No sounds detected in past {yamcam_config.summary_interval} min")
+#
+#                if summary_lines:
+#                    # Create a multi-line summary with indentation
+#                    formatted_summary = "\n    ".join(summary_lines)
+#                    logger.info(f"Summary:\n    {formatted_summary}")
+#                else:
+#                    logger.info("Summary: No sounds detected for any camera.")
+#
+#                # Reset event counts after summary
+#                for counts in event_counts.values():
+#                    counts.clear()
+#
+#        except Exception as e:
+#            logger.error(f"Exception in log_summary: {e}", exc_info=True)
 
      # -------- REPORT (deprecated, see REPORT_EVENT)
      #----- this function deprecated by report_event

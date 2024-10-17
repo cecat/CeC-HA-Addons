@@ -236,7 +236,7 @@ except KeyError:
 sounds_to_track = sounds.get('track', [])
 sounds_filters = sounds.get('filters', {})
 
-# min_score values also need to be between 0 and 1
+    # min_score values also need to be between 0 and 1
 for group, settings in sounds_filters.items():
     min_score = settings.get('min_score')
     if not (0.0 <= min_score <= 1.0):
