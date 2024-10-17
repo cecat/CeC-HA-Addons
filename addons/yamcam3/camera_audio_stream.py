@@ -211,6 +211,7 @@ class CameraAudioStream:
                     line_decoded = line.decode('utf-8', errors='replace').strip()
                     if "401 Unauthorized" in line_decoded:
                         logger.debug(f"FFmpeg failed: Invalid credentials for {self.camera_name}.")
+                        break
                     elif ffmpeg_debug:
                         logger.debug(f"FFmpeg stderr: {self.camera_name}: {line_decoded}")
                 else:

@@ -90,7 +90,7 @@ class CameraStreamSupervisor:
 
      # -------- MONITOR STREAMS
     def monitor_streams(self):
-        logger.info("Supervisor monitoring started.")
+        logger.debug("Supervisor monitoring started.")
         while self.running and not self.shutdown_event.is_set():
             time.sleep(60)  # Sleep for 1 minute
             with self.lock:
