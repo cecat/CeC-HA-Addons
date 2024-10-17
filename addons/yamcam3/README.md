@@ -254,9 +254,7 @@ number of classes from that group are in the top_k scores.
 The *sound_log* option will create a csv file in */media/yamcam*. If this
 directory does not exist, the add-on will create it.   The CSV format is 8 columns:
 
-```
-(date/time), (camera_name) (group_name), (group_score), (class_name), (class_score), (group_name event start), (group_name event end)
-```
+*(date/time),(camera_name),(group_name),(group_score),(class_name),(class_score),(group_name start),(group_name end)*
 
 Each row records one of three items in additon to date/time and camera_name:
 - a group name and score from among the *top_k*, 
