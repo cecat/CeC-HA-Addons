@@ -450,16 +450,30 @@ def update_sound_window(camera_name, detected_sounds):
      # -------- Generate Periodic summaries
 
 def generate_summary():
-    logger.info(f"Summary: sound events detected in the past{yamcam_config.n} min")
+    logger.info(f"Events Summary ({yamcam_config.summary_interval} min):")
+    
+    cameras_with_events = []
+    cameras_no_events = []
+
     with state_lock:
-        for camera_name in yamcam_config.cameras:
+        for camera_name in yamcam_config.camera_settings.keys():
             counts = event_counts.get(camera_name, {})
             total_events = sum(counts.values())
             if total_events > 0:
                 groups = ', '.join(set(counts.keys()))
-                logger.info(f"    {camera_name} : {total_events} : {groups}")
+                cameras_with_events.append(f"{camera_name} : {total_events} sound events: {groups}")
             else:
-                logger.info(f"    {camera_name} : No sound events detected.")
+                cameras_no_events.append(camera_name)
+
+        if cameras_with_events:
+            # Log each camera with sound events
+            for event_summary in cameras_with_events:
+                logger.info(f"    {event_summary}")
+
+        if cameras_no_events:
+            # Log all cameras without sound events in a single line
+            cameras_no_events_str = ', '.join(cameras_no_events)
+            logger.info(f"    {cameras_no_events_str} : No sound events")
 
         # Reset event counts after summary
         for counts in event_counts.values():
