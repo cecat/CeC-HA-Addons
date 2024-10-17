@@ -479,17 +479,16 @@ def log_summary():
                     total_events = sum(counts.values())
                     if total_events > 0:
                         groups = ', '.join(sorted(set(counts.keys())))
-                        summary_lines.append(f"{camera_name} : {total_events} sounds in "
-                                             f"past {yamcam_config.summary_interval} min: {groups}")
+                        summary_lines.append(f"{camera_name} : {total_events} sound events: {groups}")
                     else:
-                        summary_lines.append(f"{camera_name} : No sounds detected in past {yamcam_config.summary_interval} min")
+                        summary_lines.append(f"{camera_name} : No sound events")
 
                 if summary_lines:
                     # Create a multi-line summary with indentation
                     formatted_summary = "\n    ".join(summary_lines)
-                    logger.info(f"Summary:\n    {formatted_summary}")
+                    logger.info(f"Summary (past {yamcam_config.summary_interval} min):\n    {formatted_summary}")
                 else:
-                    logger.info("Summary: No sounds detected for any camera.")
+                    logger.info(f"Summary (past {yamcam_config.summary_interval} min): No sound events detected for any camera.")
 
                 # Reset event counts after summary
                 for counts in event_counts.values():
@@ -497,6 +496,7 @@ def log_summary():
 
         except Exception as e:
             logger.error(f"Exception in log_summary: {e}", exc_info=True)
+
 
      # -------- REPORT (deprecated, see REPORT_EVENT)
      #----- this function deprecated by report_event
