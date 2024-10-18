@@ -6,18 +6,22 @@ general:
                              # (must exceed this level for a sound event to be
                              # detected as starting or continuing)
   top_k: 10                  # Number of top scoring classes to analyze (default 10)
-  log_level: DEBUG           # Default INFO. In order of decreasing verbosity:
+  log_level: INFO            # Default INFO. In order of decreasing verbosity:
                              # DEBUG->INFO->WARNING->ERROR->CRITICAL 
-  logfile: true              # dump all log messages to /config/sound_log.txt for offline
+  sound_log: true            # Create CSV file in /medid/yamcam to log all class,
+                             #   group, and event detections
                              #   analysis of trends (it gets big very fast, use carefully).
                              #   Default is false
   ffmpeg_debug: false        # Log ffmpeg stderr (a firehose - includes errors and info)
                              #   Must also have log_level set to DEBUG
   exclude_groups:            # Groups we don't want to report (or log), e.g., 
-    - silence                 #   the 'silence' group in particular can be noisy...
-  summary_interval: 5       # log (INFO level) a summary every n minutes of the number
+    - silence                #   the 'silence' group in particular can be noisy...
+  summary_interval: 5        # log (INFO level) a summary every n minutes of the number
                              #   of sound groups detected.
 
+# MQTT
+# Fill in YOUR IP address for the broker (your HA server or other). 
+# Fill in YOUR mqtt username and password
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
   port: 1883                    # Default unless you specifically changed it in your broker
@@ -40,13 +44,15 @@ events:
 
 # SOURCES
 # examples of Amcrest and UniFi NVR camera rtsp feeds
+# REPLACE with RTSP feeds you know work (from your Frigate config
+# or ones you ahve verified, e.g., using VLC
 
 cameras:
-  doorfrontcam:
+  myCam1:
     ffmpeg:
       inputs:
       - path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
-  frontyardcam:
+  myCam2:
     ffmpeg:
       inputs:
       - path: "rtsp://x.x.x.x:7447/65dd5a1900f4cb70dffa2143_1"
