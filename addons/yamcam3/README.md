@@ -32,7 +32,7 @@ The add-on does the following (*italics* parameters are configurable):
 6. Reports sound event start/stop to Home Assistant via MQTT.
 
 For longitudinal analysis, a *sound_log* can be created to timestamp and log all *top_k*
-classes/scores, and associated groups/scores.
+classes/scores, associated groups/scores, and sound event start/stop.
 
 ## How to Use
 
