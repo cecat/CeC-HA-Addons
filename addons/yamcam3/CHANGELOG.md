@@ -11,6 +11,7 @@
   to "treu" or "flse").
 - Updated starter/sample microphones.yaml config file with recent changes
   and additions.
+- Removed the filename field in log messages (not needed) to clean them up a bit.
 
 ## 0.3.4
 - Moved location of logs (debug and sound) to /media/yamcam.  Those running
