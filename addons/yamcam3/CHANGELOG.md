@@ -1,6 +1,17 @@
 
 # Changelog
 
+## 0.3.5
+- Added warning log messages and logic (including default values) to handle
+  various FFmpeg failure modes for errant source RTSP paths, such as missing
+  credentials, wrong port, etc.
+- Added sound events to the sound_log file, so it now has 8 columns (see 
+  README).
+- Check for and set to default booleans with spelling errors (like setting
+  to "treu" or "flse").
+- Updated starter/sample microphones.yaml config file with recent changes
+  and additions.
+
 ## 0.3.4
 - Moved location of logs (debug and sound) to /media/yamcam.  Those running
   Frigate will already have /media but /media/yamcam will be created if it
@@ -23,7 +34,7 @@
   log messages including errors.
 
 ## 0.3.2
-- Clean up logging
+- Cleaned up logging
 - Added a logfile capability for longitudinal analysis of sound activity
 - Implemented *sound events* as the reportable (via MQTT) measure, with 
   start and end messages and settable parameters to define when to determine
@@ -34,6 +45,7 @@
   level will log all sound classes, groups, and events.
 - Added a summary report that every *summary_interval* minutes logs (INFO level)
   how many sound events (and what sound groups) were detected for each source.
+
 ## 0.3.1
 - Overhaul how we use/report yamnet scores/detections.  In this version,
   we switch from capturing sound, analyzing, and reporting every n second intervals
