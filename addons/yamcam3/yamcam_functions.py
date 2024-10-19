@@ -298,6 +298,7 @@ def rank_sounds(scores, camera_name):
         group = class_name.split('.')[0]  # Get the group prefix
         if group in exclude_groups:
             logger.debug(f"{camera_name}:--> {class_name}: {score:.2f} (excluded_group)")
+            continue # skip, don't log classes from excluded groups
         else:
             logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
         # CSV logging (classes)
