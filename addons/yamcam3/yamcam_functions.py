@@ -81,7 +81,7 @@ import yamcam_config
 from yamcam_config import (
         interpreter, input_details, output_details, logger,
         sound_log, sound_log_dir, check_storage,
-        exclude_groups, summary_interval, shutdown_event
+        summary_interval, shutdown_event
 )
 
 logger = yamcam_config.logger

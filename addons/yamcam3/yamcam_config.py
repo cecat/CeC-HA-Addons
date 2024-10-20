@@ -136,7 +136,7 @@ ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
 default_min_score    = general_settings.get('default_min_score', 0.5)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 top_k                = general_settings.get('top_k', 10)
-exclude_groups       = general_settings.get('exclude_groups', [])   # groups to ignore
+#exclude_groups       = general_settings.get('exclude_groups', [])   # groups to ignore
 summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
 # --------- VERIFY GENERAL SETTINGS
