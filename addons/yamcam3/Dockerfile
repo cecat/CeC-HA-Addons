@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TensorFlow Lite runtime and compatible NumPy version
+COPY requirements.txt .
 RUN pip install --no-cache-dir tflite-runtime pycoral 'numpy<2.0' paho-mqtt pyyaml scipy
 
 # Copy the local model and class map files from the subdirectory
