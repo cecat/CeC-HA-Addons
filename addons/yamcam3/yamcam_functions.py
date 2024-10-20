@@ -274,6 +274,9 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
 
 
      # -------- Calculate, Group, and Filter Scores  
+
+# In yamcam_functions.py
+
 def rank_sounds(scores, camera_name):
     if shutdown_event.is_set():
         return []
@@ -284,27 +287,29 @@ def rank_sounds(scores, camera_name):
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
     sounds_filters = yamcam_config.sounds_filters
+    sounds_to_track = yamcam_config.sounds_to_track  # Add this line
 
-
-# Step 1: Filter out scores below noise_threshold
+    # Step 1: Filter out scores below noise_threshold
     filtered_scores = [
         (i, score) for i, score in enumerate(scores[0]) if score >= noise_threshold
     ]
 
     logger.debug(f"{camera_name}: {len(filtered_scores)} classes found:")
+
     # Log individual classes and their scores before grouping
     for i, score in filtered_scores:
         class_name = class_names[i]
         group = class_name.split('.')[0]  # Get the group prefix
-        if group in exclude_groups:
-            logger.debug(f"{camera_name}:--> {class_name}: {score:.2f} (excluded_group)")
-            continue # skip, don't log classes from excluded groups
-        else:
-            logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
+
+        if group not in sounds_to_track:
+            continue  # Skip groups not in sounds_to_track
+
+        logger.debug(f"{camera_name}:--> {class_name}: {score:.2f}")
+
         # CSV logging (classes)
         if sound_log_writer is not None:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            row = [timestamp, camera_name, '', '', class_name, f"{score:.2f}",'' ,'']
+            row = [timestamp, camera_name, '', '', class_name, f"{score:.2f}", '', '']
             with sound_log_lock:
                 sound_log_writer.writerow(row)
                 sound_log_file.flush()
@@ -326,14 +331,15 @@ def rank_sounds(scores, camera_name):
 
     # Log the group names and composite scores
     for group, score in limited_composite_scores:
-        if group in exclude_groups:
-            continue # Skip logging this group
-        logger.debug(f"{camera_name}: ----->{group}: {score:.2f}")
+        if group not in sounds_to_track:
+            continue  # Skip groups not in sounds_to_track
+
+        logger.debug(f"{camera_name}: -----> {group}: {score:.2f}")
 
         # CSV logging (groups)
         if sound_log_writer is not None:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            row = [timestamp, camera_name, group, f"{score:.2f}", '', '','' ,'']
+            row = [timestamp, camera_name, group, f"{score:.2f}", '', '', '', '']
             with sound_log_lock:
                 sound_log_writer.writerow(row)
                 sound_log_file.flush()
@@ -341,7 +347,7 @@ def rank_sounds(scores, camera_name):
     # Step 4: Apply min_score filters and prepare results
     results = []
     for group, score in limited_composite_scores:
-        if group in yamcam_config.sounds_to_track:
+        if group in sounds_to_track:
             min_score = sounds_filters.get(group, {}).get('min_score', default_min_score)
             if score >= min_score:
                 results.append({'class': group, 'score': score})

@@ -263,6 +263,7 @@ try:
     sounds = config['sounds']
 except KeyError:
     logger.warning("Missing sounds settings in the configuration file. Using default values.")
+    sounds = {} # in case none are configured.
 
 sounds_to_track = sounds.get('track', [])
 sounds_filters = sounds.get('filters', {})
