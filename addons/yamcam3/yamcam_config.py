@@ -96,9 +96,6 @@ def format_input_details(details):
 ### --------------- LOGIC ---------------###
 #                                              #
 
-
-logger.info("\n\n-------- YAMCAM3 Started-------- \n")
-
     # -------- SET INITIAL LOGGING FORMAT
 
 logging.basicConfig(
@@ -112,6 +109,8 @@ logger = logging.getLogger(__name__)
 
 for handler in logger.handlers:
     handler.addFilter(ShutdownFilter())
+
+logger.info("\n\n-------- YAMCAM3 Started-------- \n")
 
     # -------- OPEN YAML CONFIG FILE
 
@@ -184,7 +183,7 @@ if isinstance(ffmpeg_debug, str):
     else:                       # Handle mistyped or invalid boolean values
         logger.warning(f"Invalid boolean value '{ffmpeg_debug}' for ffmpeg_debug. Defaulting to False.")
         ffmpeg_debug = False
-elif isinstance(logfile, bool):
+elif isinstance(ffmpeg_debug, bool):
     pass                        # Value is already a valid boolean, no action needed
 else:                           # Value is neither string nor boolean, default to False
     logger.warning(f"Invalid boolean value '{ffmpeg_debug}' for ffmpeg_debug. Defaulting to False.")
@@ -278,12 +277,6 @@ for group, settings in sounds_filters.items():
         settings['min_score'] = default_min_score 
 
     # -------- CAMS (SOUND SOURCES)
-
-try:
-    camera_settings  = config['cameras']
-except KeyError as e:
-    logger.error(f"Missing camera settings in the configuration file: {e}")
-    raise
 
 try:
     camera_settings = config['cameras']
