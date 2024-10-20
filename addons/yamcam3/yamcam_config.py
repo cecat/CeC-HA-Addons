@@ -25,10 +25,11 @@ sound_log_dir = '/media/yamcam'
 shutdown_event = threading.Event()
 
 #                                              #
-### ---------- SET UP LOGGING  --------------###
+### --------------- FUNCTIONS ---------------###
 #                                              #
 
-     # -------- MAKE SURE THE LOG DIRECTORY EXISTS
+    # -------- MAKE SURE THE LOG DIRECTORY EXISTS
+
 def check_for_log_dir():
     try:
         os.makedirs(sound_log_dir, exist_ok=True)
@@ -40,7 +41,8 @@ def check_for_log_dir():
 
         sys.exit(1)  # Exit with a non-zero code to indicate failure
 
-     # -------- KEEP THE USER INFORMED OF ACCUMULATED LOGS
+    # -------- KEEP THE USER INFORMED OF ACCUMULATED LOGS
+
 def check_storage(directory, file_extension):
     try:
         # count *.file_extension files
@@ -58,33 +60,60 @@ def check_storage(directory, file_extension):
     except Exception as e:
         print(f"Error while counting files or calculating size in {directory}: {e}")
 
-     # -------- SET INITIAL LOGGING LEVEL
+    # -------- SHUT_DOWN HANDLING 
+
+class ShutdownFilter(logging.Filter):
+    def filter(self, record):
+        return not shutdown_event.is_set()
+    
+    # -------- VALIDATE CAMERA CONFIGURATION
+
+def validate_camera_config(camera_settings):
+    for camera_name, camera_config in camera_settings.items():
+        ffmpeg_config = camera_config.get('ffmpeg')
+        if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
+            raise ValueError(f"STOPPING. Camera '{camera_name}': 'ffmpeg' section is missing or invalid.")
+
+        inputs = ffmpeg_config.get('inputs')
+        if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
+            raise ValueError(f"Camera '{camera_name}': 'inputs' section is missing or invalid.")
+
+        rtsp_url = inputs[0].get('path')
+        if not rtsp_url or not isinstance(rtsp_url, str):
+            raise ValueError(f"Camera '{camera_name}': RTSP path is missing or invalid.")
+
+    # -------- LOG DETAILS FOR DEBUG
+
+def format_input_details(details):
+    formatted_details = "Input Details:\n"
+    for detail in details:
+        formatted_details += "  -\n"
+        for key, value in detail.items():
+            formatted_details += f"    {key}: {value}\n"
+    return formatted_details
+
+#                                              #
+### --------------- LOGIC ---------------###
+#                                              #
+
+
+logger.info("\n\n-------- YAMCAM3 Started-------- \n")
+
+    # -------- SET INITIAL LOGGING FORMAT
+
 logging.basicConfig(
     level=logging.INFO,
-    #format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     format='%(asctime)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 logger = logging.getLogger(__name__)
 
-
-#                                              #
-### ---------- SHUT_DOWN HANDLING -----------###
-#                                              #
-
-# Add the shutdown filter to all handlers
-class ShutdownFilter(logging.Filter):
-    def filter(self, record):
-        return not shutdown_event.is_set()
+    # -------- ASSIGN HANDLERS
 
 for handler in logger.handlers:
     handler.addFilter(ShutdownFilter())
 
-logger.info("\n\n-------- YAMCAM3 Started-------- \n")
-
-#                                                #
-### ---------- GET CONFIGURATION --------------###
-#                                                #
+    # -------- OPEN YAML CONFIG FILE
 
 try:
     with open(config_path) as f:
@@ -93,7 +122,8 @@ except yaml.YAMLError as e:
     logger.error(f"Error reading YAML file {config_path}: {e}")
     raise
 
-     # -------- GENERAL 
+     # -------- GENERAL SETTINGS
+
 try:
     general_settings = config['general']
 except KeyError as e:
@@ -110,7 +140,7 @@ top_k                = general_settings.get('top_k', 10)
 exclude_groups       = general_settings.get('exclude_groups', [])   # groups to ignore
 summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
-    # --------- VERIFY values
+    # --------- VERIFY GENERAL SETTINGS
 
     # LOGFILE must be boolean
 if isinstance(logfile, str):
@@ -181,17 +211,15 @@ if not (1 <= top_k <= 20):
     )
     top_k = 10
         
-    # interval for summary entry log messages
+    # courtesy message re interval for summary entry log messages
 logger.info (f"Summary reports every {summary_interval} min.")
         
 
-     # -------- SET UP LOGGING TO FILE FOR DEBUG ANALYSIS 
-if logfile:
+    # -------- SET UP LOGGING TO FILE FOR DEBUG ANALYSIS if logfile:
 
     check_for_log_dir() # make sure /media/yamcam exists
 
     timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
-    #log_path = f"{log_dir}/{timestamp}.log"
     log_path = os.path.join(log_dir, f"{timestamp}.log")
 
     check_storage(log_dir, '.log') # let the user know how much storage they're using
@@ -209,12 +237,13 @@ if logfile:
         logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
 
-     # -------- SET UP LOGGING TO FILE FOR SOUND ANALYSIS
+    # -------- MAKE SURE LOG DIR EXISTS BEFORE LOGGING
+
 if sound_log:
-    check_for_log_dir() # make sure /media/yamcam exists
+    check_for_log_dir() 
 
+    # -------- SOUND EVENT PARAMETERS 
 
-     # -------- SOUND EVENT PARAMETERS 
 try:
     events_settings = config['events']
 except KeyError:
@@ -229,7 +258,8 @@ window_detect = events_settings.get('window_detect', 5)
 persistence = events_settings.get('persistence', 3)
 decay = events_settings.get('decay', 15)
 
-     # -------- SOUND GROUPS TO WATCH 
+    # -------- SOUND GROUPS TO WATCH; MIN_SCORES (optional)
+
 try:
     sounds = config['sounds']
 except KeyError:
@@ -247,29 +277,14 @@ for group, settings in sounds_filters.items():
         )
         settings['min_score'] = default_min_score 
 
-     # -------- VALIDATE CAMERA CONFIGURATION
-def validate_camera_config(camera_settings):
-    for camera_name, camera_config in camera_settings.items():
-        ffmpeg_config = camera_config.get('ffmpeg')
-        if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
-            raise ValueError(f"STOPPING. Camera '{camera_name}': 'ffmpeg' section is missing or invalid.")
+    # -------- CAMS (SOUND SOURCES)
 
-        inputs = ffmpeg_config.get('inputs')
-        if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
-            raise ValueError(f"Camera '{camera_name}': 'inputs' section is missing or invalid.")
-
-        rtsp_url = inputs[0].get('path')
-        if not rtsp_url or not isinstance(rtsp_url, str):
-            raise ValueError(f"Camera '{camera_name}': RTSP path is missing or invalid.")
-
-     # -------- SOUND SOURCES 
 try:
     camera_settings  = config['cameras']
 except KeyError as e:
     logger.error(f"Missing camera settings in the configuration file: {e}")
     raise
 
-     # -------- VALIDATE CAM SETTINGS
 try:
     camera_settings = config['cameras']
     validate_camera_config(camera_settings)
@@ -280,8 +295,8 @@ except ValueError as e:
     logger.error(f"Configuration error: {e}")
     sys.exit(1)
 
+    # -------- MQTT SETTINGS 
 
-     # -------- MQTT SETTINGS 
 try:
     mqtt_settings = config['mqtt']
 except KeyError as e:
@@ -295,7 +310,8 @@ mqtt_client_id       = mqtt_settings.get('client_id', 'yamcam')
 mqtt_username        = mqtt_settings.get('user', 'noUser')
 mqtt_password        = mqtt_settings.get('password', 'noPassword')
     
-     # -------- LOG LEVEL
+    # -------- LOG LEVEL
+
 log_levels = {
     'DEBUG'    : logging.DEBUG,
     'INFO'     : logging.INFO,
@@ -320,17 +336,8 @@ else:
 ### ---------- SET UP YAMNET MODEL ----------###
 #                                              #
 
-     # -------- LOG DETAILS FOR DEBUG
-def format_input_details(details):
-    formatted_details = "Input Details:\n"
-    for detail in details:
-        formatted_details += "  -\n"
-        for key, value in detail.items():
-            formatted_details += f"    {key}: {value}\n"
-    return formatted_details
+    # -------- LOAD MODEL (using TensorFLow Lite)
 
-
-     # -------- LOAD MODEL (using TensorFLow Lite)
 logger.debug("Loading YAMNet model")
 interpreter    = tflite.Interpreter(model_path=model_path)
 interpreter.allocate_tensors()
@@ -339,7 +346,8 @@ output_details = interpreter.get_output_details()
 logger.debug("YAMNet model loaded.")
 logger.debug(format_input_details(input_details))
 
-     # -------- BUILD CLASS NAMES DICTIONARY
+    # -------- BUILD CLASS NAMES DICTIONARY
+
 class_names = []
 with open(class_map_path, 'r') as file:
     reader = csv.reader(file)

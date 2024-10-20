@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 
+- Stopped logging classes from excluded groups. Mostly because the CSV was primarily "silence" which
+  meant huge files and (more importantly) a vast majority of rows being silence (not useful)
 ## 0.3.5
 - Added warning log messages and logic (including default values) to handle
   various FFmpeg failure modes for errant source RTSP paths, such as missing

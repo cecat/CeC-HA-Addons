@@ -23,13 +23,13 @@ from yamcam_supervisor import CameraStreamSupervisor  # Import the supervisor
 mqtt_client = start_mqtt()
 set_mqtt_client(mqtt_client)
 
-     # -------- PULL FROM CONFIG
+     # -------- PULL FROM CONFIG FILE
 camera_settings = yamcam_config.camera_settings
 
      # -------- GLOBALS
 running = True
 
-     # -------- GRACEFUL SHUT-DOWN
+     # -------- SHUT-DOWN HANDLER
 def shutdown(signum, frame):
     global running
     logger.warning(f"Received Order 66 (signal {signum}), shutting down...")
@@ -42,7 +42,7 @@ def shutdown(signum, frame):
     logging.shutdown()  # Ensure all logs are flushed
     sys.exit(0)
 
-     # -------- REGISTER SHUTDOWN HANDLERS
+     # -------- REGISTER SHUTDOWN HANDLER
     # (i.e., when HASS user hits "stop")
 signal.signal(signal.SIGINT, shutdown)
 signal.signal(signal.SIGTERM, shutdown)
