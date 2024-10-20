@@ -218,27 +218,28 @@ logger.info (f"Summary reports every {summary_interval} min.")
 
 check_for_log_dir() # make sure /media/yamcam exists
 
-timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
-log_path = os.path.join(log_dir, f"{timestamp}.log")
+if logfile:
+    timestamp = datetime.now().strftime('%Y%m%d-%H%M') # timestamp for filename
+    log_path = os.path.join(log_dir, f"{timestamp}.log")
 
-check_storage(log_dir, '.log') # let the user know how much storage they're using
+    check_storage(log_dir, '.log') # let the user know how much storage they're using
 
-logger.info(f"Creating {log_path} for debug analysis.")
-try:
-    file_handler = logging.FileHandler(log_path, mode='a')  # always append
-    file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler) # Add the file handler to the logger
-    logger.info(f"Logging to {log_path}.")
-except Exception as e:
-    logger.error(f"Could not create or open the log file at {log_path}: {e}")
+    logger.info(f"Creating {log_path} for debug analysis.")
+    try:
+        file_handler = logging.FileHandler(log_path, mode='a')  # always append
+        file_handler.setLevel(logging.DEBUG)  # hard coding logfile to DEBUG
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler) # Add the file handler to the logger
+        logger.info(f"Logging to {log_path}.")
+    except Exception as e:
+        logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
 
 # -------- MAKE SURE LOG DIR EXISTS BEFORE LOGGING
 #FIX- seems unnecessary as we already checked just above
-if sound_log:
-    check_for_log_dir() 
+#if sound_log:
+#    check_for_log_dir() 
 
 # -------- SOUND EVENT PARAMETERS 
 
