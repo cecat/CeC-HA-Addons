@@ -274,8 +274,9 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
             logger.error(f"{camera_name}: Error during waveform analysis: {e}")
             return None
     else:
-        dummy_scores = np.random.uniform(0.1, 0.4, size=521)
+        dummy_scores = np.random.uniform(0.1, 0.4, size=(1, 521))
         return dummy_scores
+
 
 
      # -------- Calculate, Group, and Filter Scores  
