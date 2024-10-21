@@ -6,10 +6,7 @@
 import yaml
 import csv
 import logging
-# for tpu
-#import tflite_runtime.interpreter as tflite
-from tflite_runtime.interpreter import Interpreter, load_delegate
-
+import tflite_runtime.interpreter as tflite
 import time
 import threading
 import os
