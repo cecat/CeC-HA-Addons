@@ -2,7 +2,7 @@
   "name": "YAMNet Camera Sounds - DEV",
   "description": "Analyze audio from camera mics via continous monitoring of RTSP streams to detect sound types using YAMNet. This version under active development and at times may not build.",
   "version": "1.0.0-Dev",
-  "slug": "yamcam-Dev",
+  "slug": "yamcam-dev",
   "init": false,
   "arch": [
     "aarch64",
