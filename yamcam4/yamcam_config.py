@@ -8,7 +8,7 @@ import csv
 import logging
 # for tpu
 #import tflite_runtime.interpreter as tflite
-from tflite_rungime.interpreter import Interpreter, load_delegate
+from tflite_runtime.interpreter import Interpreter, load_delegate
 
 import time
 import threading
