@@ -1,8 +1,9 @@
 ## Repo for CeC's HASS (experimental) Addons
 
-Use at your own risk - these are useful for me but not supported in any way.
+Miscelaneous add-ons for Home Assistant.
 
-If you want to play (and feedback/fixes would be welcome!) you can...
+Feedback/fixes would be welcome.  To use an add-on from this repo
+(presently there is only one add-on in the repo):
 
 ### Add this repo to your Home Assistant Add-on store
 
