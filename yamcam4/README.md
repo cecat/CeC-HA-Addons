@@ -5,8 +5,16 @@
 [production version](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam3).**
 
 # Objectives for next version
-- Identify high CPU usage, testing both ffmpeg and yamnet
--- If yamnet, integrated Coral TPU support
+
+This addon uses 40-50% of the CPU running on an (admittedly) underpowered x86
+mini-PC. Some quick experiments using mock code to measure CPU usage from FFMPEG
+streams vs.  YAMNet inference show that YAMNet inference is the primary cause
+of high CPU usage.  Bypassing (simulating) FFMPEG streams had little impact on
+CPU use, while bypassing (simulating) YAMNet inference dropped CPU usage
+from 45-50% down to under 10%.
+
+This next version will incorporate TPU support, however the Coral TPU does not
+support multi-tenancy,so this will require a dedicated Coral TPU.
 
 
 This add-on is a work in progress.  Please report any issues
