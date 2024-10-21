@@ -274,14 +274,13 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
             logger.error(f"{camera_name}: Error during waveform analysis: {e}")
             return None
     else:
-        dummy_scores = np.random.uniform(0.1, 0.4, size=(1, 521))
+        output_shape = output_details[0]['shape']
+        dummy_scores = np.random.uniform(0.1, 0.4, size=output_shape)
         return dummy_scores
 
 
 
      # -------- Calculate, Group, and Filter Scores  
-
-# In yamcam_functions.py
 
 def rank_sounds(scores, camera_name):
     if shutdown_event.is_set():
@@ -293,7 +292,16 @@ def rank_sounds(scores, camera_name):
     noise_threshold = yamcam_config.noise_threshold
     class_names = yamcam_config.class_names
     sounds_filters = yamcam_config.sounds_filters
-    sounds_to_track = yamcam_config.sounds_to_track  # Add this line
+    sounds_to_track = yamcam_config.sounds_to_track  
+
+    # Code for debugging tests
+    if scores.ndim == 1:
+        scores_array = scores
+    elif scores.ndim == 2:
+        scores_array = scores[0]
+    else:
+        logger.error(f"{camera_name}: Unexpected scores shape: {scores.shape}")
+        return []
 
     # Step 1: Filter out scores below noise_threshold
     filtered_scores = [
