@@ -10,8 +10,9 @@ RUN apt-get update && apt-get install -y \
     curl
 
 # Add Coral Edge TPU repository
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+RUN curl -L https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - || echo "APT key add failed" && \
     echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list
+
 
 # Install Edge TPU runtime
 RUN apt-get update && apt-get install -y libedgetpu1-std
