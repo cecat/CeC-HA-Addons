@@ -2,13 +2,16 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Add Coral Edge TPU repository and install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
     wget \
-    libedgetpu1-std \
-    && rm -rf /var/lib/apt/lists/*
+    curl && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list && \
+    apt-get update && apt-get install -y libedgetpu1-std && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
@@ -28,3 +31,4 @@ COPY yamcam_supervisor.py .
 
 # Set entrypoint
 CMD ["python", "yamcam.py"]
+
