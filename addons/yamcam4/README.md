@@ -1,7 +1,7 @@
 # Camera-sounds-DEV add-on for Home Assistant
 
 # This is the DEV version under active development.
-This means that it's possible it won't build! Please use the production version.
+<span style="color: red;">*This means that it's possible it won't build! Please use the production version.*</span>
 
 This add-on is a work in progress.  Please report any issues
 [here](https://github.com/cecat/CeC-HA-Addons/issues). 
