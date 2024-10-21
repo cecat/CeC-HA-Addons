@@ -1,4 +1,7 @@
 {
   "name": "CeC Home Assistant Add-ons",
   "url": "https://github.com/cecat/CeC-HA-Addons",
+  "resources": [
+    "https://github.com/cecat/CeC-HA-Addons/raw/main/addons/yamcam3/config.json"
+  ]
 }
