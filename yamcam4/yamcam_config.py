@@ -6,7 +6,10 @@
 import yaml
 import csv
 import logging
-import tflite_runtime.interpreter as tflite
+# for tpu
+#import tflite_runtime.interpreter as tflite
+from tflite_rungime.interpreter import Interpreter, load_delegate
+
 import time
 import threading
 import os
@@ -140,6 +143,15 @@ summary_interval     = general_settings.get('summary_interval', 5 ) # periodic r
 # for testing
 no_model             = general_settings.get('no_model', False)
 no_ffmpeg            = general_settings.get('no_ffmpeg', False)
+
+# implement tpu support, then worry about parsing yaml
+use_tpu = True
+
+if use_tpu:
+    model_path = 'yamnet_edgetpu.tflite'
+else:
+    model_path = 'yamnet.tflite'
+
 
 # --------- VERIFY GENERAL SETTINGS
 
@@ -334,12 +346,36 @@ else:
 # -------- LOAD MODEL (using TensorFLow Lite)
 
 logger.debug("Loading YAMNet model")
-interpreter    = tflite.Interpreter(model_path=model_path)
-interpreter.allocate_tensors()
-input_details  = interpreter.get_input_details()
-output_details = interpreter.get_output_details()
-logger.debug("YAMNet model loaded.")
-logger.debug(format_input_details(input_details))
+try:        
+    if use_tpu:         
+        interpreter = tflite.Interpreter(
+            model_path=model_path,
+            experimental_delegates=[load_delegate('libedgetpu.so.1')]
+        )
+        logger.info("Using Edge TPU for inference.")
+    else:
+        interpreter = tflite.Interpreter(model_path=model_path)
+        logger.info("Using CPU for inference.")
+    interpreter.allocate_tensors()
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    logger.debug("YAMNet model loaded.")
+
+    # Insert the input details print statements here
+    # Log input and output details for debugging
+    logger.debug(f"Input details:")
+    for idx, detail in enumerate(input_details):
+        logger.debug(f"  Input {idx}: index={detail['index']}, shape={detail['shape']}, dtype={detail['dtype']}, quantization={detail.get('quantization')}")
+    logger.debug(f"Output details:")
+    for idx, detail in enumerate(output_details):
+        logger.debug(f"  Output {idx}: index={detail['index']}, shape={detail['shape']}, dtype={detail['dtype']}, quantization={detail.get('quantization')}")
+
+except Exception as e:
+    logger.error(f"Failed to initialize the interpreter: {e}")
+    sys.exit(1)
+
+
+
 
 # -------- BUILD CLASS NAMES DICTIONARY
 
