@@ -1,5 +1,5 @@
 
-# Changelog
+# Changelog - Historic
 
 ## 1.0.0
 - Eliminated the *exclude_groups* list as we have a *sounds*->*track* list already,
