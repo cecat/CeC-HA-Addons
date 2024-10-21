@@ -9,4 +9,4 @@
   meant huge files and (more importantly) a vast majority of rows being silence (not useful).
 
 ## Previous Version Changelog
-- Preserved at 
+- Preserved in [CHANGELOG_HIST.md](https://github.com/cecat/CeC-HA-Addons/blob/dev/addons/yamcam4/CHANGELOG_HIST.md). 

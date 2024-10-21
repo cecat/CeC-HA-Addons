@@ -1,7 +1,13 @@
 # Camera-sounds-DEV add-on for Home Assistant
 
 # This is the DEV version under active development.
-This means that it's possible it won't build! Please use the production version.
+**This means that it's possible it won't build! Please use the 
+[production version](https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam3).**
+
+# Objectives for next version
+- Identify high CPU usage, testing both ffmpeg and yamnet
+-- If yamnet, integrated Coral TPU support
+
 
 This add-on is a work in progress.  Please report any issues
 [here](https://github.com/cecat/CeC-HA-Addons/issues). 
