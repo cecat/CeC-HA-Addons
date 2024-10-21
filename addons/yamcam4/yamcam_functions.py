@@ -81,6 +81,7 @@ import yamcam_config
 from yamcam_config import (
         interpreter, input_details, output_details, logger,
         sound_log, sound_log_dir, check_storage,
+        no_model, no_ffmpeg,
         summary_interval, shutdown_event
 )
 
@@ -242,35 +243,39 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
     if shutdown_event.is_set():
         return None
 
-    try:
-        # Ensure waveform is a 1D array of float32 values between -1 and 1
-        waveform = np.squeeze(waveform).astype(np.float32)
-        if waveform.ndim != 1:
-            logger.error(f"{camera_name}: Waveform must be a 1D array.")
-            return None
-
-        # Invoke the YAMNET inference engine 
+    if not no_model:
         try:
-            # Set input tensor and invoke interpreter
-            interpreter.set_tensor(input_details[0]['index'], waveform)
-            interpreter.invoke()
-
-            # Get output scores; convert to a copy to avoid holding internal references
-            scores = np.copy(interpreter.get_tensor(output_details[0]['index']))  
-
-            if scores.size == 0:
-                logger.warning(f"{camera_name}: No scores available to analyze.")
+            # Ensure waveform is a 1D array of float32 values between -1 and 1
+            waveform = np.squeeze(waveform).astype(np.float32)
+            if waveform.ndim != 1:
+                logger.error(f"{camera_name}: Waveform must be a 1D array.")
                 return None
 
-        except Exception as e:
+            # Invoke the YAMNET inference engine 
+            try:
+                # Set input tensor and invoke interpreter
+                interpreter.set_tensor(input_details[0]['index'], waveform)
+                interpreter.invoke()
+
+                # Get output scores; convert to a copy to avoid holding internal references
+                scores = np.copy(interpreter.get_tensor(output_details[0]['index']))  
+
+                if scores.size == 0:
+                    logger.warning(f"{camera_name}: No scores available to analyze.")
+                    return None
+
+            except Exception as e:
             logger.error(f"{camera_name}: Error during interpreter invocation: {e}")
             return None
 
-        return scores
+            return scores
 
-    except Exception as e:
-        logger.error(f"{camera_name}: Error during waveform analysis: {e}")
-        return None
+        except Exception as e:
+            logger.error(f"{camera_name}: Error during waveform analysis: {e}")
+            return None
+    else:
+        dummy_scores = np.random.uniform(0.1, 0.4, size=521)
+        return dummy_scores
 
 
      # -------- Calculate, Group, and Filter Scores  
