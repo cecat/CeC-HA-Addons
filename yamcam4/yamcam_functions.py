@@ -265,8 +265,8 @@ def analyze_audio_waveform(waveform, camera_name, interpreter, input_details, ou
                     return None
 
             except Exception as e:
-            logger.error(f"{camera_name}: Error during interpreter invocation: {e}")
-            return None
+                logger.error(f"{camera_name}: Error during interpreter invocation: {e}")
+                return None
 
             return scores
 
