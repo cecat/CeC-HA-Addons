@@ -7,6 +7,7 @@ import yaml
 import csv
 import logging
 import tflite_runtime.interpreter as tflite
+from tflite_runtime.interpreter import load_delegate
 import time
 import threading
 import os
