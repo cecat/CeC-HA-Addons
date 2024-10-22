@@ -1,6 +1,6 @@
-tflite-runtime==2.5.0
-pycoral
+pycoral==2.1.0
 numpy<2.0
 paho-mqtt
 pyyaml
 scipy
+
