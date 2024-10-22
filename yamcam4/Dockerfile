@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libsndfile1 \
     wget \
     curl \
+    usbutils \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the local model and Edge TPU library
