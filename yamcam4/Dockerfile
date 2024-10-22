@@ -8,7 +8,9 @@ RUN apt-get update && apt-get install -y \
     libsndfile1 \
     wget \
     curl \
-    gnupg
+    gnupg \
+    build-essential \
+    libatlas-base-dev
 
 # Add Coral apt repository and install Edge TPU runtime
 RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list && \
@@ -17,7 +19,7 @@ RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" >
 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --extra-index-url https://google-coral.github.io/py-repo/ -r requirements.txt
 
 # Copy the local model and class map files
 COPY files/yamnet.tflite .
