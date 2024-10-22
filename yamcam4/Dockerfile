@@ -7,26 +7,22 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
     wget \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+    curl
 
-# Copy and install the pre-downloaded libedgetpu deb package
-COPY libedgetpu1-std.deb /app/libedgetpu1-std.deb
-RUN dpkg -i /app/libedgetpu1-std.deb || apt-get -f install
-
-# Set the library path for Edge TPU
-ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/local/lib
+# Copy the Edge TPU library for Linux (x86_64 architecture)
+COPY files/libedgetpu.so.1.0 /usr/lib/libedgetpu.so.1.0
+RUN ln -s /usr/lib/libedgetpu.so.1.0 /usr/lib/libedgetpu.so.1  # Create a symlink for proper linking
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the local model and class map files from the subdirectory
+# Copy the local model and class map files
 COPY files/yamnet.tflite .
 COPY files/yamnet_edgetpu.tflite .
 COPY files/yamnet_class_map.csv .
 
-# Copy the yamcam.py script and functions
+# Copy the application code
 COPY yamcam.py .
 COPY yamcam_functions.py .
 COPY yamcam_config.py .
