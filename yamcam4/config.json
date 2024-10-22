@@ -21,6 +21,9 @@
     "cec:rw",
     "media:rw"
   ],
+  "devices": [
+  "/dev/bus/usb:/dev/bus/usb:rwm"
+  ],
   "url": "https://github.com/cecat/CeC-HA-Addons"
 }
 
