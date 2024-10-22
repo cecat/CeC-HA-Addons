@@ -356,21 +356,25 @@ try:
     input_details = interpreter.get_input_details()
     output_details = interpreter.get_output_details()
     logger.debug("YAMNet model loaded.")
-
-    # Insert the input details print statements here
-    # Log input and output details for debugging
     logger.debug(f"Input details:")
     for idx, detail in enumerate(input_details):
-        logger.debug(f"  Input {idx}: index={detail['index']}, shape={detail['shape']}, dtype={detail['dtype']}, quantization={detail.get('quantization')}")
+        logger.debug(f"  Input {idx}: index={detail['index']}, "
+                     f"shape={detail['shape']}, dtype={detail['dtype']}, "
+                     f"quantization={detail.get('quantization')}")
     logger.debug(f"Output details:")
     for idx, detail in enumerate(output_details):
-        logger.debug(f"  Output {idx}: index={detail['index']}, shape={detail['shape']}, dtype={detail['dtype']}, quantization={detail.get('quantization')}")
+        logger.debug(f"  Output {idx}: index={detail['index']}, "
+                     f"shape={detail['shape']}, dtype={detail['dtype']}, "
+                     f"quantization={detail.get('quantization')}")
 
 except Exception as e:
     logger.error(f"Failed to initialize the interpreter: {e}")
+    time.sleep(60) # give time to drop into container to poke around
     sys.exit(1)
 
 
+            logger.info(f"NOTE: You have {file_count} {file_extension} files in {directory}, "
+                        f"({total_size_mb:.2f}MB)")
 
 
 # -------- BUILD CLASS NAMES DICTIONARY
