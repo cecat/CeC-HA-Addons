@@ -11,9 +11,12 @@ RUN apt-get install -y libedgetpu1-std || cat /var/log/apt/term.log
 # Clean up
 RUN rm -rf /var/lib/apt/lists/*
 
+# Set the library path for Edge TPU
+ENV LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/local/lib
+
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt 
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the local model and class map files from the subdirectory
 COPY files/yamnet.tflite .
