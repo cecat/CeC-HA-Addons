@@ -8,15 +8,15 @@ RUN apt-get update && apt-get install -y \
     libsndfile1 \
     wget \
     curl \
-    usbutils \
-    && rm -rf /var/lib/apt/lists/*
+    usbutils
 
-# Add the Coral Debian package repository and install the Edge TPU runtime
-RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list \
-    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
-    && apt-get update \
-    && apt-get install -y libedgetpu1-std \
-    && rm -rf /var/lib/apt/lists/*
+# Add the Coral Edge TPU GPG key and repository to sources list
+RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list && \
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+
+# Update apt and install libedgetpu
+RUN apt-get update && apt-get install -y libedgetpu1-std && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy the local model and Edge TPU library
 COPY files/yamnet.tflite .
