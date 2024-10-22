@@ -1,4 +1,4 @@
-tflite-runtime
+tflite-runtime==2.5.0
 pycoral
 numpy<2.0
 paho-mqtt
