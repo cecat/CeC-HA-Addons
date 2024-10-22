@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies and USB utilities
+# Install system dependencies and Edge TPU runtime
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
@@ -11,9 +11,12 @@ RUN apt-get update && apt-get install -y \
     usbutils \
     && rm -rf /var/lib/apt/lists/*
 
-# Manually download and install the libedgetpu package for x86_64 (amd64)
-RUN wget https://packages.cloud.google.com/apt/pool/edgetpu/libedgetpu1-std_15.0-2_amd64.deb -O /tmp/libedgetpu1-std.deb \
-    && dpkg -i /tmp/libedgetpu1-std.deb && rm /tmp/libedgetpu1-std.deb
+# Add the Coral Debian package repository and install the Edge TPU runtime
+RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list \
+    && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
+    && apt-get update \
+    && apt-get install -y libedgetpu1-std \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy the local model and Edge TPU library
 COPY files/yamnet.tflite .
