@@ -11,10 +11,9 @@ RUN apt-get update && apt-get install -y \
     usbutils \
     && rm -rf /var/lib/apt/lists/*
 
-# Manually download and install the libedgetpu package
-RUN wget https://packages.cloud.google.com/apt/pool/edgetpu/libedgetpu1-std_15.0-2_arm64.deb -O /tmp/libedgetpu1-std.deb && \
-    dpkg -i /tmp/libedgetpu1-std.deb && \
-    rm /tmp/libedgetpu1-std.deb
+# Manually download and install the libedgetpu package for x86_64 (amd64)
+RUN wget https://packages.cloud.google.com/apt/pool/edgetpu/libedgetpu1-std_15.0-2_amd64.deb -O /tmp/libedgetpu1-std.deb \
+    && dpkg -i /tmp/libedgetpu1-std.deb && rm /tmp/libedgetpu1-std.deb
 
 # Copy the local model and Edge TPU library
 COPY files/yamnet.tflite .
@@ -36,3 +35,4 @@ COPY yamcam_supervisor.py .
 
 # Set entrypoint
 CMD ["python", "yamcam.py"]
+
