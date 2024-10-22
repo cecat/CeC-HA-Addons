@@ -1,6 +1,6 @@
 {
   "name": "YAMNet Camera Sounds - DEV",
-  "description": "Analyze audio from camera mics via continous monitoring of RTSP streams to detect sound types using YAMNet. This version under active development and at times may not build.",
+  "description": "Analyze audio from camera mics via continuous monitoring of RTSP streams to detect sound types using YAMNet. This version is under active development and may not always build correctly.",
   "version": "1.0.0-Dev",
   "slug": "yamcam-dev",
   "init": false,
@@ -20,6 +20,12 @@
     "config:rw",
     "cec:rw",
     "media:rw"
+  ],
+  "devices": [
+    {
+      "name": "TPU",
+      "path": "/dev/bus/usb:/dev/bus/usb"
+    }
   ],
   "url": "https://github.com/cecat/CeC-HA-Addons/"
 }
