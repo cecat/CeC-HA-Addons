@@ -4,13 +4,14 @@ WORKDIR /app
 
 RUN sleep 30
 
-# Install system dependencies and add a delay for inspection
+# Install system dependencies and Edge TPU runtime
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
     wget \
     curl \
-    gnupg2 \
+    usbutils \
+    lsof \  
     && rm -rf /var/lib/apt/lists/*
 
 # Sleep delay for manual inspection
