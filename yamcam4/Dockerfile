@@ -11,6 +11,12 @@ RUN apt-get update && apt-get install -y \
     usbutils \
     && rm -rf /var/lib/apt/lists/*
 
+# Add the Coral APT key and repository for Edge TPU
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list && \
+    apt-get update && \
+    apt-get install -y libedgetpu1-std
+
 # Copy the local model and Edge TPU library
 COPY files/yamnet.tflite .
 COPY files/yamnet_edgetpu.tflite .
