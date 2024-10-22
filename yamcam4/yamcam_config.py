@@ -13,6 +13,7 @@ import threading
 import os
 import sys
 from datetime import datetime
+import ctypes
 
 # File paths
 
@@ -340,6 +341,23 @@ else:
 #                                              #
 
 # -------- LOAD MODEL (using TensorFLow Lite)
+
+# check access to lib
+logger.debug("Testing lib and delegate loading")
+try:
+    ctypes.CDLL('libedgetpu.so.1')
+    logger.debug("libedgetpu.so.1 loaded successfully")
+except OSError as e:
+    logger.debug(f"Failed to load libedgetpu.so.1: {e}")
+
+# Test loading the delegate directly
+try:
+    delegate = load_delegate('libedgetpu.so.1')
+    logger.debug("Delegate loaded successfully")
+except Exception as e:
+    logger.debug(f"Failed to load delegate: {e}")
+
+time.sleep(30) # give time to drop into container to poke around
 
 logger.debug("Loading YAMNet model")
 try:        
