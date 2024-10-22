@@ -2,14 +2,14 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies and Edge TPU runtime
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    libsndfile1 \
-    wget \
-    curl \
-    libedgetpu1-std \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies in steps to isolate any issues
+RUN apt-get update && apt-get install -y ffmpeg || cat /var/log/apt/term.log
+RUN apt-get install -y libsndfile1 || cat /var/log/apt/term.log
+RUN apt-get install -y wget curl || cat /var/log/apt/term.log
+RUN apt-get install -y libedgetpu1-std || cat /var/log/apt/term.log
+
+# Clean up
+RUN rm -rf /var/lib/apt/lists/*
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
