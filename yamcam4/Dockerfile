@@ -3,10 +3,15 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Install system dependencies in steps to isolate any issues
-RUN apt-get update && apt-get install -y ffmpeg || cat /var/log/apt/term.log
-RUN apt-get install -y libsndfile1 || cat /var/log/apt/term.log
-RUN apt-get install -y wget curl || cat /var/log/apt/term.log
-RUN apt-get install -y libedgetpu1-std || cat /var/log/apt/term.log
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    wget \
+    curl \
+    libedgetpu1-std
+
+# Copy the Edge TPU library to a known location
+RUN cp /usr/lib/x86_64-linux-gnu/libedgetpu.so.1 /usr/local/lib/libedgetpu.so.1
 
 # Clean up
 RUN rm -rf /var/lib/apt/lists/*
