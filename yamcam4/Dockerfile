@@ -2,7 +2,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Install system dependencies and Edge TPU runtime
+# Install system dependencies and USB utilities
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
@@ -11,11 +11,10 @@ RUN apt-get update && apt-get install -y \
     usbutils \
     && rm -rf /var/lib/apt/lists/*
 
-# Add the Coral APT key and repository for Edge TPU
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list && \
-    apt-get update && \
-    apt-get install -y libedgetpu1-std
+# Manually download and install the libedgetpu package
+RUN wget https://packages.cloud.google.com/apt/pool/edgetpu/libedgetpu1-std_15.0-2_arm64.deb -O /tmp/libedgetpu1-std.deb && \
+    dpkg -i /tmp/libedgetpu1-std.deb && \
+    rm /tmp/libedgetpu1-std.deb
 
 # Copy the local model and Edge TPU library
 COPY files/yamnet.tflite .
@@ -37,4 +36,3 @@ COPY yamcam_supervisor.py .
 
 # Set entrypoint
 CMD ["python", "yamcam.py"]
-
