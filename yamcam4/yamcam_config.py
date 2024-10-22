@@ -141,9 +141,7 @@ summary_interval     = general_settings.get('summary_interval', 5 ) # periodic r
 # for testing
 no_model             = general_settings.get('no_model', False)
 no_ffmpeg            = general_settings.get('no_ffmpeg', False)
-
-# implement tpu support, then worry about parsing yaml
-use_tpu = True
+use_tpu              = general_settings.get('use_tpu', False)
 
 if use_tpu:
     model_path = 'yamnet_edgetpu.tflite'
