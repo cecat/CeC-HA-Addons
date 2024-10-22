@@ -2,6 +2,9 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
+# Insert a delay before package installation for debugging
+RUN echo "Sleeping for 30 seconds for debugging..." && sleep 30
+
 # Install system dependencies and Edge TPU runtime
 RUN apt-get update && apt-get install -y \
     ffmpeg \
