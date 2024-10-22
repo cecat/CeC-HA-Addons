@@ -372,11 +372,6 @@ except Exception as e:
     time.sleep(60) # give time to drop into container to poke around
     sys.exit(1)
 
-
-            logger.info(f"NOTE: You have {file_count} {file_extension} files in {directory}, "
-                        f"({total_size_mb:.2f}MB)")
-
-
 # -------- BUILD CLASS NAMES DICTIONARY
 
 class_names = []
