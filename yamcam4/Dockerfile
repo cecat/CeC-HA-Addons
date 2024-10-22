@@ -9,13 +9,13 @@ RUN apt-get update && apt-get install -y \
     wget \
     curl
 
-# Add Google Coral repository for libedgetpu
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list && \
-    apt-get update
+# Use the new method for adding the Coral Edge TPU key and repository
+RUN mkdir -p /usr/share/keyrings && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | tee /usr/share/keyrings/coral-edgetpu-archive-keyring.gpg >/dev/null && \
+    echo "deb [signed-by=/usr/share/keyrings/coral-edgetpu-archive-keyring.gpg] https://packages.cloud.google.com/apt coral-edgetpu-stable main" | tee /etc/apt/sources.list.d/coral-edgetpu.list
 
-# Install Edge TPU runtime
-RUN apt-get install -y libedgetpu1-std
+# Update and install the Edge TPU runtime
+RUN apt-get update && apt-get install -y libedgetpu1-std
 
 # Clean up
 RUN rm -rf /var/lib/apt/lists/*
