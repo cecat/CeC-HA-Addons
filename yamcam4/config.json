@@ -23,7 +23,6 @@
   ],
   "devices": [
     {
-      "name": "TPU",
       "path": "/dev/bus/usb:/dev/bus/usb"
     }
   ],
