@@ -2,16 +2,27 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-# Add delay for inspection
-RUN echo "Sleeping for 90 seconds before continuing..." && sleep 90
+RUN sleep 30
 
-# Add Coral Edge TPU repository, key, and install dependencies
+# Install system dependencies and add a delay for inspection
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    libsndfile1 \
+    wget \
+    curl \
+    gnupg2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Sleep delay for manual inspection
+RUN sleep 30
+
+# Add Coral Edge TPU sources and GPG key, then install TPU runtime
 RUN echo "deb https://packages.cloud.google.com/apt coral-edgetpu-stable main" > /etc/apt/sources.list.d/coral-edgetpu.list && \
-    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | tee /usr/share/keyrings/coral-edgetpu-archive-keyring.gpg > /dev/null && \
-    apt-get update && apt-get install -y libedgetpu1-std && rm -rf /var/lib/apt/lists/*
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    apt-get update && apt-get install -y libedgetpu1-std && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install system dependencies
-RUN apt-get install -y ffmpeg libsndfile1 wget curl usbutils && rm -rf /var/lib/apt/lists/*
+RUN sleep 30
 
 # Copy the local model and Edge TPU library
 COPY files/yamnet.tflite .
@@ -19,6 +30,8 @@ COPY files/yamnet_edgetpu.tflite .
 COPY files/yamnet_class_map.csv .
 COPY files/libedgetpu.so.1.0 /usr/lib/libedgetpu.so.1.0
 RUN ln -s /usr/lib/libedgetpu.so.1.0 /usr/lib/libedgetpu.so.1
+
+RUN sleep 30
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
