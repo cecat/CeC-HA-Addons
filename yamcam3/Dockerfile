@@ -7,7 +7,10 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     libsndfile1 \
     wget \
+    gdal-bin \
+    libgdal-dev \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
