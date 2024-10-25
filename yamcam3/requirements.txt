@@ -1,6 +1,4 @@
 tflite-runtime
-pycoral
 numpy<2.0
 paho-mqtt
 pyyaml
-scipy
