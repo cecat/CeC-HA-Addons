@@ -1,6 +1,7 @@
 # Camera-sounds add-on for Home Assistant
 
-This add-on is a work in progress.  Please report any issues
+This add-on is a work in progress and has only been tested on an x86 processor. 
+RPi4 is being tested but at the moment is not working.  Please report any issues
 [here](https://github.com/cecat/CeC-HA-Addons/issues). 
 
 This project uses TensorFlow Lite and the
@@ -278,7 +279,9 @@ from the *Official add-ons* repository.
 ### Other Notes
 
 This add-on has only been tested using RTSP feeds from Amcrest and UniFi (via NVR)
-cameras. It's been tested on Home Assistant running on a Raspberry Pi 4 and on
-an Intel Celeron (neither of which support Advanced Vector
+cameras. It's been tested on Home Assistant running on 
+an Intel Celeron (does not support Advanced Vector
 Extensions (AVX) instructions).
+
+The ARM (RPi) version is unstable at the moment, so under construction.
 
