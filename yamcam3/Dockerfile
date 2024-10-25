@@ -11,6 +11,9 @@ RUN apt-get update && apt-get install -y \
     libgdal-dev \
     && rm -rf /var/lib/apt/lists/*
 
+# Set GDAL environment variables
+ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
+ENV C_INCLUDE_PATH=/usr/include/gdal
 
 # Install TensorFlow Lite runtime and compatible NumPy version
 COPY requirements.txt .
