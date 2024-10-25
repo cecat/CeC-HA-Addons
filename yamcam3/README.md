@@ -1,7 +1,12 @@
 # Camera-sounds add-on for Home Assistant
 
 This add-on is a work in progress and has only been tested on an x86 processor. 
-RPi4 is being tested but at the moment is not working.  Please report any issues
+I do **NOT** recommend using this add-on if you have a tiny system (e.g., a RPi4), 
+especially if you are already running a resource-hungry add-on like Frigate, as
+this addon is also resource-intensive and HASS behaves unpredictably (but badly)
+when it is trying to run on an overloaded system.
+
+Please report any issues
 [here](https://github.com/cecat/CeC-HA-Addons/issues). 
 
 This project uses TensorFlow Lite and the
