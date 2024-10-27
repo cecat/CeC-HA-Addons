@@ -92,6 +92,28 @@ def format_input_details(details):
             formatted_details += f"    {key}: {value}\n"
     return formatted_details
 
+# -------- VALIDATE BOOLEAN PARAMETERS
+
+def validate_boolean(var_name, var_value):
+    if isinstance(var_value, str):
+        var_lower = var_value.lower()
+        if var_lower == "true":
+            return True
+        elif var_lower == "false":
+            return False
+        else:
+            logger.warning(f"Invalid boolean value '{var_value}' for {var_name}. Defaulting to False.")
+            return False
+    elif isinstance(var_value, bool):
+        return var_value
+    else:
+        logger.warning(f"Invalid type '{type(var_value).__name__}' for {var_name}. Defaulting to False.")
+        return False
+
+
+
+
+
 #                                              #
 ### --------------- STARTUP ---------------###
 #                                              #
@@ -141,53 +163,10 @@ summary_interval     = general_settings.get('summary_interval', 5 ) # periodic r
 
 # --------- VERIFY GENERAL SETTINGS
 
-# LOGFILE must be boolean
-if isinstance(logfile, str):
-    logfile_lower = logfile.lower()
-    if logfile_lower == "true":
-        logfile = True
-    elif logfile_lower == "false":
-        logfile = False
-    else:                       # Handle mistyped or invalid boolean values
-        logger.warning(f"Invalid boolean value '{logfile}' for logfile. Defaulting to False.")
-        logfile = False
-elif isinstance(logfile, bool):
-    pass                        # Value is already a valid boolean, no action needed
-else:                           # Value is neither string nor boolean, default to False
-    logger.warning(f"Invalid boolean type for '{logfile}' for logfile. Defaulting to False.")
-    logfile = False
+logfile = validate_boolean("logfile", logfile)
+sound_log = validate_boolean("sound_log", sound_log)
+ffmpeg_debug = validate_boolean("ffmpeg_debug", ffmpeg_debug)
 
-# SOUND_LOG must be boolean
-if isinstance(sound_log, str):
-    sound_log_lower = sound_log.lower()
-    if sound_log_lower == "true":
-        sound_log = True
-    elif sound_log_lower == "false":
-        sound_log = False
-    else:                       # Handle mistyped or invalid boolean values
-        logger.warning(f"Invalid boolean value '{sound_log}' for sound_log. Defaulting to False.")
-        sound_log = False
-elif isinstance(sound_log, bool):
-    pass                        # Value is already a valid boolean, no action needed
-else:                           # Value is neither string nor boolean, default to False
-    logger.warning(f"Invalid boolean value '{sound_log}' for sound_log. Defaulting to False.")
-    sound_log = False
-
-# FFMPEG_DEBUG must be boolean
-if isinstance(ffmpeg_debug, str):
-    ffmpeg_debug_lower = ffmpeg_debug.lower()
-    if ffmpeg_debug_lower == "true":
-        ffmpeg_debug = True
-    elif ffmpeg_debug_lower == "false":
-        ffmpeg_debug = False
-    else:                       # Handle mistyped or invalid boolean values
-        logger.warning(f"Invalid boolean value '{ffmpeg_debug}' for ffmpeg_debug. Defaulting to False.")
-        ffmpeg_debug = False
-elif isinstance(ffmpeg_debug, bool):
-    pass                        # Value is already a valid boolean, no action needed
-else:                           # Value is neither string nor boolean, default to False
-    logger.warning(f"Invalid boolean value '{ffmpeg_debug}' for ffmpeg_debug. Defaulting to False.")
-    logfile = False
 
 # DEFAULT_MIN_SCORE must be between 0 and 1
 if not (0.0 <= default_min_score <= 1.0):
