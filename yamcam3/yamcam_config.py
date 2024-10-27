@@ -86,15 +86,18 @@ def validate_camera_config(camera_settings):
     for camera_name, camera_config in camera_settings.items():
         ffmpeg_config = camera_config.get('ffmpeg')
         if not ffmpeg_config or not isinstance(ffmpeg_config, dict):
-            raise ValueError(f"STOPPING. Camera '{camera_name}': 'ffmpeg' section is missing or invalid.")
+            raise ValueError(f"STOPPING. Camera '{camera_name}': "
+                              "'ffmpeg' section is missing or invalid.")
 
         inputs = ffmpeg_config.get('inputs')
         if not inputs or not isinstance(inputs, list) or len(inputs) == 0:
-            raise ValueError(f"Camera '{camera_name}': 'inputs' section is missing or invalid.")
+            raise ValueError(f"Camera '{camera_name}': "
+                              "'inputs' section is missing or invalid.")
 
         rtsp_url = inputs[0].get('path')
         if not rtsp_url or not isinstance(rtsp_url, str):
-            raise ValueError(f"Camera '{camera_name}': RTSP path is missing or invalid.")
+            raise ValueError(f"Camera '{camera_name}': "
+                              "RTSP path is missing or invalid.")
 
 # -------- LOG DETAILS FOR DEBUG
 
@@ -116,12 +119,14 @@ def validate_boolean(var_name, var_value):
         elif var_lower == "false":
             return False
         else:
-            logger.warning(f"Invalid boolean value '{var_value}' for {var_name}. Defaulting to False.")
+            logger.warning(f"Invalid boolean value '{var_value}' "
+                           f"for {var_name}. Defaulting to False.")
             return False
     elif isinstance(var_value, bool):
         return var_value
     else:
-        logger.warning(f"Invalid type '{type(var_value).__name__}' for {var_name}. Defaulting to False.")
+        logger.warning(f"Invalid type '{type(var_value).__name__}' "
+                       f"for boolean {var_name}. Defaulting to False.")
         return False
 
 
@@ -172,7 +177,6 @@ ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
 default_min_score    = general_settings.get('default_min_score', 0.5)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 top_k                = general_settings.get('top_k', 10)
-#exclude_groups       = general_settings.get('exclude_groups', [])   # groups to ignore
 summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
 
 # --------- VERIFY GENERAL SETTINGS
@@ -228,11 +232,6 @@ if logfile:
     except Exception as e:
         logger.error(f"Could not create or open the log file at {log_path}: {e}")
 
-
-# -------- MAKE SURE LOG DIR EXISTS BEFORE LOGGING
-#FIX- seems unnecessary as we already checked just above
-#if sound_log:
-#    check_for_log_dir() 
 
 # -------- SOUND EVENT PARAMETERS 
 
