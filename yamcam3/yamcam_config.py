@@ -27,6 +27,20 @@ shutdown_event = threading.Event()
 #                                              #
 ### --------------- FUNCTIONS ---------------###
 #                                              #
+# 
+#    check_for_log_dir()
+#          Make sure the log directory exists
+#    check_storage(directory, file_extension)
+#          Check how much space our logs are taking up
+#    shutdownFilter(logging.Filter) and filter(self, record)
+#          Smooth shutdown, minimize dangling log msgs
+#    validate_camera_config(camera_settings)
+#          Check for common errors in RTSP path spec`
+#    format_input_details(details)
+#          For debug, nicely format specs for what the model expects
+#    validate_boolean(var_name, var_value)
+#          Check that booleans are all correctly set, default to False
+#
 
 # -------- MAKE SURE THE LOG DIRECTORY EXISTS
 
