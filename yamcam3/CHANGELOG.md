@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 1.0.1
+- boolean function check to reduce duplication for multiple bools
+- implement .dockerignore to try to speed up builds
 ## 1.0.0
 - Eliminated the *exclude_groups* list as we have a *sounds*->*track* list already,
   so any group not in that list will be excluded (previously all groups/classes were
