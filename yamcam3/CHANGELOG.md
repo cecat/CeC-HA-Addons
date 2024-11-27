@@ -2,6 +2,8 @@
 # Changelog
 
 ## 1.0.1
+- set summary_interval to 0 if none wanted 
+## 1.0.1
 - boolean function check to reduce duplication for multiple bools
 - implement .dockerignore to try to speed up builds
 ## 1.0.0

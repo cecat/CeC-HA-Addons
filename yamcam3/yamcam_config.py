@@ -177,7 +177,7 @@ ffmpeg_debug         = general_settings.get('ffmpeg_debug', False)
 default_min_score    = general_settings.get('default_min_score', 0.5)
 noise_threshold      = general_settings.get('noise_threshold', 0.1)   
 top_k                = general_settings.get('top_k', 10)
-summary_interval     = general_settings.get('summary_interval', 5 ) # periodic reports (min)
+summary_interval     = general_settings.get('summary_interval', 15 ) # periodic reports (min)
 
 # --------- VERIFY GENERAL SETTINGS
 
@@ -209,7 +209,11 @@ if not (1 <= top_k <= 20):
         
 # courtesy message re interval for summary entry log messages
         
-logger.info (f"Summary reports every {summary_interval} min.")
+if summary_interval == 0:
+    logger.info (f"No summary reports.") 
+    summary_interval = 14400 # narrator: actually, summary reports every 10 days...
+else
+    logger.info (f"Summary reports every {summary_interval} min.")
 
 # -------- SET UP LOGGING TO FILE FOR DEBUG ANALYSIS if logfile=True:
 

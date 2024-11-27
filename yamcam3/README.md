@@ -101,6 +101,7 @@ general:
   ffmpeg_debug: false           # Log ffmpeg stderr (a firehose - includes errors and info)
                                 #   Must also have log_level set to DEBUG
   summary_interval: 15          # log a summary every n min showing the sound groups detected.
+                                #   If set to 0, no summaries
 
 mqtt:
   host: "x.x.x.x"               # Your MQTT server (commonly the IP addr of your HA server)
@@ -162,6 +163,7 @@ The file is a csv with date/time, camera_name, group, group_score, class, class_
 the CSV file **/media/yamcam/yyyy-mm-dd-hh-mm.csv**.  
 - **ffmpeg_debug**: Logs all ffmpeg stderr messages, which have no codes nor does ffmpeg
 differentiate between info and errors - so it's a firehose (coming from all n sources).
+- **summary_interval**: Logs a summary every n minutes. No summaries logged if set to 0
 
 **MQTT configuration variables**
 
