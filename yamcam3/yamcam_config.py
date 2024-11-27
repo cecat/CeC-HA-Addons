@@ -212,7 +212,7 @@ if not (1 <= top_k <= 20):
 if summary_interval == 0:
     logger.info (f"No summary reports.") 
     summary_interval = 14400 # narrator: actually, summary reports every 10 days...
-else
+else:
     logger.info (f"Summary reports every {summary_interval} min.")
 
 # -------- SET UP LOGGING TO FILE FOR DEBUG ANALYSIS if logfile=True:
