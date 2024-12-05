@@ -395,74 +395,8 @@ def calculate_composite_scores(group_scores_dict):
     return composite_scores
 
      # -------- Manage Sound Event Window 
-     # debugging version
+
 def update_sound_window(camera_name, detected_sounds):
-    if shutdown_event.is_set():
-        return
-
-    current_time = time.time()
-    with state_lock:
-        # Initialize if not present
-        if camera_name not in sound_windows:
-            sound_windows[camera_name] = {}
-            active_sounds[camera_name] = {}
-            last_detection_time[camera_name] = {}
-            decay_counters[camera_name] = {}  # Initialize decay_counters for the camera
-            event_counts[camera_name] = {}    # Initialize event_counts for the camera
-
-        window = sound_windows[camera_name]
-        active = active_sounds[camera_name]
-        last_time = last_detection_time[camera_name]
-        decay_camera = decay_counters[camera_name]
-        counts = event_counts[camera_name]
-
-        for sound_class in yamcam_config.sounds_to_track:
-            # Initialize deque for sound class
-            if sound_class not in window:
-                window[sound_class] = deque(maxlen=yamcam_config.window_detect)
-
-            # Update detections
-            is_detected = sound_class in detected_sounds
-            window[sound_class].append(is_detected)
-
-            # Debug: Log the deque contents
-            logger.debug(f"{camera_name}: Window for {sound_class}: {list(window[sound_class])}")
-            logger.debug(f"{camera_name}: Detected {sound_class}: {is_detected}")
-
-            # Update last detection time
-            if is_detected:
-                last_time[sound_class] = current_time
-
-            # Check for start event
-            if window[sound_class].count(True) >= yamcam_config.persistence:
-                if not active.get(sound_class, False):
-                    active[sound_class] = True
-                    decay_camera[sound_class] = yamcam_config.decay
-                    # Increment the event count for this sound_class
-                    counts[sound_class] = counts.get(sound_class, 0) + 1
-                    report_event(camera_name, sound_class, 'start', current_time)
-                    logger.info(f"{camera_name}: Sound '{sound_class}' started.")
-            else:
-                # Check for stop event using decay counters
-                if active.get(sound_class, False):
-                    if sound_class in detected_sounds:
-                        # Reset decay counter if sound is detected
-                        decay_camera[sound_class] = yamcam_config.decay
-                    else:
-                        # Decrement decay counter if sound is not detected
-                        decay_camera[sound_class] -= 1
-                        logger.debug(f"{camera_name}: Decay counter for {sound_class}: {decay_camera[sound_class]}")
-                        if decay_camera[sound_class] <= 0:
-                            active[sound_class] = False
-                            report_event(camera_name, sound_class, 'stop', current_time)
-                            logger.info(f"{camera_name}: Sound '{sound_class}' stopped.")
-
-        # Debug: Log the active state and decay counters for all sounds
-        logger.debug(f"{camera_name}: Active sounds: {active}")
-        logger.debug(f"{camera_name}: Decay counters: {decay_camera}")
-
-
-def production_update_sound_window(camera_name, detected_sounds):
 
     if shutdown_event.is_set():
         return
