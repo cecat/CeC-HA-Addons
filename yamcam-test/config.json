@@ -1,0 +1,26 @@
+{
+  "name": "YAMNet Camera Sounds-test version",
+  "description": "Analyze audio from camera mics via continous monitoring of RTSP streams to detect sound types using YAMNet",
+  "version": "1.0.2",
+  "slug": "yamcam-test",
+  "init": false,
+  "arch": [
+    "aarch64",
+    "amd64",
+    "armhf",
+    "armv7",
+    "i386"
+  ],
+  "startup": "services",
+  "options": {},
+  "schema": {},
+  "logo": "logo.png",
+  "icon": "icon.png",
+  "map": [
+    "config:rw",
+    "cec:rw",
+    "media:rw"
+  ],
+  "url": "https://github.com/cecat/CeC-HA-Addons/tree/main/addons/yamcam3"
+}
+

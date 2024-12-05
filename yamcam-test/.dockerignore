@@ -1,0 +1,13 @@
+# Exclude all files by default
+**
+
+# Include only specific files and directories
+!Dockerfile
+!requirements.txt
+!files/
+!yamcam.py
+!yamcam_functions.py
+!yamcam_config.py
+!camera_audio_stream.py
+!yamcam_supervisor.py
+
