@@ -1,6 +1,9 @@
 
 # Changelog
 
+## 1.0.3
+- modified group composite score algorithm to award 0.1 rather than 0.05 for each
+  detectec instance of that group within top_k, boosting group scores
 ## 1.0.2
 - set summary_interval to 0 if none wanted 
 ## 1.0.1
