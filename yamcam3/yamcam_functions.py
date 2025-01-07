@@ -388,7 +388,7 @@ def calculate_composite_scores(group_scores_dict):
         if max_score > 0.7:
             composite_score = max_score
         else:
-            composite_score = min(max_score + 0.05 * len(scores), 0.95)
+            composite_score = min(max_score + 0.1 * len(scores), 0.95) 
 
         composite_scores.append((group, composite_score))
 
