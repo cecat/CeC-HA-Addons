@@ -252,7 +252,7 @@ at least *top_k* classes that exceed *noise_threshold*), then calculates a
 group score from these.  The composite (i.e., group) score is calculated as follows:
 - If the highest score (*max_score*) among those in the same group >= 0.7,
 group_score = max_score
-- Else group_score = max_score + 0.05(group_count), where group_count is the
+- Else group_score = max_score + 0.1*(group_count), where group_count is the
 number of classes from that group are in the top_k scores. 
 - group_score is capped at 0.95.
 
