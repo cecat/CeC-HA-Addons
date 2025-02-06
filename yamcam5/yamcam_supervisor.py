@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-yamcam_supervisor.py - Supervisor for Camera Streams in Yamcam Sound Profiler (YSP)
-CeC November 2024
+yamcam_supervisor.py - Supervisor for camera streams in Yamcam5 Home Assistant Add-on
+CeC Feb 2025 (Updated)
 """
 
 import threading
@@ -15,7 +15,7 @@ class CameraStreamSupervisor:
         self.camera_configs = camera_configs
         self.analyze_callback = analyze_callback
         self.shutdown_event = shutdown_event  # Shared shutdown event
-        self.streams = {}  # Dictionary mapping camera_name -> CameraAudioStream instance
+        self.streams = {}  # Mapping: camera_name -> CameraAudioStream instance
         self.lock = threading.Lock()
         self.running = True
         self.supervisor_thread = threading.Thread(target=self.monitor_streams, daemon=True, name="SupervisorThread")
@@ -41,10 +41,10 @@ class CameraStreamSupervisor:
                     self.streams[camera_name] = stream
                 logger.info(f"Started stream for {camera_name}.")
             except Exception as e:
-                logger.error(f"{camera_name}: Failed to start stream: {e}. Halting the program.", exc_info=True)
+                logger.error(f"{camera_name}: Failed to start stream: {e}", exc_info=True)
                 sys.exit(1)
         else:
-            logger.error(f"{camera_name}: No configuration found. Halting the add-on.")
+            logger.error(f"{camera_name}: No configuration found. Halting add-on.")
             sys.exit(1)
 
     def stop_all_streams(self):
@@ -59,10 +59,10 @@ class CameraStreamSupervisor:
                     stream.stop()
                 except Exception as e:
                     logger.error(f"Error stopping stream {stream.camera_name}: {e}", exc_info=True)
-            logger.debug("All camera streams have been requested to stop.")
+            logger.info("All camera streams have been requested to stop.")
         try:
             self.supervisor_thread.join(timeout=5)
-            logger.debug("Supervisor thread stopped.")
+            logger.info("Supervisor thread stopped.")
         except Exception as e:
             logger.error(f"Error stopping supervisor thread: {e}", exc_info=True)
 
