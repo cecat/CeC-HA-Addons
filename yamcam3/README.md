@@ -83,6 +83,16 @@ The *sounds:* section also follows the same syntax as Frigate's detection object
 individual min_score thresholds (which override *default_min_store* for the
 associated groups).
 
+With the topic set to "yamcam/sounds" here is a sample packet showing the start of a sound event:
+```
+{
+    "camera_name": "entry",
+    "sound_class": "music",
+    "event_type": "start",
+    "timestamp": "2025-04-03 14:26:59"
+}
+```
+
 #### Sample Configuration File
 
 You can get a starter configuration file and just fill in your MQTT and camera details 
