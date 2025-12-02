@@ -2,6 +2,11 @@
 
 Miscelaneous add-ons for Home Assistant.
 
+The production version is yamcam3.  The others (yamcam-{text,4,5} are experimental.
+
+[Jump to YamCam Details]
+(https://github.com/cecat/CeC-HA-Addons/tree/main/yamcam3#readme)
+
 Feedback/fixes would be welcome.  To use an add-on from this repo
 (presently there is only one add-on in the repo):
 
