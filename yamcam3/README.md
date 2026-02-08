@@ -208,7 +208,7 @@ groups are listed here.* If no *min_score* is set for a group, the *default_min_
 
 Available sound groups are:
 - aircraft
-- alert (e.g., sirens, alarms, loud bangs...)
+- alert (e.g., alarms, loud bangs, gunshots...)
 - animals
 - birds
 - boats
@@ -220,6 +220,7 @@ Available sound groups are:
 - music
 - people (e.g., laughter, coughing, speaking, ringtones, doorbells...)
 - silence
+- siren (civil defense siren, emergency vehicle sirens)
 - trains
 - vehicles
 - water

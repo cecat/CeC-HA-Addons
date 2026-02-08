@@ -315,10 +315,10 @@ index,mid,display_name
 313,/m/02rhddq,vehicles.reversingBeeps
 314,/m/03cl9h,vehicles.iceCreamTruckIceCreamVan
 315,/m/01bjv,vehicles.bus
-316,/m/03j1ly,alert.emergencyVehicle
-317,/m/04qvtq,alert.policeCarSiren
-318,/m/012n7d,alert.ambulanceSiren
-319,/m/012ndj,alert.fireEngineFireTruckSiren
+316,/m/03j1ly,siren.emergencyVehicle
+317,/m/04qvtq,siren.policeCarSiren
+318,/m/012n7d,siren.ambulanceSiren
+319,/m/012ndj,siren.fireEngineFireTruckSiren
 320,/m/04_sv,vehicles.motorcycle
 321,/m/0btp2,vehicles.trafficNoiseRoadwayNoise
 322,/m/06d_3,trains.railTransport
@@ -389,8 +389,8 @@ index,mid,display_name
 387,/m/015jpf,domestic.dialTone
 388,/m/01z47d,domestic.busySignal
 389,/m/046dlr,people.alarmClock
-390,/m/03kmc9,alert.siren
-391,/m/0dgbq,alert.civilDefenseSiren
+390,/m/03kmc9,siren.siren
+391,/m/0dgbq,siren.civilDefenseSiren
 392,/m/030rvx,people.buzzer
 393,/m/01y3hg,alert.smokeDetectorSmokeAlarm
 394,/m/0c3f7m,alert.fireAlarm

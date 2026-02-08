@@ -68,10 +68,15 @@ cameras:
 #
 sounds:                     
   track:                    
+    - siren                    # Dedicated group for civil defense/emergency sirens
     - people
     - birds
     - alert
   filters:
+    siren:
+      min_score: 0.4           # Lower base threshold - sirens are distinctive
+      start_threshold: 0.5     # Moderate threshold to start
+      continue_threshold: 0.3  # Low threshold to sustain (sirens are continuous)
     people:
       min_score: 0.60
     birds:
