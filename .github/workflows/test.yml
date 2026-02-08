@@ -3,8 +3,16 @@ name: Tests
 on:
   push:
     branches: [main, 'refactor/**', 'feature/**']
+    paths:
+      - 'yamcam3/**'
   pull_request:
     branches: [main]
+    paths:
+      - 'yamcam3/**'
+
+defaults:
+  run:
+    working-directory: yamcam3
 
 jobs:
   test:
@@ -50,6 +58,7 @@ jobs:
           pip install flake8
 
       - name: Lint with flake8
+        working-directory: yamcam3
         run: |
           # Stop build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=__pycache__,files
