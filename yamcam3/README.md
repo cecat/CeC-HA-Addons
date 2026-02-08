@@ -6,6 +6,9 @@ especially if you are already running a resource-hungry add-on like Frigate, as
 this addon is also resource-intensive and HASS behaves unpredictably (and badly)
 when it is trying to run on an overloaded system.
 
+**Note (v2.0.1):** This version uses 50% overlapping audio windows for more reliable
+detection, which roughly doubles the inference rate (~2x CPU for audio processing).
+
 Please report any issues
 [here](https://github.com/cecat/CeC-HA-Addons/issues). 
 
@@ -140,11 +143,16 @@ cameras:
       - path: "rtsp://x.x.x.x:7447/65dd5a1900f4cb70dffa2143_1"
 
 sounds:                     
-  track:                    
+  track:
+    - siren
     - people
     - birds
     - alert
   filters:
+    siren:
+      min_score: 0.4
+      start_threshold: 0.5      # higher threshold to START an event
+      continue_threshold: 0.3   # lower threshold to SUSTAIN an event
     people:
       min_score: 0.70
     birds:
@@ -205,6 +213,10 @@ configuration file), with the detected sound classes as the payload to this topi
 These are structured similarly to Frigate configuration. *Nothing will be reported if no sound
 groups are listed here.* If no *min_score* is set for a group, the *default_min_score*
 (General parameters above) is used.
+
+Optional **hysteresis thresholds** can reduce false starts and dropouts for sustained sounds:
+- **start_threshold**: Score required to START a sound event (higher = fewer false positives). Defaults to *min_score*.
+- **continue_threshold**: Score required to SUSTAIN an event once started (lower = fewer dropouts). Defaults to *min_score*.
 
 Available sound groups are:
 - aircraft
