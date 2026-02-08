@@ -49,6 +49,7 @@ class CameraAudioStream:
             self.shutdown_event = shutdown_event # store the shutdown event
             self.running = False
             self.buffer_size = 31200  # YAMNet needs 15,600 samples, 2B per sample
+            self.hop_size = 15600     # 50% overlap: read half buffer between inferences
             self.lock = threading.Lock()
             self.interpreter = tflite.Interpreter(model_path=model_path)
             self.interpreter.allocate_tensors()
@@ -134,13 +135,29 @@ class CameraAudioStream:
         # Inform supervisor that the stream has stopped
         self.supervisor.stream_stopped(self.camera_name)
 
-# ----------- READ_STREM -----------#
+# ----------- READ_STREAM -----------#
 
     def read_stream(self):
+        """
+        Continuously read audio from FFmpeg with 50% overlapping windows.
+        
+        YAMNet needs 0.975s (15,600 samples) of audio. With 50% overlap,
+        we run inference every ~0.5s using overlapping windows, which
+        stabilizes detection across frame boundaries.
+        """
         raw_audio = b""
+        first_fill = True  # First iteration needs full buffer
+        
         while self.running and not self.shutdown_event.is_set():
             try:
-                while len(raw_audio) < self.buffer_size:
+                # Determine how many bytes we need to read
+                if first_fill:
+                    bytes_needed = self.buffer_size  # Full buffer for first inference
+                else:
+                    bytes_needed = self.hop_size  # Only half buffer for subsequent (50% overlap)
+                
+                bytes_read = 0
+                while bytes_read < bytes_needed:
                     with self.lock:
                         if not self.running or not self.process or not self.process.stdout:
                             logger.error(f"{self.camera_name}: Process terminated or "
@@ -150,7 +167,7 @@ class CameraAudioStream:
                     # Wait up to 5 seconds for data to become available
                     ready, _, _ = select.select([fd], [], [], 5)
                     if ready:
-                        chunk = self.process.stdout.read(self.buffer_size - len(raw_audio))
+                        chunk = self.process.stdout.read(bytes_needed - bytes_read)
                         if not chunk:
                             with self.lock:
                                 return_code = self.process.poll()
@@ -166,14 +183,23 @@ class CameraAudioStream:
                                 continue
                         else:
                             raw_audio += chunk
+                            bytes_read += len(chunk)
                     else:
-                    # No data ready, select timed out
+                        # No data ready, select timed out
                         if self.shutdown_event.is_set() or not self.running:
                             logger.warning(f"{self.camera_name}: Shutdown detected. Exiting read_stream.")
                             return
                         else:
                             # No data yet, continue waiting for data
                             continue
+
+                # Ensure we have exactly buffer_size bytes for inference
+                if len(raw_audio) > self.buffer_size:
+                    raw_audio = raw_audio[-self.buffer_size:]  # Keep only the last buffer_size bytes
+                
+                if len(raw_audio) < self.buffer_size:
+                    # Not enough data yet (shouldn't happen after first fill)
+                    continue
 
                 #### Process raw_audio ####
 
@@ -187,14 +213,16 @@ class CameraAudioStream:
                         self.input_details,
                         self.output_details
                     )
+                
+                # Keep the last half of the buffer for 50% overlap
+                # (the second half becomes the first half of the next window)
+                raw_audio = raw_audio[self.hop_size:]
+                first_fill = False
 
             except Exception as e:
                 logger.error(f"{self.camera_name}: Exception in read_stream: {e}", exc_info=True)
                 self.stop()
                 return  # Exit the method to stop the thread
-
-            finally:
-                raw_audio = b""
 
 # ----------- READ_STDERR -----------#
 
