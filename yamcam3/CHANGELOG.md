@@ -1,6 +1,14 @@
 
 # Changelog
 
+## 2.0.1 (Feb 7, 2026)
+- Improved siren detection: bypass top_k pruning for tracked groups, score-based
+  event windows with hysteresis thresholds (start_threshold, continue_threshold)
+- Created dedicated "siren" group separating civil defense and emergency vehicle
+  sirens from the broader "alert" group for focused detection
+- Added 50% overlapping inference windows (~2x inference rate) to stabilize
+  detection across audio frame boundaries
+
 ## 1.0.3
 - modified group composite score algorithm to award 0.1 rather than 0.05 for each
   detectec instance of that group within top_k, boosting group scores
