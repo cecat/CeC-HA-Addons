@@ -264,14 +264,35 @@ except KeyError:
 sounds_to_track = sounds.get('track', [])
 sounds_filters = sounds.get('filters', {})
 
-# min_score values also need to be between 0 and 1
+# Validate and set default threshold values for each tracked group
+# Hysteresis: start_threshold (higher) to begin event, continue_threshold (lower) to sustain
 for group, settings in sounds_filters.items():
+    # Validate min_score
     min_score = settings.get('min_score')
-    if not (0.0 <= min_score <= 1.0):
-        logger.warning(f"Invalid min_score '{min_score}' for group '{group}'."
-                        "Should be between 0.0 and 1.0. Defaulting to default_min_score."
-        )
-        settings['min_score'] = default_min_score 
+    if min_score is None or not (0.0 <= min_score <= 1.0):
+        logger.warning(f"Invalid or missing min_score '{min_score}' for group '{group}'. "
+                        "Defaulting to default_min_score.")
+        settings['min_score'] = default_min_score
+    
+    # Validate start_threshold (defaults to min_score if not specified)
+    start_threshold = settings.get('start_threshold')
+    if start_threshold is not None:
+        if not (0.0 <= start_threshold <= 1.0):
+            logger.warning(f"Invalid start_threshold '{start_threshold}' for group '{group}'. "
+                            "Defaulting to min_score.")
+            settings['start_threshold'] = settings['min_score']
+    else:
+        settings['start_threshold'] = settings['min_score']
+    
+    # Validate continue_threshold (defaults to min_score if not specified)
+    continue_threshold = settings.get('continue_threshold')
+    if continue_threshold is not None:
+        if not (0.0 <= continue_threshold <= 1.0):
+            logger.warning(f"Invalid continue_threshold '{continue_threshold}' for group '{group}'. "
+                            "Defaulting to min_score.")
+            settings['continue_threshold'] = settings['min_score']
+    else:
+        settings['continue_threshold'] = settings['min_score']
 
 # -------- CAMS (SOUND SOURCES)
 

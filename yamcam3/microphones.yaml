@@ -59,7 +59,13 @@ cameras:
 
 
 # sound groups to listen for, and optional individual thresholds (will override
-# reporting_threshold above in general settings). 
+# reporting_threshold above in general settings).
+#
+# Hysteresis thresholds (optional):
+#   start_threshold:    Score required to START detecting an event (higher = fewer false starts)
+#   continue_threshold: Score required to CONTINUE an event (lower = fewer dropouts)
+#   If not specified, both default to min_score.
+#
 sounds:                     
   track:                    
     - people
@@ -72,4 +78,6 @@ sounds:
       min_score: 0.70
     alert:
       min_score: 0.5
+      start_threshold: 0.6     # Higher threshold to start (reduce false positives)
+      continue_threshold: 0.4  # Lower threshold to sustain (reduce dropouts)
 

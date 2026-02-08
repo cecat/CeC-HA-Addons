@@ -193,8 +193,6 @@ def start_mqtt():
 
      # -------- REPORT SOUND EVENT
 def report_event(camera_name, sound_class, event_type, timestamp):
-    global mqtt_client
-
     # CSV logging (events)
     if sound_log_writer is not None:
         log_timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Use current time for CSV log
@@ -326,10 +324,10 @@ def rank_sounds(scores, camera_name):
     # Step 3.1: Sort composite scores in descending order
     sorted_composite_scores = sorted(composite_scores, key=lambda x: x[1], reverse=True)
 
-    # Step 3.2: Limit to top_k composite scores
+    # Step 3.2: Limit to top_k for logging/debug purposes only
     limited_composite_scores = sorted_composite_scores[:top_k]
 
-    # Log the group names and composite scores
+    # Log the top_k group names and composite scores (for debug)
     for group, score in limited_composite_scores:
         if group not in sounds_to_track:
             continue  # Skip groups not in sounds_to_track
@@ -344,13 +342,14 @@ def rank_sounds(scores, camera_name):
                 sound_log_writer.writerow(row)
                 sound_log_file.flush()
 
-    # Step 4: Apply min_score filters and prepare results
+    # Step 4: Return ALL tracked groups with their composite scores
+    # Threshold filtering (with hysteresis) happens in update_sound_window()
+    # This ensures the event window can apply different thresholds for start vs continue
     results = []
-    for group, score in limited_composite_scores:
-        if group in sounds_to_track:
-            min_score = sounds_filters.get(group, {}).get('min_score', default_min_score)
-            if score >= min_score:
-                results.append({'class': group, 'score': score})
+    composite_dict = dict(sorted_composite_scores)  # Convert to dict for easy lookup
+    for group in sounds_to_track:
+        score = composite_dict.get(group, 0.0)  # 0.0 if group not in composite scores
+        results.append({'class': group, 'score': score})
 
     return results
 
@@ -396,12 +395,26 @@ def calculate_composite_scores(group_scores_dict):
 
      # -------- Manage Sound Event Window 
 
-def update_sound_window(camera_name, detected_sounds):
-
+def update_sound_window(camera_name, detected_scores):
+    """
+    Update the sliding window for sound event detection with hysteresis.
+    
+    Args:
+        camera_name: Name of the camera/audio source
+        detected_scores: Dict of {sound_class: score} for all tracked groups.
+    
+    Hysteresis:
+        - To START an event: score must exceed start_threshold
+        - To CONTINUE an event: score only needs to exceed continue_threshold (lower)
+        This reduces dropouts for sustained sounds like sirens.
+    """
     if shutdown_event.is_set():
         return
 
     current_time = time.time()
+    default_min_score = yamcam_config.default_min_score
+    sounds_filters = yamcam_config.sounds_filters
+    
     with state_lock:
 
         # Initialize if not present
@@ -419,21 +432,45 @@ def update_sound_window(camera_name, detected_sounds):
         counts = event_counts[camera_name]
 
         for sound_class in yamcam_config.sounds_to_track:
-            # Initialize deque for sound class
+            # Initialize deque for sound class (stores scores as floats)
             if sound_class not in window:
                 window[sound_class] = deque(maxlen=yamcam_config.window_detect)
 
-            # Update detections
-            is_detected = sound_class in detected_sounds
-            window[sound_class].append(is_detected)
+            # Get thresholds for this sound class (with defaults)
+            group_filters = sounds_filters.get(sound_class, {})
+            start_threshold = group_filters.get('start_threshold', default_min_score)
+            continue_threshold = group_filters.get('continue_threshold', default_min_score)
+            
+            # Get score for this sound class
+            score = detected_scores.get(sound_class, 0.0)
+            
+            # Determine if this sample counts as a detection based on hysteresis
+            # Use different thresholds depending on whether sound is currently active
+            is_active = active.get(sound_class, False)
+            if is_active:
+                # Sound is active - use lower continue_threshold
+                is_detected = score >= continue_threshold
+            else:
+                # Sound not active - use higher start_threshold
+                is_detected = score >= start_threshold
+            
+            # Store the score in the window (for potential future analysis)
+            window[sound_class].append(score)
 
-            # Update last detection time
+            # Update last detection time if detected
             if is_detected:
                 last_time[sound_class] = current_time
 
+            # Count samples that meet the appropriate threshold in the window
+            # For consistency, use start_threshold when counting for event start
+            if is_active:
+                detection_count = sum(1 for s in window[sound_class] if s >= continue_threshold)
+            else:
+                detection_count = sum(1 for s in window[sound_class] if s >= start_threshold)
+
             # Check for start event
-            if window[sound_class].count(True) >= yamcam_config.persistence:
-                if not active.get(sound_class, False):
+            if detection_count >= yamcam_config.persistence:
+                if not is_active:
                     active[sound_class] = True
                     decay_camera[sound_class] = yamcam_config.decay
                     # Increment the event count for this sound_class
@@ -443,9 +480,9 @@ def update_sound_window(camera_name, detected_sounds):
                         logger.info(f"{camera_name}: Sound '{sound_class}' started.")
             else:
                 # Check for stop event using decay counters
-                if active.get(sound_class, False):
-                    if sound_class in detected_sounds:
-                        # Reset decay counter if sound is detected
+                if is_active:
+                    if is_detected:
+                        # Reset decay counter if sound is detected (above continue_threshold)
                         decay_camera[sound_class] = yamcam_config.decay
                     else:
                         # Decrement decay counter if sound is not detected

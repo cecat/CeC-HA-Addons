@@ -17,6 +17,7 @@
 #
 # yamcam_supervisor.py
 
+import sys
 import threading
 import time
 from camera_audio_stream import CameraAudioStream

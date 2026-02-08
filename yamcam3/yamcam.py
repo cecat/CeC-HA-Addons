@@ -61,12 +61,10 @@ def analyze_callback(camera_name, waveform, interpreter, input_details, output_d
         results = rank_sounds(scores, camera_name)
         if shutdown_event.is_set():
             return
-        detected_sounds = [
-            result['class']
-            for result in results
-            if result['class'] in yamcam_config.sounds_to_track
-        ]
-        update_sound_window(camera_name, detected_sounds)
+        # Build {group: score} dict from results
+        # rank_sounds now returns all tracked groups with their scores
+        detected_scores = {result['class']: result['score'] for result in results}
+        update_sound_window(camera_name, detected_scores)
     else:
         if not shutdown_event.is_set():
             logger.error(f"FAILED to analyze audio: {camera_name}")
