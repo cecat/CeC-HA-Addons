@@ -133,11 +133,11 @@ events:
                                 #   the sound event has stopped.
 
 cameras:
-  doorfrontcam:
+  myAmcrestCam:
     ffmpeg:
       inputs:
       - path: "rtsp://user:password@x.x.x.x:554/cam/realmonitor?channel=1&subtype=1"
-  frontyardcam:
+  myUniFiCamViaNVR:
     ffmpeg:
       inputs:
       - path: "rtsp://x.x.x.x:7447/65dd5a1900f4cb70dffa2143_1"
